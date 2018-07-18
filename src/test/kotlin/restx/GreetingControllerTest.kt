@@ -60,8 +60,8 @@ public class GreetingControllerTest {
     }
 
     @Test
-    public fun `it should reject a payload`() {
+    public fun `it should accept a payload without a file`() {
         mockMvc.perform(fileUpload("/payloads"))
-                .andExpect(status().isBadRequest)
+                .andExpect(content().string("""-1"""))
     }
 }

@@ -20,8 +20,9 @@ open class GreetingController {
             Greeting(counter, "Hello, $name")
 
     @PostMapping("/payloads")
-    fun uploadPayload(@RequestParam("file") file: MultipartFile): ResponseEntity<Long> =
-            ResponseEntity.status(201).body(file.size)
+    fun uploadPayload(@RequestParam("file", required = false) file: MultipartFile?): ResponseEntity<Long> {
+        return ResponseEntity.status(201).body(file?.size ?: -1)
+    }
 
 }
 
