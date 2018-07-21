@@ -2,9 +2,9 @@ package restx
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets
  * @author Ha3
  */
 @ActiveProfiles("test")
-@RunWith(SpringRunner::class)
+@ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [Application::class, TestAppConfig::class])
 public class GreetingControllerTest {
     @Autowired
@@ -42,7 +42,7 @@ public class GreetingControllerTest {
 
     private lateinit var mockMvc: MockMvc;
 
-    @Before
+    @BeforeEach
     public fun setup() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
