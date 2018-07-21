@@ -1,5 +1,6 @@
 package restx
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.http.ResponseEntity
@@ -15,6 +16,9 @@ data class Greeting(val id: Long, val content: String)
 open class GreetingController {
     val counter = 0L
 
+    @Autowired
+    lateinit var payloadStorage: IPayloadStorage;
+
     @GetMapping("/greeting")
     fun greeting(@RequestParam(value = "name", defaultValue = "World") name: String) =
             Greeting(counter, "Hello, $name")
@@ -24,7 +28,17 @@ open class GreetingController {
         return ResponseEntity.status(201).body(file?.size ?: -1)
     }
 
+    @GetMapping("/payloads")
+    fun getPayloads(): ResponseEntity<List<Payload>> {
+        return ResponseEntity.status(200).body(payloadStorage.getAll())
+    }
 }
+
+interface IPayloadStorage {
+    fun getAll(): List<Payload>
+}
+
+data class Payload(val id: String)
 
 @SpringBootApplication
 open class Application

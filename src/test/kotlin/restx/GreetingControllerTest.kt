@@ -1,11 +1,18 @@
 package restx
 
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import org.springframework.mock.web.MockMultipartFile
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload
@@ -23,11 +30,15 @@ import java.nio.charset.StandardCharsets
  *
  * @author Ha3
  */
+@ActiveProfiles("test")
 @RunWith(SpringRunner::class)
-@SpringBootTest(classes = [Application::class])
+@SpringBootTest(classes = [Application::class, TestAppConfig::class])
 public class GreetingControllerTest {
     @Autowired
     private lateinit var webApplicationContext: WebApplicationContext
+
+    @Autowired
+    lateinit var mockPayloadStorage: IPayloadStorage;
 
     private lateinit var mockMvc: MockMvc;
 
@@ -63,5 +74,29 @@ public class GreetingControllerTest {
     public fun `it should accept a payload without a file`() {
         mockMvc.perform(fileUpload("/payloads"))
                 .andExpect(content().string("""-1"""))
+    }
+
+    @Test
+    public fun `it should list all payloads`() {
+        whenever(mockPayloadStorage.getAll())
+                .thenReturn(listOf(somePayload()))
+
+        mockMvc.perform(get("/payloads"))
+                .andExpect(content().string("""[{"id":"ABCD"}]"""))
+    }
+
+    private fun somePayload() = Payload(GENERIC_ID)
+
+    companion object {
+        private val GENERIC_ID = "ABCD"
+    }
+}
+
+@Profile("test")
+@Configuration
+open class TestAppConfig {
+    @Bean
+    @Primary
+    public open fun payloadStorage(): IPayloadStorage = mock {
     }
 }
