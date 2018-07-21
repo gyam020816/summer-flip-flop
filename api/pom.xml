@@ -7,7 +7,7 @@
         <artifactId>summer-flip-flop</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>spring-connector</artifactId>
+    <artifactId>api</artifactId>
     <packaging>jar</packaging>
 
     <modelVersion>4.0.0</modelVersion>
@@ -17,22 +17,6 @@
             <groupId>eu.ha3.x.sff</groupId>
             <artifactId>core</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.ha3.x.sff</groupId>
-            <artifactId>api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

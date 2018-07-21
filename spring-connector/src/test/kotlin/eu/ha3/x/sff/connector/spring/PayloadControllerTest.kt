@@ -1,7 +1,9 @@
-package restx
+package eu.ha3.x.sff.connector.spring
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import eu.ha3.x.sff.api.IPayloadStorage
+import eu.ha3.x.sff.core.Payload
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -33,7 +35,7 @@ import java.nio.charset.StandardCharsets
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [Application::class, TestAppConfig::class])
-public class GreetingControllerTest {
+public class PayloadControllerTest {
     @Autowired
     private lateinit var webApplicationContext: WebApplicationContext
 
@@ -97,6 +99,5 @@ public class GreetingControllerTest {
 open class TestAppConfig {
     @Bean
     @Primary
-    public open fun payloadStorage(): IPayloadStorage = mock {
-    }
+    public open fun payloadStorage(): IPayloadStorage = mock()
 }
