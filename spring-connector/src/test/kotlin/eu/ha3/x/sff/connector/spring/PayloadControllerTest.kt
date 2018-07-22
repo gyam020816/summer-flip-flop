@@ -4,9 +4,7 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import eu.ha3.x.sff.api.IPayloadStorage
 import eu.ha3.x.sff.core.Payload
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
@@ -14,40 +12,24 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.mock.web.MockMultipartFile
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup
-import org.springframework.web.context.WebApplicationContext
 import java.nio.charset.StandardCharsets
 
+@Profile("test")
+@Configuration
+open class PayloadAppConfig {
+    @Bean
+    @Primary
+    public open fun payloadStorage(): IPayloadStorage = mock()
+}
 
-/**
- * (Default template)
- * Created on 2018-07-18
- *
- * @author Ha3
- */
-@ActiveProfiles("test")
-@ExtendWith(SpringExtension::class)
-@SpringBootTest(classes = [Application::class, TestAppConfig::class])
-public class PayloadControllerTest {
-    @Autowired
-    private lateinit var webApplicationContext: WebApplicationContext
-
+@SpringBootTest(classes = [Application::class, PayloadAppConfig::class])
+public class PayloadControllerTest : AControllerTest() {
     @Autowired
     lateinit var mockPayloadStorage: IPayloadStorage;
-
-    private lateinit var mockMvc: MockMvc;
-
-    @BeforeEach
-    public fun setup() {
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
-    }
 
     @Test
     public fun `it should return a greeting`() {
@@ -92,12 +74,4 @@ public class PayloadControllerTest {
     companion object {
         private val GENERIC_ID = "ABCD"
     }
-}
-
-@Profile("test")
-@Configuration
-open class TestAppConfig {
-    @Bean
-    @Primary
-    public open fun payloadStorage(): IPayloadStorage = mock()
 }
