@@ -13,14 +13,12 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 open class PayloadController {
-    val counter = 0L
-
     @Autowired
     lateinit var payloadStorage: IPayloadStorage;
 
     @GetMapping("/greeting")
     fun greeting(@RequestParam(value = "name", defaultValue = "World") name: String) =
-            Greeting(counter, "Hello, $name")
+            Greeting(0L, "Hello, $name")
 
     @PostMapping("/payloads")
     fun uploadPayload(@RequestParam("file", required = false) file: MultipartFile?): ResponseEntity<Long> {
