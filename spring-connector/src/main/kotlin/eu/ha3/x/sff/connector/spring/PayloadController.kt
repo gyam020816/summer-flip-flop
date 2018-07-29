@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 open class PayloadController {
     @Autowired
-    lateinit var payloadStorage: IPayloadStorage;
+    private lateinit var payloadStorage: IPayloadStorage;
 
     @GetMapping("/greeting")
     fun greeting(@RequestParam(value = "name", defaultValue = "World") name: String) =
