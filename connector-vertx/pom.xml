@@ -7,7 +7,7 @@
         <artifactId>summer-flip-flop</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>vertx-connector</artifactId>
+    <artifactId>connector-vertx</artifactId>
     <packaging>jar</packaging>
 
     <modelVersion>4.0.0</modelVersion>

@@ -13,8 +13,8 @@
         <module>api</module>
         <module>api-impl</module>
         <module>system</module>
-        <module>spring-connector</module>
-        <module>vertx-connector</module>
+        <module>connector-spring</module>
+        <module>connector-vertx</module>
         <module>test-jacoco-reporter</module>
     </modules>
 
