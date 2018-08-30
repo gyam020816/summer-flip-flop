@@ -31,7 +31,7 @@ class MyVerticleTest {
         vertx!!.createHttpClient().getNow(8080, "localhost", "/greeting"
         ) { response ->
             response.handler { body ->
-                context.assertEquals(body.toString(), """{
+                context.assertEquals(body.toString().replace("\r\n", "\n"), """{
   "id" : 0,
   "content" : "Hello, World"
 }""")
