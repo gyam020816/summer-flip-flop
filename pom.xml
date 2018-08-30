@@ -14,6 +14,7 @@
         <module>api-impl</module>
         <module>system</module>
         <module>spring-connector</module>
+        <module>vertx-connector</module>
         <module>test-jacoco-reporter</module>
     </modules>
 
