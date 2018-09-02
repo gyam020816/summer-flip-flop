@@ -10,7 +10,9 @@ package eu.ha3.x.sff.connector.vertx
 
 import eu.ha3.x.sff.core.Greeting
 import io.vertx.core.AbstractVerticle
+import io.vertx.core.AsyncResult
 import io.vertx.core.Future
+import io.vertx.core.eventbus.Message
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.Json
 import io.vertx.ext.web.Router
@@ -19,7 +21,7 @@ import io.vertx.ext.web.RoutingContext
 class MyVerticle : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         val router: Router = Router.router(vertx)
-        router.route(HttpMethod.GET, "/greeting") .handler(::greeting)
+        router.route(HttpMethod.GET, "/greeting").handler(::greeting)
 
         vertx
                 .createHttpServer()
@@ -31,6 +33,11 @@ class MyVerticle : AbstractVerticle() {
                         fut.fail(result.cause())
                     }
                 }
+
+
+        vertx.eventBus().consumer(VEvent.GREETING.toString()) { msg: Message<String> ->
+            msg.reply("nothing")
+        }
     }
 
     private fun greeting(rc: RoutingContext) {
@@ -39,8 +46,18 @@ class MyVerticle : AbstractVerticle() {
         val name = query["name"] ?: "World"
         val reply = Greeting(0L, "Hello, $name")
 
-        rc.response()
-                .putHeader("content-type", "application/json; charset=utf-8")
-                .end(Json.encodePrettily(reply))
+        vertx.eventBus().send(
+                VEvent.GREETING.toString(),
+                VOp.GREETING.toString()
+        ) { res: AsyncResult<Message<String>> ->
+            if (res.succeeded()) {
+                rc.response()
+                        .putHeader("content-type", "application/json; charset=utf-8")
+                        .end(Json.encodePrettily(reply))
+            } else {
+                rc.response().setStatusCode(500).end()
+            }
+        }
+
     }
 }
