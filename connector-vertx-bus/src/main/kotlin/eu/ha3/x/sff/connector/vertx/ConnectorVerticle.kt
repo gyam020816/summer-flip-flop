@@ -7,9 +7,7 @@ package eu.ha3.x.sff.connector.vertx
  * @author Ha3
  */
 import io.vertx.core.AbstractVerticle
-import io.vertx.core.AsyncResult
 import io.vertx.core.Future
-import io.vertx.core.eventbus.Message
 
 class ConnectorVerticle : AbstractVerticle() {
     private val s1 = "STUB1"
@@ -18,8 +16,8 @@ class ConnectorVerticle : AbstractVerticle() {
 
     override fun start(fut: Future<Void>) {
         vertx.eventBus().apply {
-            consumer(VEvent.GREETING.toString()) { msg: Message<String> ->
-                send(VEvent.GREETING_SEQUEL.toString(), s3) { res: AsyncResult<Message<String>> ->
+            consumer<String>(VEvent.GREETING.toString()) { msg ->
+                send<String>(VEvent.GREETING_SEQUEL.toString(), s3) { res ->
                     if (res.succeeded()) {
                         msg.reply(s1)
 
@@ -28,7 +26,7 @@ class ConnectorVerticle : AbstractVerticle() {
                     }
                 }
             }
-            consumer(VEvent.GREETING_SEQUEL.toString()) { msg: Message<String> ->
+            consumer<String>(VEvent.GREETING_SEQUEL.toString()) { msg ->
                 msg.reply(s2)
             }
         }

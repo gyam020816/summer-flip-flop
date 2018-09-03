@@ -41,10 +41,10 @@ class WebVerticle : AbstractVerticle() {
         val name = query["name"] ?: "World"
         val reply = Greeting(0L, "Hello, $name")
 
-        vertx.eventBus().send(
+        vertx.eventBus().send<AsyncResult<Message<String>>>(
                 VEvent.GREETING.toString(),
                 VOp.GREETING.toString()
-        ) { res: AsyncResult<Message<String>> ->
+        ) { res ->
             if (res.succeeded()) {
                 rc.response()
                         .putHeader("content-type", "application/json; charset=utf-8")
