@@ -7,3 +7,4 @@ package eu.ha3.x.sff.core
  * @author Ha3
  */
 data class SearchResult(val result: String)
+data class SearchQuery(val query: String)
