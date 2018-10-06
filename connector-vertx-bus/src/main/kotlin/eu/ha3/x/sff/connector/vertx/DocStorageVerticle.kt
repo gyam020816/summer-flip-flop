@@ -1,7 +1,6 @@
 package eu.ha3.x.sff.connector.vertx
 
 import eu.ha3.x.sff.api.IDocStorage
-import eu.ha3.x.sff.core.DocListResponse
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.eventbus.Message
@@ -32,10 +31,3 @@ class DocStorageVerticle(private val delegate: IDocStorage) : AbstractVerticle()
     }
 }
 
-enum class DEvent {
-    LIST_DOCS;
-
-    fun address() = name
-}
-
-class NoMessage

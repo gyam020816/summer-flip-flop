@@ -5,7 +5,6 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.stub
 import eu.ha3.x.sff.api.IDocStorage
 import eu.ha3.x.sff.core.Doc
-import eu.ha3.x.sff.core.DocListResponse
 import io.reactivex.Single
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
