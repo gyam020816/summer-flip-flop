@@ -3,6 +3,7 @@ package eu.ha3.x.sff.api
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.test.verify
 import io.reactivex.Single
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -32,12 +33,5 @@ internal class DocStorageTest {
                 .assertValue(verify {
                     assertThat(this).isEqualTo(expected)
                 })
-    }
-
-    fun <T> verify(consumer: T.() -> Unit): (T) -> Boolean {
-        return { t ->
-            consumer(t)
-            true
-        }
     }
 }

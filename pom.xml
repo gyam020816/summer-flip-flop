@@ -18,6 +18,7 @@
         <module>connector-vertx-bus</module>
         <module>connector-vertx-web</module>
         <module>test-jacoco-reporter</module>
+        <module>test-libraries</module>
         <module>deployable-vertx</module>
     </modules>
 
