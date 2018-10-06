@@ -9,3 +9,5 @@ import java.time.ZonedDateTime
  * @author gyam
  */
 data class Doc(val name: String, val createdAt: ZonedDateTime)
+
+data class DocListResponse(val data: List<Doc>)
