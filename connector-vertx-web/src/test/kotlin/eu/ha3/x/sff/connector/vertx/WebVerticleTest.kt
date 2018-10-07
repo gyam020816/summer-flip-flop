@@ -5,20 +5,21 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import eu.ha3.x.sff.core.Doc
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
-import io.vertx.ext.unit.TestContext
-import io.vertx.ext.unit.junit.VertxUnitRunner
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import io.vertx.junit5.VertxExtension
+import io.vertx.junit5.VertxTestContext
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.time.ZonedDateTime
 
-@RunWith(VertxUnitRunner::class)
+@ExtendWith(VertxExtension::class)
 class WebVerticleTest {
     private lateinit var vertx: Vertx
 
-    @Before
-    fun setUp(context: TestContext) {
+    @BeforeEach
+    fun setUp(context: VertxTestContext) {
         vertx = Vertx.vertx()
         listOf(Json.mapper, Json.prettyMapper).forEach { mapper ->
             mapper.registerModule(JavaTimeModule())
@@ -26,21 +27,25 @@ class WebVerticleTest {
         }
 
         vertx.deployVerticle(WebVerticle::class.java.getName(),
-                context.asyncAssertSuccess<String>())
+                context.succeeding())
         vertx.eventBus().registerDefaultCodec(NoMessage::class.java, NoMessageCodec())
         IResponse.classes.forEach { klass ->
             vertx.eventBus().registerDefaultCodec(klass, ResponseCodec(klass))
         }
+
+        context.completeNow()
     }
 
-    @After
-    fun tearDown(context: TestContext) {
-        vertx.close(context.asyncAssertSuccess())
+    @AfterEach
+    fun tearDown(context: VertxTestContext) {
+        vertx.close(context.succeeding())
+
+        context.completeNow()
     }
 
     /*
     @Test
-    fun `it should return the docs`(context: TestContext) {
+    fun `it should return the docs`(context: io.vertx.junit5.VertxTestContext) {
         // Setup
         val async = context.async()
         vertx.eventBus().consumer<JsonObject>(VEvent.SEARCH.toString()) { msg ->
@@ -65,24 +70,26 @@ class WebVerticleTest {
     */
 
     @Test
-    fun `it should return the docs`(context: TestContext) {
+    fun `it should return the docs`(context: VertxTestContext) {
+        val async = context.checkpoint()
+
         // Setup
-        val async = context.async()
         vertx.eventBus().consumer<NoMessage>(DEvent.LIST_DOCS.address()) { msg ->
             msg.reply(DocListResponse(listOf(Doc("someDoc", ZonedDateTime.parse("2018-10-07T02:34:43.308+02:00")))))
         }
-        val QUERY = "TheQuery"
 
         // Exercise
         vertx.createHttpClient().getNow(8080, "localhost", "/docs"
         ) { response ->
             response.handler { body ->
                 // Verify
-                context.assertEquals(body.toString().replace("\r\n", "\n"), """[ {
+                context.verify {
+                    assertThat(body.toString().replace("\r\n", "\n")).isEqualTo("""[ {
   "name" : "someDoc",
   "createdAt" : "2018-10-07T02:34:43.308+02:00"
 } ]""")
-                async.complete()
+                    async.flag()
+                }
             }
         }
     }

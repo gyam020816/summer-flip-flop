@@ -31,7 +31,7 @@
         
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-unit</artifactId>
+            <artifactId>vertx-junit5</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
