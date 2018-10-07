@@ -25,8 +25,8 @@ pipeline {
                 sh 'ls'
                 sh '''
                     mkdir -p maven_local_repo
-                    mvn -Dmaven.repo.local=./maven_local_repo clean package
-                    mvn -Dmaven.repo.local=./maven_local_repo jacoco:report-aggregate
+                    mvn -Dmaven.repo.local=/root/maven_local_repo clean package
+                    mvn -Dmaven.repo.local=/root/maven_local_repo jacoco:report-aggregate
                 '''
             }
         }
