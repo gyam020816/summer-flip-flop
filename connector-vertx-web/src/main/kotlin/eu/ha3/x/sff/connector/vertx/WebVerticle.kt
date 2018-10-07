@@ -13,9 +13,7 @@ import eu.ha3.x.sff.core.Greeting
 import eu.ha3.x.sff.core.SearchQuery
 import eu.ha3.x.sff.core.SearchResult
 import io.vertx.core.AbstractVerticle
-import io.vertx.core.AsyncResult
 import io.vertx.core.Future
-import io.vertx.core.eventbus.Message
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
@@ -27,6 +25,7 @@ class WebVerticle : AbstractVerticle() {
         val router: Router = Router.router(vertx)
         router.route(HttpMethod.GET, "/greeting").handler(::greeting)
         router.route(HttpMethod.GET, "/search").handler(::search)
+        router.route(HttpMethod.GET, "/docs").handler(::docs)
 
         Json.mapper.apply {
             registerKotlinModule()
@@ -54,16 +53,15 @@ class WebVerticle : AbstractVerticle() {
         val name = query["name"] ?: "World"
         val reply = Greeting(0L, "Hello, $name")
 
-        vertx.eventBus().send<AsyncResult<Message<String>>>(
+        vertx.eventBus().send<String>(
                 VEvent.GREETING.toString(),
                 VOp.GREETING.toString()
         ) { res ->
             if (res.succeeded()) {
-                rc.response()
-                        .putHeader("content-type", "application/json; charset=utf-8")
-                        .end(Json.encodePrettily(reply))
+                rc.replyJson(reply, 200)
+
             } else {
-                rc.response().setStatusCode(500).end()
+                rc.serverError()
             }
         }
     }
@@ -75,13 +73,32 @@ class WebVerticle : AbstractVerticle() {
 
         vertx.eventBus().send<SearchResult>(VEvent.SEARCH.toString(), JsonObject.mapFrom(SearchQuery(searchQuery))) { res ->
             if (res.succeeded()) {
-                rc.response()
-                        .putHeader("content-type", "application/json; charset=utf-8")
-                        .end(Json.encodePrettily(listOf(res.result().body())))
+                rc.replyJson(listOf(res.result().body()), 200)
 
             } else {
-                rc.response().setStatusCode(500).end()
+                rc.serverError()
             }
         }
+    }
+
+    private fun docs(rc: RoutingContext) {
+        vertx.eventBus().send<DocListResponse>(DEvent.LIST_DOCS.address(), NoMessage()) { res ->
+            if (res.succeeded()) {
+                rc.replyJson(res.result().body().data, 200)
+
+            } else {
+                rc.serverError()
+            }
+        }
+    }
+
+    fun RoutingContext.replyJson(obj: Any, code: Int) {
+        response().setStatusCode(code)
+                .putHeader("content-type", "application/json; charset=utf-8")
+                .end(Json.encodePrettily(obj))
+    }
+
+    fun RoutingContext.serverError() {
+        response().setStatusCode(500).end()
     }
 }
