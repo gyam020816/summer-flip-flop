@@ -15,7 +15,8 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'mzagar/jenkins-slave-jdk-maven-git'
+                    image 'maven:3.5.4-jdk-8-alpine'
+                    args '-v $HOME/maven_local_repo:/root/maven_local_repo'
                     reuseNode true
                 }
             }
