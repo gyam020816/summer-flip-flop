@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.test.TestSample
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.time.ZonedDateTime
 
 /**
  * (Default template)
@@ -48,7 +48,7 @@ internal class EmitterToDocSystemVerticleTest {
     @Test
     fun `it should emit an event to the bus`(context: VertxTestContext) {
         val async = context.checkpoint()
-        val expected = listOf(Doc("someName", ZonedDateTime.parse("2018-10-07T16:51:56.845Z[UTC]")))
+        val expected = listOf(Doc("someName", TestSample.zonedDateTime))
         vertx.eventBus().consumer<SystemDocListResponse>(DEvent.SYSTEM_LIST_DOCS.address()) { msg ->
             msg.reply(JsonObject.mapFrom(SystemDocListResponse(expected)))
         }

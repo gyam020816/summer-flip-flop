@@ -4,6 +4,7 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import eu.ha3.x.sff.api.IDocStorage
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.test.TestSample
 import io.reactivex.Single
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +19,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.nio.charset.StandardCharsets
-import java.time.ZonedDateTime
 
 @Profile("test")
 @Configuration
@@ -68,10 +68,10 @@ public class PayloadControllerTest : AControllerTest() {
                 .thenReturn(Single.just(listOf(someDoc())))
 
         mockMvc.perform(get("/docs"))
-                .andExpect(content().string("""[{"name":"ABCD","createdAt":"2018-10-07T14:55:13.188+02:00"}]"""))
+                .andExpect(content().string("""[{"name":"ABCD","createdAt":"${TestSample.zonedDateTimeSerialized}"}]"""))
     }
 
-    private fun someDoc() = Doc(GENERIC_ID, ZonedDateTime.parse("2018-10-07T14:55:13.188+02:00"))
+    private fun someDoc() = Doc(GENERIC_ID, TestSample.zonedDateTime)
 
     companion object {
         private val GENERIC_ID = "ABCD"

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.test.TestSample
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.time.ZonedDateTime
 
 @ExtendWith(VertxExtension::class)
 class WebVerticleTest {
@@ -73,7 +73,7 @@ class WebVerticleTest {
 
         // Setup
         vertx.eventBus().consumer<JsonObject>(DEvent.LIST_DOCS.address()) { msg ->
-            msg.reply(JsonObject.mapFrom(DocListResponse(listOf(Doc("someDoc", ZonedDateTime.parse("2018-10-07T02:34:43.308+02:00"))))))
+            msg.reply(JsonObject.mapFrom(DocListResponse(listOf(Doc("someDoc", TestSample.zonedDateTime)))))
         }
 
         // Exercise
@@ -84,7 +84,7 @@ class WebVerticleTest {
                 context.verify {
                     assertThat(body.toString().replace("\r\n", "\n")).isEqualTo("""[ {
   "name" : "someDoc",
-  "createdAt" : "2018-10-07T02:34:43.308+02:00"
+  "createdAt" : "${TestSample.zonedDateTimeSerialized}"
 } ]""")
                     async.flag()
                 }
