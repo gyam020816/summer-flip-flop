@@ -5,13 +5,11 @@ import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.Json
 
-interface IResponse {
-    companion object {
-        val classes = listOf(DocListResponse::class.java)
-    }
-}
+interface IMessage
+interface IResponse
 
 data class DocListResponse(val data: List<Doc>) : IResponse
+data class SystemDocListResponse(val data: List<Doc>) : IResponse
 
 class ResponseCodec<T>(private val decodingClass: Class<T>) : MessageCodec<T, T> {
     override fun name() = this::class.java.simpleName;

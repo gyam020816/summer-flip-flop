@@ -2,9 +2,11 @@ package eu.ha3.x.sff.connector.vertx
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import eu.ha3.x.sff.core.Doc
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
+import io.vertx.core.json.JsonObject
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
 import org.assertj.core.api.Assertions.assertThat
@@ -22,25 +24,21 @@ class WebVerticleTest {
     fun setUp(context: VertxTestContext) {
         vertx = Vertx.vertx()
         listOf(Json.mapper, Json.prettyMapper).forEach { mapper ->
+            mapper.registerKotlinModule()
             mapper.registerModule(JavaTimeModule())
             mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         }
 
-        vertx.deployVerticle(WebVerticle::class.java.getName(),
-                context.succeeding())
-        vertx.eventBus().registerDefaultCodec(NoMessage::class.java, NoMessageCodec())
-        IResponse.classes.forEach { klass ->
-            vertx.eventBus().registerDefaultCodec(klass, ResponseCodec(klass))
-        }
-
-        context.completeNow()
+        vertx.deployVerticle(WebVerticle::class.java.getName(), context.succeeding {
+            context.completeNow()
+        })
     }
 
     @AfterEach
     fun tearDown(context: VertxTestContext) {
-        vertx.close(context.succeeding())
-
-        context.completeNow()
+        vertx.close(context.succeeding {
+            context.completeNow()
+        })
     }
 
     /*
@@ -74,8 +72,8 @@ class WebVerticleTest {
         val async = context.checkpoint()
 
         // Setup
-        vertx.eventBus().consumer<NoMessage>(DEvent.LIST_DOCS.address()) { msg ->
-            msg.reply(DocListResponse(listOf(Doc("someDoc", ZonedDateTime.parse("2018-10-07T02:34:43.308+02:00")))))
+        vertx.eventBus().consumer<JsonObject>(DEvent.LIST_DOCS.address()) { msg ->
+            msg.reply(JsonObject.mapFrom(DocListResponse(listOf(Doc("someDoc", ZonedDateTime.parse("2018-10-07T02:34:43.308+02:00"))))))
         }
 
         // Exercise

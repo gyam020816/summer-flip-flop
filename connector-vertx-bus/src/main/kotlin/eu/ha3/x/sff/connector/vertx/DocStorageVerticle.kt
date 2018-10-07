@@ -15,13 +15,13 @@ import io.vertx.core.json.JsonObject
 class DocStorageVerticle(private val delegate: IDocStorage) : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         vertx.eventBus().apply {
-            consumer<NoMessage>(DEvent.LIST_DOCS.address(), ::handler)
+            consumer<JsonObject>(DEvent.LIST_DOCS.address(), ::handler)
         }
 
         fut.complete()
     }
 
-    private fun handler(msg: Message<NoMessage>) {
+    private fun handler(msg: Message<JsonObject>) {
         delegate.listAll().subscribe({ result ->
             msg.reply(JsonObject.mapFrom(DocListResponse(result)))
 
