@@ -8,13 +8,13 @@ import eu.ha3.x.sff.core.Doc
 import io.reactivex.Single
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.unit.TestContext
-import io.vertx.ext.unit.junit.VertxUnitRunner
+import io.vertx.junit5.VertxExtension
+import io.vertx.junit5.VertxTestContext
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.time.ZonedDateTime
 
 /**
@@ -24,27 +24,30 @@ import java.time.ZonedDateTime
  * @author gyam
  */
 
-@RunWith(VertxUnitRunner::class)
+@ExtendWith(VertxExtension::class)
 internal class DocStorageVerticleTest {
     private lateinit var vertx: Vertx
     private lateinit var docStorage: IDocStorage
 
-    @Before
-    fun setUp(context: TestContext) {
+    @BeforeEach
+    fun setUp(context: VertxTestContext) {
         docStorage = mock()
         vertx = Vertx.vertx()
-        vertx.deployVerticle(DocStorageVerticle(docStorage),
-                context.asyncAssertSuccess<String>())
+        vertx.deployVerticle(DocStorageVerticle(docStorage), context.succeeding {
+            context.completeNow()
+        })
     }
 
-    @After
-    fun tearDown(context: TestContext) {
-        vertx.close(context.asyncAssertSuccess())
+    @AfterEach
+    fun tearDown(context: VertxTestContext) {
+        vertx.close(context.succeeding {
+            context.completeNow()
+        })
     }
 
     @Test
-    fun `it should delegate listAll`(context: TestContext) {
-        val async = context.async(1)
+    fun `it should delegate listAll`(context: VertxTestContext) {
+        val async = context.checkpoint()
         val expected = listOf(Doc("basicName", ZonedDateTime.now()))
         docStorage.stub {
             on { listAll() }.doReturn(Single.just(expected))
@@ -53,7 +56,7 @@ internal class DocStorageVerticleTest {
         // Exercise
         vertx.eventBus().send<JsonObject>(DEvent.LIST_DOCS.toString(), "") { res ->
             assertThat(res.result().body()).isEqualTo(JsonObject.mapFrom(DocListResponse(expected)))
-            async.countDown()
+            async.flag()
         }
     }
 }
