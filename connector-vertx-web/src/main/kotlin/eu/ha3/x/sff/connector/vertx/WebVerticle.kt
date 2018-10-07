@@ -10,7 +10,9 @@ package eu.ha3.x.sff.connector.vertx
 
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.vertx.core.AbstractVerticle
+import io.vertx.core.AsyncResult
 import io.vertx.core.Future
+import io.vertx.core.eventbus.Message
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
@@ -45,7 +47,7 @@ class WebVerticle : AbstractVerticle() {
     private fun docs(rc: RoutingContext) {
         vertx.eventBus().send<JsonObject>(DEvent.LIST_DOCS.address(), JsonObject.mapFrom(NoMessage())) { res ->
             if (res.succeeded()) {
-                rc.replyJson(res.result().body().mapTo(DocListResponse::class.java), 200)
+                rc.replyJson(res.mapTo(DocListResponse::class.java).data, 200)
 
             } else {
                 rc.serverError()
@@ -53,13 +55,16 @@ class WebVerticle : AbstractVerticle() {
         }
     }
 
-    fun RoutingContext.replyJson(obj: Any, code: Int) {
+    private fun AsyncResult<Message<JsonObject>>.mapTo(klass: Class<DocListResponse>) =
+            result().body().mapTo(klass)
+
+    private fun RoutingContext.replyJson(obj: Any, code: Int) {
         response().setStatusCode(code)
                 .putHeader("content-type", "application/json; charset=utf-8")
                 .end(Json.encodePrettily(obj))
     }
 
-    fun RoutingContext.serverError() {
+    private fun RoutingContext.serverError() {
         response().setStatusCode(500).end()
     }
 }

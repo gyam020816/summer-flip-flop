@@ -70,10 +70,9 @@ class WebVerticleTest {
     @Test
     fun `it should return the docs`(context: VertxTestContext) {
         val async = context.checkpoint()
-
-        // Setup
+        val expected = listOf(Doc("someDoc", TestSample.zonedDateTime))
         vertx.eventBus().consumer<JsonObject>(DEvent.LIST_DOCS.address()) { msg ->
-            msg.reply(JsonObject.mapFrom(DocListResponse(listOf(Doc("someDoc", TestSample.zonedDateTime)))))
+            msg.reply(JsonObject.mapFrom(DocListResponse(expected)))
         }
 
         // Exercise
