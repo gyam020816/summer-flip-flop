@@ -16,7 +16,7 @@ pipeline {
             agent {
                 docker {
                     image 'maven:3.5.4-jdk-8-alpine'
-                    args '-v $HOME/maven_local_repo:/root/.m2/repository'
+                    args '-v $HOME/dotm2:/root/.m2'
                     reuseNode true
                 }
             }
