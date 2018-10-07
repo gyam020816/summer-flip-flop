@@ -5,7 +5,6 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.Greeting
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -28,17 +27,17 @@ open class PayloadController {
     }
 
     @GetMapping("/docs")
-    @Async // FIXME: https://stackoverflow.com/questions/41985387/spring-async-not-allowing-use-of-autowired-beans
-    fun getDocs(): CompletableFuture<ResponseEntity<List<Doc>>> {
-        val fut = CompletableFuture<ResponseEntity<List<Doc>>>()
+    //@Async // FIXME: https://stackoverflow.com/questions/41985387/spring-async-not-allowing-use-of-autowired-beans
+    fun getDocs(): ResponseEntity<List<Doc>> {
+        val futureResponse = CompletableFuture<ResponseEntity<List<Doc>>>()
 
         docStorage.listAll().subscribe({ success ->
-            fut.complete(ResponseEntity.status(200).body(success))
+            futureResponse.complete(ResponseEntity.status(200).body(success))
 
         }, { error ->
-            fut.complete(ResponseEntity.status(500).build())
+            futureResponse.complete(ResponseEntity.status(500).build())
         })
 
-        return fut
+        return futureResponse.join()
     }
 }

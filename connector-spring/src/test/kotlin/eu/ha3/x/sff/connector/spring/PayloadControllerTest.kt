@@ -28,7 +28,7 @@ open class PayloadAppConfig {
     public open fun docStorage(): IDocStorage = mock()
 }
 
-@SpringBootTest(classes = [Application::class, PayloadAppConfig::class])
+@SpringBootTest(classes = [Application::class, PayloadAppConfig::class, JacksonMapper::class])
 public class PayloadControllerTest : AControllerTest() {
     @Autowired
     lateinit var mockDocStorage: IDocStorage;
@@ -68,10 +68,10 @@ public class PayloadControllerTest : AControllerTest() {
                 .thenReturn(Single.just(listOf(someDoc())))
 
         mockMvc.perform(get("/docs"))
-                .andExpect(content().string("""[{"id":"ABCD"}]"""))
+                .andExpect(content().string("""[{"name":"ABCD","createdAt":"2018-10-07T14:55:13.188+02:00"}]"""))
     }
 
-    private fun someDoc() = Doc(GENERIC_ID, ZonedDateTime.now())
+    private fun someDoc() = Doc(GENERIC_ID, ZonedDateTime.parse("2018-10-07T14:55:13.188+02:00"))
 
     companion object {
         private val GENERIC_ID = "ABCD"
