@@ -9,15 +9,15 @@ package eu.ha3.x.sff.connector.vertx
 
 
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.vertx.core.AbstractVerticle
 import io.vertx.core.AsyncResult
 import io.vertx.core.Future
-import io.vertx.core.eventbus.Message
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.web.Router
-import io.vertx.ext.web.RoutingContext
+import io.vertx.rxjava.core.AbstractVerticle
+import io.vertx.rxjava.core.eventbus.Message
+import io.vertx.rxjava.ext.web.Router
+import io.vertx.rxjava.ext.web.RoutingContext
 
 class WebVerticle : AbstractVerticle() {
     override fun start(fut: Future<Void>) {

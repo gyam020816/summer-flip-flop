@@ -6,10 +6,10 @@ import com.nhaarman.mockito_kotlin.stub
 import eu.ha3.x.sff.api.IDocStorage
 import eu.ha3.x.sff.core.Doc
 import io.reactivex.Single
-import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
+import io.vertx.rxjava.core.Vertx
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -33,7 +33,7 @@ internal class DocStorageVerticleTest {
     fun setUp(context: VertxTestContext) {
         docStorage = mock()
         vertx = Vertx.vertx()
-        vertx.deployVerticle(DocStorageVerticle(docStorage), context.succeeding {
+        vertx.delegate.deployVerticle(DocStorageVerticle(docStorage), context.succeeding {
             context.completeNow()
         })
     }
@@ -54,9 +54,9 @@ internal class DocStorageVerticleTest {
         }
 
         // Exercise
-        vertx.eventBus().send<JsonObject>(DEvent.LIST_DOCS.toString(), "") { res ->
-            assertThat(res.result().body()).isEqualTo(JsonObject.mapFrom(DocListResponse(expected)))
+        vertx.eventBus().rxSend<JsonObject>(DEvent.LIST_DOCS.toString(), JsonObject.mapFrom(NoMessage())).subscribe({ res ->
+            assertThat(res.body()).isEqualTo(JsonObject.mapFrom(DocListResponse(expected)))
             async.flag()
-        }
+        }, context::failNow)
     }
 }

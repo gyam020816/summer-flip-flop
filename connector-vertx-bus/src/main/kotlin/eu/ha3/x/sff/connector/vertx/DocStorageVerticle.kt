@@ -1,10 +1,10 @@
 package eu.ha3.x.sff.connector.vertx
 
 import eu.ha3.x.sff.api.IDocStorage
-import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
-import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
+import io.vertx.rxjava.core.AbstractVerticle
+import io.vertx.rxjava.core.eventbus.Message
 
 /**
  * (Default template)
