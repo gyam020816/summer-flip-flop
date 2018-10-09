@@ -24,18 +24,20 @@ internal class JsonifyTest {
         val result = model.jsonify()
 
         // Verify
-        assertThat(result.getString("someZdt")).isEqualTo("2010-12-30T22:00:04.123Z")
-        assertThat(result.getJsonArray("someList")).containsExactly("a", "b")
-        assertThat(result.getString("someString")).isEqualTo("hello")
+        result.inner.apply {
+            assertThat(getString("someZdt")).isEqualTo("2010-12-30T22:00:04.123Z")
+            assertThat(getJsonArray("someList")).containsExactly("a", "b")
+            assertThat(getString("someString")).isEqualTo("hello")
+        }
     }
 
     @Test
     internal fun `it should convert json to model`() {
         val expected = JsonifyTest.MODEL
-        val json = JsonObject()
+        val json = DJsonObject(JsonObject()
                 .put("someZdt", "2010-12-30T22:00:04.123Z")
                 .put("someList", JsonArray(listOf("a", "b")))
-                .put("someString", "hello")
+                .put("someString", "hello"))
 
         // Exercise
         val result = json.dejsonify(ExampleModel::class.java)

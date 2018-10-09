@@ -2,10 +2,9 @@ package eu.ha3.x.sff.connector.vertx
 
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.test.TestSample
-import io.vertx.core.Vertx
-import io.vertx.core.json.JsonObject
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
+import io.vertx.rxjava.core.Vertx
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -26,9 +25,10 @@ internal class EmitterToDocSystemVerticleTest {
     @BeforeEach
     fun setUp(context: VertxTestContext) {
         vertx = Vertx.vertx()
+        vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
 
         SUT = EmitterToDocSystemVerticle()
-        vertx.deployVerticle(SUT, context.succeeding { context.completeNow() })
+        vertx.delegate.deployVerticle(SUT, context.succeeding { context.completeNow() })
     }
 
     @AfterEach
@@ -40,7 +40,7 @@ internal class EmitterToDocSystemVerticleTest {
     fun `it should emit an event to the bus`(context: VertxTestContext) {
         val async = context.checkpoint()
         val expected = listOf(Doc("someName", TestSample.zonedDateTime))
-        vertx.eventBus().consumer<JsonObject>(DEvent.SYSTEM_LIST_DOCS.address()) { msg ->
+        vertx.eventBus().consumer<DJsonObject>(DEvent.SYSTEM_LIST_DOCS.address()) { msg ->
             msg.reply(SystemDocListResponse(expected).jsonify())
         }
 

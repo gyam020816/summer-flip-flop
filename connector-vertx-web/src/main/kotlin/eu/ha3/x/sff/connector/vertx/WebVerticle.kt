@@ -12,7 +12,6 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.vertx.core.Future
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.Json
-import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
 import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
@@ -43,7 +42,7 @@ class WebVerticle : AbstractVerticle() {
     }
 
     private fun docs(rc: RoutingContext) {
-        vertx.eventBus().send<JsonObject>(DEvent.LIST_DOCS.address(), NoMessage().jsonify()) { res ->
+        vertx.eventBus().send<DJsonObject>(DEvent.LIST_DOCS.address(), NoMessage().jsonify()) { res ->
             if (res.succeeded()) {
                 rc.replyJson(res.result().body().dejsonify(DocListResponse::class.java).data, 200)
 
@@ -56,7 +55,7 @@ class WebVerticle : AbstractVerticle() {
     private fun RoutingContext.replyJson(obj: Any, code: Int) {
         response().setStatusCode(code)
                 .putHeader("content-type", "application/json; charset=utf-8")
-                .end(Json.encodePrettily(obj))
+                .end(obj.jsonifyToPrettyString())
     }
 
     private fun RoutingContext.serverError() {

@@ -56,6 +56,8 @@ object Jsonify {
     }
 }
 
-fun <T> JsonObject.dejsonify(klass: Class<T>): T = Jsonify.mapper.convertValue<T>(this.map, klass)
-fun Any.jsonify(): JsonObject = JsonObject(Jsonify.mapper.convertValue(this, Map::class.java) as Map<String, Any>)
-fun Collection<*>.jsonifyList(): JsonArray = JsonArray(Jsonify.mapper.convertValue(this, List::class.java) as List)
+data class DJsonObject(val inner: JsonObject)
+fun <T> DJsonObject.dejsonify(klass: Class<T>): T = Jsonify.mapper.convertValue<T>(this.inner.map, klass)
+fun Any.jsonify(): DJsonObject = DJsonObject(JsonObject(Jsonify.mapper.convertValue(this, Map::class.java) as Map<String, Any>))
+fun Any.jsonifyToString(): String = Jsonify.mapper.writeValueAsString(this)
+fun Any.jsonifyToPrettyString(): String = Jsonify.prettyMapper.writeValueAsString(this)

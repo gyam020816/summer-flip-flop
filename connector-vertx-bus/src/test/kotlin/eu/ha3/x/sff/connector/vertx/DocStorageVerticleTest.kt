@@ -6,7 +6,6 @@ import com.nhaarman.mockito_kotlin.stub
 import eu.ha3.x.sff.api.IDocStorage
 import eu.ha3.x.sff.core.Doc
 import io.reactivex.Single
-import io.vertx.core.json.JsonObject
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
 import io.vertx.rxjava.core.Vertx
@@ -33,6 +32,7 @@ internal class DocStorageVerticleTest {
     fun setUp(context: VertxTestContext) {
         docStorage = mock()
         vertx = Vertx.vertx()
+        vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
         vertx.delegate.deployVerticle(DocStorageVerticle(docStorage), context.succeeding {
             context.completeNow()
         })
@@ -54,7 +54,7 @@ internal class DocStorageVerticleTest {
         }
 
         // Exercise
-        vertx.eventBus().rxSend<JsonObject>(DEvent.LIST_DOCS.toString(), NoMessage().jsonify()).subscribe({ res ->
+        vertx.eventBus().rxSend<DJsonObject>(DEvent.LIST_DOCS.toString(), NoMessage().jsonify()).subscribe({ res ->
             assertThat(res.body()).isEqualTo(DocListResponse(expected).jsonify())
             async.flag()
         }, context::failNow)

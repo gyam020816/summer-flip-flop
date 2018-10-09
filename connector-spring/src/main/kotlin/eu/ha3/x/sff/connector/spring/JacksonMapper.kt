@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration
 open class JacksonMapper {
     @Bean
     open fun objectMapper(): ObjectMapper {
+        // FIXME: Not sure this has any use
         val mapper = ObjectMapper()
         mapper.registerModule(JavaTimeModule())
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
