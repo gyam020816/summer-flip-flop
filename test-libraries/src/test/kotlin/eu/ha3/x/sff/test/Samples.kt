@@ -1,6 +1,6 @@
 package eu.ha3.x.sff.test
 
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 /**
@@ -12,6 +12,6 @@ import java.time.ZonedDateTime
 class TestSample {
     companion object {
         val zonedDateTimeSerialized = "2018-10-07T16:51:56.845Z"
-        val zonedDateTime = ZonedDateTime.parse(zonedDateTimeSerialized).withZoneSameInstant(ZoneId.of("UTC"))
+        val zonedDateTime = ZonedDateTime.parse(zonedDateTimeSerialized).withZoneSameInstant(ZoneOffset.UTC)
     }
 }
