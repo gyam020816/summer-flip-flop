@@ -1,12 +1,8 @@
 package eu.ha3.x.sff.connector.vertx
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.test.TestSample
 import io.vertx.core.Vertx
-import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
@@ -33,11 +29,6 @@ internal class EmitterToDocSystemVerticleTest {
 
         SUT = EmitterToDocSystemVerticle()
         vertx.deployVerticle(SUT, context.succeeding { context.completeNow() })
-        listOf(Json.mapper, Json.prettyMapper).forEach { mapper ->
-            mapper.registerKotlinModule()
-            mapper.registerModule(JavaTimeModule())
-            mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        }
     }
 
     @AfterEach
@@ -49,8 +40,8 @@ internal class EmitterToDocSystemVerticleTest {
     fun `it should emit an event to the bus`(context: VertxTestContext) {
         val async = context.checkpoint()
         val expected = listOf(Doc("someName", TestSample.zonedDateTime))
-        vertx.eventBus().consumer<SystemDocListResponse>(DEvent.SYSTEM_LIST_DOCS.address()) { msg ->
-            msg.reply(JsonObject.mapFrom(SystemDocListResponse(expected)))
+        vertx.eventBus().consumer<JsonObject>(DEvent.SYSTEM_LIST_DOCS.address()) { msg ->
+            msg.reply(SystemDocListResponse(expected).jsonify())
         }
 
         SUT.listAll().subscribe({ success ->

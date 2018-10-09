@@ -23,11 +23,6 @@ class WebVerticleTest {
     @BeforeEach
     fun setUp(context: VertxTestContext) {
         vertx = Vertx.vertx()
-        listOf(Json.mapper, Json.prettyMapper).forEach { mapper ->
-            mapper.registerKotlinModule()
-            mapper.registerModule(JavaTimeModule())
-            mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        }
 
         vertx.deployVerticle(WebVerticle::class.java.getName(), context.succeeding {
             context.completeNow()
@@ -72,7 +67,7 @@ class WebVerticleTest {
         val async = context.checkpoint()
         val expected = listOf(Doc("someDoc", TestSample.zonedDateTime))
         vertx.eventBus().consumer<JsonObject>(DEvent.LIST_DOCS.address()) { msg ->
-            msg.reply(JsonObject.mapFrom(DocListResponse(expected)))
+            msg.reply(DocListResponse(expected).jsonify())
         }
 
         // Exercise

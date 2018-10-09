@@ -9,13 +9,11 @@ package eu.ha3.x.sff.connector.vertx
 
 
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.vertx.core.AsyncResult
 import io.vertx.core.Future
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
-import io.vertx.rxjava.core.eventbus.Message
 import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
 
@@ -45,18 +43,15 @@ class WebVerticle : AbstractVerticle() {
     }
 
     private fun docs(rc: RoutingContext) {
-        vertx.eventBus().send<JsonObject>(DEvent.LIST_DOCS.address(), JsonObject.mapFrom(NoMessage())) { res ->
+        vertx.eventBus().send<JsonObject>(DEvent.LIST_DOCS.address(), NoMessage().jsonify()) { res ->
             if (res.succeeded()) {
-                rc.replyJson(res.mapTo(DocListResponse::class.java).data, 200)
+                rc.replyJson(res.result().body().dejsonify(DocListResponse::class.java).data, 200)
 
             } else {
                 rc.serverError()
             }
         }
     }
-
-    private fun AsyncResult<Message<JsonObject>>.mapTo(klass: Class<DocListResponse>) =
-            result().body().mapTo(klass)
 
     private fun RoutingContext.replyJson(obj: Any, code: Int) {
         response().setStatusCode(code)

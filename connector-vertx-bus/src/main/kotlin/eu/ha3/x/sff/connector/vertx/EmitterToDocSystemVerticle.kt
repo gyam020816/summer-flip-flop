@@ -16,7 +16,7 @@ class EmitterToDocSystemVerticle : AbstractVerticle(), IDocSystem {
     override fun listAll(): Single<List<Doc>> {
         return Single.create<List<Doc>> { handler ->
             vertx.eventBus().rxSend<JsonObject>(DEvent.SYSTEM_LIST_DOCS.address(), JsonObject()).subscribe({ res ->
-                handler.onSuccess(res.body().mapTo(SystemDocListResponse::class.java).data)
+                handler.onSuccess(res.body().dejsonify(SystemDocListResponse::class.java).data)
 
             }, handler::onError);
         }

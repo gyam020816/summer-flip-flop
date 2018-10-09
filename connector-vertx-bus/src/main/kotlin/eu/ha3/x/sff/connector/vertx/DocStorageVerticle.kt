@@ -23,7 +23,7 @@ class DocStorageVerticle(private val delegate: IDocStorage) : AbstractVerticle()
 
     private fun handler(msg: Message<JsonObject>) {
         delegate.listAll().subscribe({ result ->
-            msg.reply(JsonObject.mapFrom(DocListResponse(result)))
+            msg.reply(DocListResponse(result).jsonify())
 
         }, { error ->
             msg.fail(500, "")
