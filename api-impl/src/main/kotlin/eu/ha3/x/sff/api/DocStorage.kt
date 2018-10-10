@@ -9,7 +9,7 @@ import io.reactivex.Single
  *
  * @author gyam
  */
-class DocStorage(val docSystem: IDocSystem) : IDocStorage {
+class DocStorage(private val docSystem: IDocSystem) : IDocStorage {
     override fun listAll(): Single<List<Doc>> {
         return docSystem.listAll()
     }
