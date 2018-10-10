@@ -39,7 +39,8 @@ pipeline {
                 keepAll: true,
                 reportDir: 'test-jacoco-reporter/target/site/jacoco-aggregate',
                 reportFiles: 'index.html',
-                reportName: 'Coverage Report'
+                reportName: 'Coverage Report',
+                includes: '*'
               ]
             step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'automation@ha3.eu'])
         }
