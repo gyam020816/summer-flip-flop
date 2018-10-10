@@ -16,7 +16,7 @@ pipeline {
             agent {
                 docker {
                     image 'maven:3.5.4-jdk-8-alpine'
-                    args '-v $HOME/dotm2:/root/.m2'
+                    args '-v $HOME/dotm2:/root/maven_local_repo'
                     reuseNode true
                 }
             }
@@ -24,8 +24,8 @@ pipeline {
                 checkout scm
                 sh 'ls'
                 sh '''
-                    mvn clean package
-                    mvn jacoco:report-aggregate
+                    mvn -Dmaven.repo.local=/root/maven_local_repo clean package
+                    mvn -Dmaven.repo.local=/root/maven_local_repo jacoco:report-aggregate
                 '''
             }
         }
