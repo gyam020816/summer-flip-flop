@@ -2,11 +2,12 @@ package eu.ha3.x.sff.connector.vertx
 
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.test.TestSample
-import io.vertx.core.Vertx
-import io.vertx.core.http.RequestOptions
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
+import io.vertx.rxjava.core.Vertx
+import io.vertx.rxjava.ext.web.client.WebClient
 import net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,7 +21,7 @@ class WebVerticleTest {
     fun setUp(context: VertxTestContext) {
         vertx = Vertx.vertx()
 
-        vertx.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
+        vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
         vertx.deployVerticle(WebVerticle::class.java.getName(), context.succeeding {
             context.completeNow()
         })
@@ -61,25 +62,22 @@ class WebVerticleTest {
     fun `it should append the docs`(context: VertxTestContext) {
         val async = context.checkpoint()
         val expected = Doc("someDoc", TestSample.zonedDateTime)
-        vertx.eventBus().consumer<DJsonObject>(DEvent.LIST_DOCS.address()) { msg ->
+        vertx.eventBus().consumer<DJsonObject>(DEvent.APPEND_TO_DOCS.address()) { msg ->
             msg.reply(DocResponse(expected).jsonify())
         }
 
         // Exercise
-        vertx.createHttpClient().post(RequestOptions().apply {
-            host = "localhost"
-            port = 8080
-        }) { response ->
-            response.handler { body ->
-                // Verify
-                context.verify {
-                    assertThatJson(body.toString()).isEqualTo("""{
-  "name" : "someDoc",
-  "createdAt" : "${TestSample.zonedDateTimeSerialized}"
-}""")
-                    async.flag()
+        WebClient.create(vertx)
+                .post(8080, "localhost", "/docs")
+                .sendJson(DocCreateRequest("someDoc").jsonify().inner) { response ->
+                    // Verify
+                    context.verify {
+                        val result = response.result()
+
+                        assertThatJson(result.bodyAsString()).isEqualTo(expected.jsonify().inner.encodePrettily())
+                        assertThat(result.statusCode()).isEqualTo(201)
+                        async.flag()
+                    }
                 }
-            }
-        }
     }
 }

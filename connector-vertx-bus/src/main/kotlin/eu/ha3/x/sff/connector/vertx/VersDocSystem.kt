@@ -14,8 +14,8 @@ import io.vertx.rxjava.core.AbstractVerticle
 class VersDocSystem : AbstractVerticle(), IDocSystem {
     override fun listAll(): Single<List<Doc>> {
         return Single.create<List<Doc>> { handler ->
-            vertx.eventBus().rxSend<DJsonObject>(DEvent.SYSTEM_LIST_DOCS.address(), NoMessage().jsonify()).subscribe({ res ->
-                handler.onSuccess(res.body().dejsonify(SystemDocListResponse::class.java).data)
+            vertx.eventBus().dsSend<SystemDocListResponse>(DEvent.SYSTEM_LIST_DOCS.address(), NoMessage()).subscribe({ res ->
+                handler.onSuccess(res.data)
 
             }, handler::onError);
         }

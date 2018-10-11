@@ -58,6 +58,7 @@ object Jsonify {
 
 data class DJsonObject(val inner: JsonObject)
 fun <T> DJsonObject.dejsonify(klass: Class<T>): T = Jsonify.mapper.convertValue<T>(this.inner.map, klass)
+fun <T> String.dejsonifyByParsing(klass: Class<T>): T = Jsonify.mapper.readValue(this, klass)
 fun Any.jsonify(): DJsonObject = DJsonObject(JsonObject(Jsonify.mapper.convertValue(this, Map::class.java) as Map<String, Any>))
 fun Any.jsonifyToString(): String = Jsonify.mapper.writeValueAsString(this)
 fun Any.jsonifyToPrettyString(): String = Jsonify.prettyMapper.writeValueAsString(this)

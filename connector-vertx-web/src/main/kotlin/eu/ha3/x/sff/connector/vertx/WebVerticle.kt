@@ -8,6 +8,7 @@ package eu.ha3.x.sff.connector.vertx
  */
 
 
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.vertx.core.Future
 import io.vertx.core.http.HttpMethod
@@ -15,12 +16,14 @@ import io.vertx.core.json.Json
 import io.vertx.rxjava.core.AbstractVerticle
 import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
+import io.vertx.rxjava.ext.web.handler.BodyHandler
 
 class WebVerticle : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         val router: Router = Router.router(vertx)
+        router.route().handler(BodyHandler.create());
         router.route(HttpMethod.GET, "/docs").handler(::getDocs)
-        router.route(HttpMethod.POST, "/docs").handler(::appendToDocs)
+        router.route(HttpMethod.POST, "/docs").handler(::appendToDocs);
 
         Json.mapper.apply {
             registerKotlinModule()
@@ -54,10 +57,17 @@ class WebVerticle : AbstractVerticle() {
     }
 
     private fun appendToDocs(rc: RoutingContext) {
-        vertx.eventBus().rxSend<DJsonObject>(DEvent.APPEND_TO_DOCS.address(), DocCreateRequest(rc.bodyAsString.dejsonify(DocCreateRequest::class.java)).jsonify()).subscribe({ res ->
+        val parsed = rc.bodyAsString.dejsonifyByParsing(DocCreateRequest::class.java)
+        vertx.eventBus().rxSend<DJsonObject>(DEvent.APPEND_TO_DOCS.address(), parsed.jsonify()).subscribe({ res ->
             rc.replyJson(res.body().dejsonify(DocResponse::class.java).data, 201)
-        }, {
-            rc.serverError()
+
+        }, { err ->
+            if (err is MissingKotlinParameterException) {
+                rc.fail(400)
+
+            } else {
+                rc.serverError()
+            }
         })
     }
 
