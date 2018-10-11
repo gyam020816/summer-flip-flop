@@ -11,7 +11,7 @@ import io.vertx.rxjava.core.AbstractVerticle
  *
  * @author Ha3
  */
-class EmitterToDocSystemVerticle : AbstractVerticle(), IDocSystem {
+class VersDocSystem : AbstractVerticle(), IDocSystem {
     override fun listAll(): Single<List<Doc>> {
         return Single.create<List<Doc>> { handler ->
             vertx.eventBus().rxSend<DJsonObject>(DEvent.SYSTEM_LIST_DOCS.address(), NoMessage().jsonify()).subscribe({ res ->

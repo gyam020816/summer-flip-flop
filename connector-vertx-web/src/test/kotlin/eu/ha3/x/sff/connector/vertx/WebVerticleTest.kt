@@ -3,6 +3,7 @@ package eu.ha3.x.sff.connector.vertx
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.test.TestSample
 import io.vertx.core.Vertx
+import io.vertx.core.http.RequestOptions
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
 import net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
@@ -50,6 +51,32 @@ class WebVerticleTest {
   "name" : "someDoc",
   "createdAt" : "${TestSample.zonedDateTimeSerialized}"
 } ]""")
+                    async.flag()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `it should append the docs`(context: VertxTestContext) {
+        val async = context.checkpoint()
+        val expected = Doc("someDoc", TestSample.zonedDateTime)
+        vertx.eventBus().consumer<DJsonObject>(DEvent.LIST_DOCS.address()) { msg ->
+            msg.reply(DocResponse(expected).jsonify())
+        }
+
+        // Exercise
+        vertx.createHttpClient().post(RequestOptions().apply {
+            host = "localhost"
+            port = 8080
+        }) { response ->
+            response.handler { body ->
+                // Verify
+                context.verify {
+                    assertThatJson(body.toString()).isEqualTo("""{
+  "name" : "someDoc",
+  "createdAt" : "${TestSample.zonedDateTimeSerialized}"
+}""")
                     async.flag()
                 }
             }

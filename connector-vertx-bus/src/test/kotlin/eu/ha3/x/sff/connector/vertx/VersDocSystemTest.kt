@@ -18,16 +18,16 @@ import org.junit.jupiter.api.extension.ExtendWith
  * @author Ha3
  */
 @ExtendWith(VertxExtension::class)
-internal class EmitterToDocSystemVerticleTest {
+internal class VersDocSystemTest {
     private lateinit var vertx: Vertx
-    private lateinit var SUT: EmitterToDocSystemVerticle
+    private lateinit var SUT: VersDocSystem
 
     @BeforeEach
     fun setUp(context: VertxTestContext) {
         vertx = Vertx.vertx()
         vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
 
-        SUT = EmitterToDocSystemVerticle()
+        SUT = VersDocSystem()
         vertx.delegate.deployVerticle(SUT, context.succeeding { context.completeNow() })
     }
 

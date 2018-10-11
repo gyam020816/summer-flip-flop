@@ -19,7 +19,8 @@ import io.vertx.rxjava.ext.web.RoutingContext
 class WebVerticle : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         val router: Router = Router.router(vertx)
-        router.route(HttpMethod.GET, "/docs").handler(::docs)
+        router.route(HttpMethod.GET, "/docs").handler(::getDocs)
+        router.route(HttpMethod.POST, "/docs").handler(::appendToDocs)
 
         Json.mapper.apply {
             registerKotlinModule()
@@ -41,7 +42,7 @@ class WebVerticle : AbstractVerticle() {
                 }
     }
 
-    private fun docs(rc: RoutingContext) {
+    private fun getDocs(rc: RoutingContext) {
         vertx.eventBus().send<DJsonObject>(DEvent.LIST_DOCS.address(), NoMessage().jsonify()) { res ->
             if (res.succeeded()) {
                 rc.replyJson(res.result().body().dejsonify(DocListResponse::class.java).data, 200)
@@ -50,6 +51,14 @@ class WebVerticle : AbstractVerticle() {
                 rc.serverError()
             }
         }
+    }
+
+    private fun appendToDocs(rc: RoutingContext) {
+        vertx.eventBus().rxSend<DJsonObject>(DEvent.APPEND_TO_DOCS.address(), DocCreateRequest(rc.bodyAsString.dejsonify(DocCreateRequest::class.java)).jsonify()).subscribe({ res ->
+            rc.replyJson(res.body().dejsonify(DocResponse::class.java).data, 201)
+        }, {
+            rc.serverError()
+        })
     }
 
     private fun RoutingContext.replyJson(obj: Any, code: Int) {

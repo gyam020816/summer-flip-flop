@@ -1,5 +1,13 @@
+import eu.ha3.x.sff.api.DocStorage
+import eu.ha3.x.sff.api.IDocSystem
+import eu.ha3.x.sff.connector.vertx.DocStorageVerticle
+import eu.ha3.x.sff.connector.vertx.DocSystemVerticle
+import eu.ha3.x.sff.connector.vertx.VersDocSystem
 import eu.ha3.x.sff.connector.vertx.WebVerticle
+import eu.ha3.x.sff.core.Doc
+import io.reactivex.Single
 import io.vertx.core.Vertx
+import java.time.ZonedDateTime
 
 /**
  * (Default template)
@@ -9,5 +17,16 @@ import io.vertx.core.Vertx
  */
 fun main(args: Array<String>) {
     val vertx = Vertx.vertx()
-    vertx.deployVerticle(WebVerticle())
+    val verticles = listOf(
+            WebVerticle(),
+            DocStorageVerticle(DocStorage(VersDocSystem())),
+            DocSystemVerticle(object : IDocSystem {
+                override fun listAll(): Single<List<Doc>> {
+                    return Single.just(listOf(Doc("hello", ZonedDateTime.now())))
+                }
+            })
+    )
+    verticles.forEach {
+        vertx.deployVerticle(it)
+    }
 }
