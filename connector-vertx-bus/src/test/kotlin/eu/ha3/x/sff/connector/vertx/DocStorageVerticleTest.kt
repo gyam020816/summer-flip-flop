@@ -14,6 +14,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 /**
@@ -48,14 +49,14 @@ internal class DocStorageVerticleTest {
     @Test
     fun `it should delegate listAll`(context: VertxTestContext) {
         val async = context.checkpoint()
-        val expected = listOf(Doc("basicName", ZonedDateTime.now()))
+        val expected = listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC)))
         docStorage.stub {
             on { listAll() }.doReturn(Single.just(expected))
         }
 
         // Exercise
-        vertx.eventBus().rxSend<DJsonObject>(DEvent.LIST_DOCS.toString(), NoMessage().jsonify()).subscribe({ res ->
-            assertThat(res.body()).isEqualTo(DocListResponse(expected).jsonify())
+        vertx.eventBus().dsSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
+            assertThat(res.answer).isEqualTo(DocListResponse(expected))
             async.flag()
         }, context::failNow)
     }

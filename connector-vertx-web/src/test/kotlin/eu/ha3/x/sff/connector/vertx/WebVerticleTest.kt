@@ -38,8 +38,8 @@ class WebVerticleTest {
     fun `it should return the docs`(context: VertxTestContext) {
         val async = context.checkpoint()
         val expected = listOf(Doc("someDoc", TestSample.zonedDateTime))
-        vertx.eventBus().consumer<DJsonObject>(DEvent.LIST_DOCS.address()) { msg ->
-            msg.reply(DocListResponse(expected).jsonify())
+        vertx.eventBus().dsConsumer<NoMessage>(DEvent.LIST_DOCS.address()) { question, msg ->
+            msg.reply(DocListResponse(expected).asAnswer())
         }
 
         // Exercise
@@ -62,8 +62,8 @@ class WebVerticleTest {
     fun `it should append the docs`(context: VertxTestContext) {
         val async = context.checkpoint()
         val expected = Doc("someDoc", TestSample.zonedDateTime)
-        vertx.eventBus().consumer<DJsonObject>(DEvent.APPEND_TO_DOCS.address()) { msg ->
-            msg.reply(DocResponse(expected).jsonify())
+        vertx.eventBus().dsConsumer<DocCreateRequest>(DEvent.APPEND_TO_DOCS.address()) { question, msg ->
+            msg.reply(DocResponse(expected).asAnswer())
         }
 
         // Exercise

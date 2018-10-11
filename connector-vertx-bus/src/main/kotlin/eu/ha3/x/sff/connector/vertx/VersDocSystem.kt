@@ -15,7 +15,7 @@ class VersDocSystem : AbstractVerticle(), IDocSystem {
     override fun listAll(): Single<List<Doc>> {
         return Single.create<List<Doc>> { handler ->
             vertx.eventBus().dsSend<SystemDocListResponse>(DEvent.SYSTEM_LIST_DOCS.address(), NoMessage()).subscribe({ res ->
-                handler.onSuccess(res.data)
+                handler.onSuccess(res.answer.data)
 
             }, handler::onError);
         }

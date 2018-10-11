@@ -58,8 +58,8 @@ class WebVerticle : AbstractVerticle() {
 
     private fun appendToDocs(rc: RoutingContext) {
         val parsed = rc.bodyAsString.dejsonifyByParsing(DocCreateRequest::class.java)
-        vertx.eventBus().rxSend<DJsonObject>(DEvent.APPEND_TO_DOCS.address(), parsed.jsonify()).subscribe({ res ->
-            rc.replyJson(res.body().dejsonify(DocResponse::class.java).data, 201)
+        vertx.eventBus().dsSend<DocResponse>(DEvent.APPEND_TO_DOCS.address(), parsed).subscribe({ res ->
+            rc.replyJson(res.answer.data, 201)
 
         }, { err ->
             if (err is MissingKotlinParameterException) {

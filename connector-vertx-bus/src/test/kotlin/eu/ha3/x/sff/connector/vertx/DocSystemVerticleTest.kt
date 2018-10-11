@@ -9,11 +9,12 @@ import io.reactivex.Single
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
 import io.vertx.rxjava.core.Vertx
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 /**
@@ -47,14 +48,17 @@ internal class DocSystemVerticleTest {
     @Test
     fun `it should delegate listAll`(context: VertxTestContext) {
         val async = context.checkpoint()
-        val expected = listOf(Doc("basicName", ZonedDateTime.now()))
+        val expected = listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC)))
         docSystem.stub {
             on { listAll() }.doReturn(Single.just(expected))
         }
 
         // Exercise
-        vertx.eventBus().rxSend<DJsonObject>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage().jsonify()).subscribe({ res ->
-            Assertions.assertThat(res.body()).isEqualTo(DocListResponse(expected).jsonify())
+        vertx.eventBus().dsSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
+            context.verify {
+                assertThat(res.answer).isEqualTo(DocListResponse(expected))
+            }
+
             async.flag()
         }, context::failNow)
     }

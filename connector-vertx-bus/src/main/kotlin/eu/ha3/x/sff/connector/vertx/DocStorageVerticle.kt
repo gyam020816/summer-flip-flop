@@ -14,15 +14,15 @@ import io.vertx.rxjava.core.eventbus.Message
 class DocStorageVerticle(private val delegate: IDocStorage) : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         vertx.eventBus().apply {
-            consumer<DJsonObject>(DEvent.LIST_DOCS.address(), ::handler)
+            dsConsumer(DEvent.LIST_DOCS.address(), ::handler)
         }
 
         fut.complete()
     }
 
-    private fun handler(msg: Message<DJsonObject>) {
+    private fun handler(noMessage: NoMessage, msg: Message<DJsonObject>) {
         delegate.listAll().subscribe({ result ->
-            msg.reply(DocListResponse(result).jsonify())
+            msg.reply(DocListResponse(result).asAnswer())
 
         }, { error ->
             msg.fail(500, "")
