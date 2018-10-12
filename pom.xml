@@ -20,6 +20,7 @@
         <module>test-jacoco-reporter</module>
         <module>test-libraries</module>
         <module>deployable-vertx</module>
+        <module>system-impl</module>
     </modules>
 
     <properties>

@@ -1,6 +1,6 @@
 package eu.ha3.x.sff.connector.vertx
 
-import eu.ha3.x.sff.api.IDocSystem
+import eu.ha3.x.sff.system.IDocSystem
 import io.vertx.core.Future
 import io.vertx.rxjava.core.AbstractVerticle
 import io.vertx.rxjava.core.eventbus.Message
