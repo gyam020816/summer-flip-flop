@@ -15,16 +15,16 @@ class Binder<Q : Any, A : Any>(
         private val address: String,
         private val questionClass: Class<Q>,
         private val answerClass: Class<A>,
-        private val boundFn: (Q) -> Single<A>,
         private val errorHandler: (DAnswerer<*>) -> (Throwable) -> Unit = { answerer -> { error ->
             answerer.message.fail(500, "")
         }}
 ) : AbstractVerticle(), DBinder {
+    fun ofSingle(boundFn: (Q) -> Single<A>) = BSingle(boundFn)
 
-    fun registerAnswerer(bus: EventBus) {
-        bus.dsAnswererBound(address, { question: Q, answerer: DAnswerer<A> ->
-            boundFn.invoke(question).subscribe(answerer::answer, errorHandler.invoke(answerer))
-        }, questionClass)
+    interface DBind<B> {
+        fun registerAnswerer(bus: EventBus)
+        fun questionner(): B
+        fun bind(bus: EventBus): B
     }
 
     fun questionner(): (Q) -> Single<A> = { question ->
@@ -36,11 +36,18 @@ class Binder<Q : Any, A : Any>(
         }
     }
 
-    companion object {
-        inline fun <reified Q : Any, reified A: Any> produce(bus: EventBus, address: String, noinline boundFn: (Q) -> Single<A>): (Q) -> Single<A> {
-            val storage = Binder(address, Q::class.java, A::class.java, boundFn)
-            storage.registerAnswerer(bus)
-            return storage.questionner()
+    inner class BSingle(private val boundFn: (Q) -> Single<A>): DBind<(Q) -> Single<A>> {
+        override fun questionner(): (Q) -> Single<A> = this@Binder.questionner()
+
+        override fun registerAnswerer(bus: EventBus) {
+            bus.dsAnswererBound(address, { question: Q, answerer: DAnswerer<A> ->
+                boundFn.invoke(question).subscribe(answerer::answer, errorHandler.invoke(answerer))
+            }, questionClass)
+        }
+
+        override fun bind(bus: EventBus): (Q) -> Single<A> {
+            registerAnswerer(bus)
+            return this.questionner()
         }
     }
 }
