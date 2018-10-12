@@ -1,9 +1,6 @@
 
 import eu.ha3.x.sff.api.DocStorage
-import eu.ha3.x.sff.connector.vertx.DocStorageVerticle
-import eu.ha3.x.sff.connector.vertx.DocSystemVerticle
-import eu.ha3.x.sff.connector.vertx.VersDocSystem
-import eu.ha3.x.sff.connector.vertx.WebVerticle
+import eu.ha3.x.sff.connector.vertx.*
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.system.IDocSystem
 import io.reactivex.Single
@@ -18,6 +15,8 @@ import java.time.ZonedDateTime
  */
 fun main(args: Array<String>) {
     val vertx = Vertx.vertx()
+    vertx.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
+
     val verticles = listOf(
             WebVerticle(),
             DocStorageVerticle(DocStorage(VersDocSystem())),
@@ -25,7 +24,5 @@ fun main(args: Array<String>) {
                 override fun listAll(): Single<List<Doc>> = Single.just(listOf(Doc("hello", ZonedDateTime.now())))
             })
     )
-    verticles.forEach {
-        vertx.deployVerticle(it)
-    }
+    verticles.forEach(vertx::deployVerticle)
 }
