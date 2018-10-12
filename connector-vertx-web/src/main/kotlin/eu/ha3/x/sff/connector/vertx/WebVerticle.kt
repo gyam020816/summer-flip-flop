@@ -8,7 +8,6 @@ package eu.ha3.x.sff.connector.vertx
  */
 
 
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.vertx.core.Future
 import io.vertx.core.http.HttpMethod
@@ -57,17 +56,19 @@ class WebVerticle : AbstractVerticle() {
     }
 
     private fun appendToDocs(rc: RoutingContext) {
-        val parsed = rc.bodyAsString.dejsonifyByParsing(DocCreateRequest::class.java)
+        val parsed: DocCreateRequest = try {
+            rc.bodyAsString.dejsonifyByParsing(DocCreateRequest::class.java)
+
+        } catch (e: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException) {
+            rc.fail(400)
+            return
+        }
+
         vertx.eventBus().dsSend<DocResponse>(DEvent.APPEND_TO_DOCS.address(), parsed).subscribe({ res ->
             rc.replyJson(res.answer.data, 201)
 
         }, { err ->
-            if (err is MissingKotlinParameterException) {
-                rc.fail(400)
-
-            } else {
-                rc.serverError()
-            }
+            rc.serverError()
         })
     }
 

@@ -4,6 +4,7 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.test.TestSample
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
+import io.vertx.kotlin.core.json.JsonObject
 import io.vertx.rxjava.core.Vertx
 import io.vertx.rxjava.ext.web.client.WebClient
 import net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
@@ -76,6 +77,25 @@ class WebVerticleTest {
 
                         assertThatJson(result.bodyAsString()).isEqualTo(expected.jsonify().inner.encodePrettily())
                         assertThat(result.statusCode()).isEqualTo(201)
+                        async.flag()
+                    }
+                }
+    }
+
+    @Test
+    fun `it should error with bad request`(context: VertxTestContext) {
+        val async = context.checkpoint()
+
+        // Exercise
+        WebClient.create(vertx)
+                .post(8080, "localhost", "/docs")
+                .sendJson(JsonObject()) { response ->
+                    // Verify
+                    context.verify {
+                        val result = response.result()
+
+                        assertThat(result.bodyAsString()).isEqualTo("")
+                        assertThat(result.statusCode()).isEqualTo(400)
                         async.flag()
                     }
                 }
