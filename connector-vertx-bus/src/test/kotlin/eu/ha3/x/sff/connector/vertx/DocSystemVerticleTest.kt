@@ -4,6 +4,8 @@ import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.stub
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.system.IDocSystem
 import io.reactivex.Single
 import io.vertx.junit5.VertxExtension
@@ -48,7 +50,7 @@ internal class DocSystemVerticleTest {
     @Test
     fun `it should delegate listAll`(context: VertxTestContext) {
         val async = context.checkpoint()
-        val expected = listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC)))
+        val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC))))
         docSystem.stub {
             on { listAll() }.doReturn(Single.just(expected))
         }
@@ -56,7 +58,7 @@ internal class DocSystemVerticleTest {
         // Exercise
         vertx.eventBus().dsSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
             context.verify {
-                assertThat(res.answer).isEqualTo(DocListResponse(expected))
+                assertThat(res.answer).isEqualTo(expected)
             }
 
             async.flag()

@@ -1,6 +1,8 @@
 package eu.ha3.x.sff.api
 
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocCreateRequest
+import eu.ha3.x.sff.core.DocListResponse
 import io.reactivex.Single
 
 /**
@@ -10,5 +12,6 @@ import io.reactivex.Single
  * @author gyam
  */
 interface IDocStorage {
-    fun listAll(): Single<List<Doc>>
+    fun appendToDocs(doc: DocCreateRequest): Single<Doc>
+    fun listAll(): Single<DocListResponse>
 }

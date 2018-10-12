@@ -1,9 +1,12 @@
 package eu.ha3.x.sff.connector.vertx
 
+import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.system.IDocSystem
+import io.reactivex.Single
 import io.vertx.core.Future
 import io.vertx.rxjava.core.AbstractVerticle
-import io.vertx.rxjava.core.eventbus.Message
 
 /**
  * (Default template)
@@ -13,19 +16,26 @@ import io.vertx.rxjava.core.eventbus.Message
  */
 class DocSystemVerticle(private val delegate: IDocSystem) : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
-        vertx.eventBus().apply {
-            dsConsumer(DEvent.SYSTEM_LIST_DOCS.address(), ::handler)
-        }
+        DocSystemVerticle.appendToDocs.ofSingle { doc ->
+            delegate.appendToDocs(doc)
+
+        }.bind(vertx.eventBus())
+
+        DocSystemVerticle.listDocs.ofSingle {
+            delegate.listAll()
+
+        }.bind(vertx.eventBus())
 
         fut.complete()
     }
 
-    private fun handler(noMessage: NoMessage, msg: Message<DJsonObject>) {
-        delegate.listAll().subscribe({ result ->
-            msg.reply(DocListResponse(result).asAnswer())
+    object VersDocStorage : IDocSystem {
+        override fun appendToDocs(doc: Doc): Single<NoMessage> = appendToDocs.questionner()(doc)
+        override fun listAll(): Single<DocListResponse> = listDocs.questionner()(NoMessage())
+    }
 
-        }, { error ->
-            msg.fail(500, "")
-        })
+    companion object {
+        val appendToDocs = Binder(DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
+        val listDocs = Binder(DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
     }
 }

@@ -1,6 +1,8 @@
 package eu.ha3.x.sff.system
 
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.NoMessage
 import io.reactivex.Single
 
 /**
@@ -10,5 +12,6 @@ import io.reactivex.Single
  * @author gyam
  */
 interface IDocSystem {
-    fun listAll(): Single<List<Doc>>
+    fun listAll(): Single<DocListResponse>
+    fun appendToDocs(doc: Doc): Single<NoMessage>
 }

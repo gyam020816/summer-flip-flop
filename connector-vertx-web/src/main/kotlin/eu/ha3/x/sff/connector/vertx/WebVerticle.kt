@@ -9,6 +9,8 @@ package eu.ha3.x.sff.connector.vertx
 
 
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import eu.ha3.x.sff.api.IDocStorage
+import eu.ha3.x.sff.core.DocCreateRequest
 import io.vertx.core.Future
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.Json
@@ -17,7 +19,7 @@ import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
 import io.vertx.rxjava.ext.web.handler.BodyHandler
 
-class WebVerticle : AbstractVerticle() {
+class WebVerticle(private val docStorage: IDocStorage) : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         val router: Router = Router.router(vertx)
         router.route().handler(BodyHandler.create());
@@ -45,18 +47,16 @@ class WebVerticle : AbstractVerticle() {
     }
 
     private fun getDocs(rc: RoutingContext) {
-        vertx.eventBus().send<DJsonObject>(DEvent.LIST_DOCS.address(), NoMessage().jsonify()) { res ->
-            if (res.succeeded()) {
-                rc.replyJson(res.result().body().dejsonify(DocListResponse::class.java).data, 200)
+        docStorage.listAll().subscribe({ res ->
+            rc.replyJson(res.data, 200)
 
-            } else {
-                rc.serverError()
-            }
-        }
+        }, { error ->
+            rc.serverError()
+        })
     }
 
     private fun appendToDocs(rc: RoutingContext) {
-        val parsed: DocCreateRequest = try {
+        val createRequest: DocCreateRequest = try {
             rc.bodyAsString.dejsonifyByParsing(DocCreateRequest::class.java)
 
         } catch (e: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException) {
@@ -64,8 +64,8 @@ class WebVerticle : AbstractVerticle() {
             return
         }
 
-        vertx.eventBus().dsSend<DocResponse>(DEvent.APPEND_TO_DOCS.address(), parsed).subscribe({ res ->
-            rc.replyJson(res.answer.data, 201)
+        docStorage.appendToDocs(createRequest).subscribe({ res ->
+            rc.replyJson(res, 201)
 
         }, { err ->
             rc.serverError()

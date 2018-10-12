@@ -2,9 +2,10 @@
 import eu.ha3.x.sff.api.DocStorage
 import eu.ha3.x.sff.connector.vertx.DJsonObject
 import eu.ha3.x.sff.connector.vertx.DJsonObjectMessageCodec
-import eu.ha3.x.sff.connector.vertx.DocStorageVerticle
 import eu.ha3.x.sff.connector.vertx.WebVerticle
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.system.IDocSystem
 import io.reactivex.Single
 import io.vertx.core.Vertx
@@ -21,9 +22,9 @@ fun main(args: Array<String>) {
     vertx.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
 
     val verticles = listOf(
-            WebVerticle(),
-            DocStorageVerticle(DocStorage(object : IDocSystem {
-                override fun listAll(): Single<List<Doc>> = Single.just(listOf(Doc("hello", ZonedDateTime.now())))
+            WebVerticle(DocStorage(object : IDocSystem {
+                override fun appendToDocs(doc: Doc) = Single.just(NoMessage())
+                override fun listAll() = Single.just(DocListResponse(listOf(Doc("hello", ZonedDateTime.now()))))
             }))
     )
     verticles.forEach(vertx::deployVerticle)

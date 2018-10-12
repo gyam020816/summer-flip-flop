@@ -4,6 +4,7 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import eu.ha3.x.sff.api.IDocStorage
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.test.TestSample
 import io.reactivex.Single
 import org.junit.jupiter.api.Test
@@ -34,22 +35,6 @@ public class PayloadControllerTest : AControllerTest() {
     lateinit var mockDocStorage: IDocStorage;
 
     @Test
-    public fun `it should return a greeting`() {
-        mockMvc.perform(get("/greeting"))
-                .andExpect(status().isOk)
-                .andExpect(content().string("""{"id":0,"content":"Hello, World"}"""))
-    }
-
-    @Test
-    public fun `it should return a custom greeting`() {
-        mockMvc.perform(
-                get("/greeting?name=Gérald")
-        )
-                .andExpect(status().isOk)
-                .andExpect(content().string("""{"id":0,"content":"Hello, Gérald"}"""))
-    }
-
-    @Test
     public fun `it should upload a doc and return its size`() {
         mockMvc.perform(fileUpload("/docs").file(MockMultipartFile("file", "hello".toByteArray(StandardCharsets.UTF_8))))
                 .andExpect(status().isCreated)
@@ -65,7 +50,7 @@ public class PayloadControllerTest : AControllerTest() {
     @Test
     public fun `it should list all docs`() {
         whenever(mockDocStorage.listAll())
-                .thenReturn(Single.just(listOf(someDoc())))
+                .thenReturn(Single.just(DocListResponse(listOf(someDoc()))))
 
         mockMvc.perform(get("/docs"))
                 .andExpect(content().string("""[{"name":"ABCD","createdAt":"${TestSample.zonedDateTimeSerialized}"}]"""))

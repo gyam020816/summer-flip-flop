@@ -5,6 +5,8 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.stub
 import eu.ha3.x.sff.api.IDocStorage
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.NoMessage
 import io.reactivex.Single
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
@@ -49,14 +51,14 @@ internal class DocStorageVerticleTest {
     @Test
     fun `it should delegate listAll`(context: VertxTestContext) {
         val async = context.checkpoint()
-        val expected = listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC)))
+        val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC))))
         docStorage.stub {
             on { listAll() }.doReturn(Single.just(expected))
         }
 
         // Exercise
         vertx.eventBus().dsSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
-            assertThat(res.answer).isEqualTo(DocListResponse(expected))
+            assertThat(res.answer).isEqualTo(expected)
             async.flag()
         }, context::failNow)
     }
