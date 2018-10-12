@@ -32,3 +32,20 @@ inline fun <reified Q, reified A : Any> EventBus.dsAnswerer(address: String, cro
         consumerFn(handle.body().interpretAs(Q::class.java), DAnswerer(handle))
     }
 }
+
+inline fun <A> EventBus.dsSendBound(address: String, question: Any, answerClass: Class<A>): Single<DAnswer<A>> = Single.create { handler ->
+    rxSend<DJsonObject>(address, question.asQuestion()).subscribe({ success ->
+        handler.onSuccess(DAnswer(success.body().interpretAs(answerClass), success))
+
+    }, handler::onError);
+}
+inline fun <Q> EventBus.dsConsumerBound(address: String, crossinline consumerFn: (question: Q, message: Message<DJsonObject>) -> Unit, questionClass: Class<Q>) {
+    this.consumer<DJsonObject>(address) { handle ->
+        consumerFn(handle.body().interpretAs(questionClass), handle)
+    }
+}
+inline fun <Q, A : Any> EventBus.dsAnswererBound(address: String, crossinline consumerFn: (question: Q, answerer: DAnswerer<A>) -> Unit, questionClass: Class<Q>) {
+    this.consumer<DJsonObject>(address) { handle ->
+        consumerFn(handle.body().interpretAs(questionClass), DAnswerer(handle))
+    }
+}
