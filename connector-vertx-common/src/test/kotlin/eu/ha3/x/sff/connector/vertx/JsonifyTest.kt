@@ -56,7 +56,7 @@ internal class JsonifyTest {
 
         // Verify
         result.inner.apply {
-            assertThat(getString("someZdt")).isEqualTo("2010-12-30T22:00:04.123+01:00[Europe/Paris]")
+            assertThat(getString("someZdt")).isEqualTo("2010-12-30T22:00:04.123+01:00")
             assertThat(getJsonArray("someList")).containsExactly("a", "b")
             assertThat(getString("someString")).isEqualTo("hello")
         }
@@ -66,7 +66,7 @@ internal class JsonifyTest {
     internal fun `it should convert json to non-utc model`() {
         val expected = JsonifyTest.MODEL_ZONED_PARIS
         val json = DJsonObject(JsonObject()
-                .put("someZdt", "2010-12-30T22:00:04.123+01:00[Europe/Paris]")
+                .put("someZdt", "2010-12-30T22:00:04.123+01:00")
                 .put("someList", JsonArray(listOf("a", "b")))
                 .put("someString", "hello"))
 
@@ -79,12 +79,12 @@ internal class JsonifyTest {
 
     companion object {
         val MODEL = ExampleModel(
-                ZonedDateTime.of(2010, 12, 30, 22, 0, 4, 123_000_000, ZoneOffset.UTC),
+                ZonedDateTime.of(2010, 12, 30, 22, 0, 4, 123_000_000, ZoneOffset.UTC).withFixedOffsetZone(),
                 listOf("a", "b"),
                 "hello"
         )
         val MODEL_ZONED_PARIS = ExampleModel(
-                ZonedDateTime.of(2010, 12, 30, 22, 0, 4, 123_000_000, ZoneId.of("Europe/Paris")),
+                ZonedDateTime.of(2010, 12, 30, 22, 0, 4, 123_000_000, ZoneId.of("Europe/Paris")).withFixedOffsetZone(),
                 listOf("a", "b"),
                 "hello"
         )
