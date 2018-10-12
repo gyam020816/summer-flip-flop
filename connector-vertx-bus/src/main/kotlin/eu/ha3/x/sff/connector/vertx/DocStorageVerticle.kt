@@ -3,7 +3,6 @@ package eu.ha3.x.sff.connector.vertx
 import eu.ha3.x.sff.api.IDocStorage
 import io.vertx.core.Future
 import io.vertx.rxjava.core.AbstractVerticle
-import io.vertx.rxjava.core.eventbus.Message
 
 /**
  * (Default template)
@@ -14,18 +13,18 @@ import io.vertx.rxjava.core.eventbus.Message
 class DocStorageVerticle(private val delegate: IDocStorage) : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         vertx.eventBus().apply {
-            dsConsumer(DEvent.LIST_DOCS.address(), ::handler)
+            dsAnswerer(DEvent.LIST_DOCS.address(), ::handler)
         }
 
         fut.complete()
     }
 
-    private fun handler(noMessage: NoMessage, msg: Message<DJsonObject>) {
+    private fun handler(noMessage: NoMessage, msg: DAnswerer<DocListResponse>) {
         delegate.listAll().subscribe({ result ->
-            msg.reply(DocListResponse(result).asAnswer())
+            msg.answer(DocListResponse(result))
 
         }, { error ->
-            msg.fail(500, "")
+            msg.message.fail(500, "")
         })
     }
 }

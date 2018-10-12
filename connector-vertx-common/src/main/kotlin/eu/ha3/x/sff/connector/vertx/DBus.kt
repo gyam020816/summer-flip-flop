@@ -11,6 +11,11 @@ import io.vertx.rxjava.core.eventbus.Message
  * @author Ha3
  */
 data class DAnswer<T>(val answer: T, val message: Message<DJsonObject>)
+data class DAnswerer<A : Any>(val message: Message<DJsonObject>) {
+    fun answer(answer: A) {
+        message.reply(answer.asAnswer())
+    }
+}
 inline fun <reified A> EventBus.dsSend(address: String, question: Any): Single<DAnswer<A>> = Single.create { handler ->
     rxSend<DJsonObject>(address, question.asQuestion()).subscribe({ success ->
         handler.onSuccess(DAnswer(success.body().interpretAs(A::class.java), success))
@@ -20,5 +25,10 @@ inline fun <reified A> EventBus.dsSend(address: String, question: Any): Single<D
 inline fun <reified Q> EventBus.dsConsumer(address: String, crossinline consumerFn: (question: Q, message: Message<DJsonObject>) -> Unit) {
     this.consumer<DJsonObject>(address) { handle ->
         consumerFn(handle.body().interpretAs(Q::class.java), handle)
+    }
+}
+inline fun <reified Q, reified A : Any> EventBus.dsAnswerer(address: String, crossinline consumerFn: (question: Q, answerer: DAnswerer<A>) -> Unit) {
+    this.consumer<DJsonObject>(address) { handle ->
+        consumerFn(handle.body().interpretAs(Q::class.java), DAnswerer(handle))
     }
 }
