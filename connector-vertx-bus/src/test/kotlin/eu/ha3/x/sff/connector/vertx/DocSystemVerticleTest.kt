@@ -3,8 +3,8 @@ package eu.ha3.x.sff.connector.vertx
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.stub
-import eu.ha3.x.sff.api.IDocSystem
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.system.IDocSystem
 import io.reactivex.Single
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext

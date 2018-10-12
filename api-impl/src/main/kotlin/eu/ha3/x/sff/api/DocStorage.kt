@@ -1,6 +1,7 @@
 package eu.ha3.x.sff.api
 
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.system.IDocSystem
 import io.reactivex.Single
 
 /**
