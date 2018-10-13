@@ -20,19 +20,19 @@ class DocStorageVerticle(private val delegate: IDocStorage) : AbstractVerticle()
         appendToDocs.ofSingle { doc ->
             delegate.appendToDocs(doc)
 
-        }.bind(vertx.eventBus())
+        }.registerAnswerer(vertx.eventBus())
 
         listDocs.ofSingle {
             delegate.listAll()
 
-        }.bind(vertx.eventBus())
+        }.registerAnswerer(vertx.eventBus())
 
         fut.complete()
     }
 
     object VersDocStorage : IDocStorage {
-        override fun appendToDocs(doc: DocCreateRequest): Single<Doc> = appendToDocs.questionner()(doc)
-        override fun listAll(): Single<DocListResponse> = listDocs.questionner()(NoMessage())
+        override fun appendToDocs(doc: DocCreateRequest): Single<Doc> = appendToDocs.questionSender()(doc)
+        override fun listAll(): Single<DocListResponse> = listDocs.questionSender()(NoMessage())
     }
 
     companion object {

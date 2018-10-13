@@ -19,19 +19,19 @@ class DocSystemVerticle(private val delegate: IDocSystem) : AbstractVerticle() {
         DocSystemVerticle.appendToDocs.ofSingle { doc ->
             delegate.appendToDocs(doc)
 
-        }.bind(vertx.eventBus())
+        }.registerAnswerer(vertx.eventBus())
 
         DocSystemVerticle.listDocs.ofSingle {
             delegate.listAll()
 
-        }.bind(vertx.eventBus())
+        }.registerAnswerer(vertx.eventBus())
 
         fut.complete()
     }
 
     object VersDocStorage : IDocSystem {
-        override fun appendToDocs(doc: Doc): Single<NoMessage> = appendToDocs.questionner()(doc)
-        override fun listAll(): Single<DocListResponse> = listDocs.questionner()(NoMessage())
+        override fun appendToDocs(doc: Doc): Single<NoMessage> = appendToDocs.questionSender(doc)
+        override fun listAll(): Single<DocListResponse> = listDocs.questionSender(NoMessage())
     }
 
     companion object {

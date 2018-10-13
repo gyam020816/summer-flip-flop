@@ -23,11 +23,12 @@ class Binder<Q : Any, A : Any>(
 
     interface DBind<B> {
         fun registerAnswerer(bus: EventBus)
-        fun questionner(): B
         fun bind(bus: EventBus): B
     }
 
-    fun questionner(): (Q) -> Single<A> = { question ->
+    fun questionSender(q: Q): Single<A> = questionSender()(q)
+
+    fun questionSender(): (Q) -> Single<A> = { question ->
         Single.create<A> { handler ->
             vertx.eventBus().dsSendBound(address, question, answerClass).subscribe({ res ->
                 handler.onSuccess(res.answer)
@@ -37,8 +38,6 @@ class Binder<Q : Any, A : Any>(
     }
 
     inner class BSingle(private val boundFn: (Q) -> Single<A>): DBind<(Q) -> Single<A>> {
-        override fun questionner(): (Q) -> Single<A> = this@Binder.questionner()
-
         override fun registerAnswerer(bus: EventBus) {
             bus.dsAnswererBound(address, { question: Q, answerer: DAnswerer<A> ->
                 boundFn.invoke(question).subscribe(answerer::answer, errorHandler.invoke(answerer))
@@ -47,7 +46,7 @@ class Binder<Q : Any, A : Any>(
 
         override fun bind(bus: EventBus): (Q) -> Single<A> {
             registerAnswerer(bus)
-            return this.questionner()
+            return questionSender()
         }
     }
 }
