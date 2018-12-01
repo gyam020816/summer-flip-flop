@@ -11,6 +11,8 @@ import io.vertx.rxjava.core.eventbus.Message
  *
  * @author Ha3
  */
+typealias DConsumer<Q, A> = (question: Q, answerer: DEventBus.DAnswerer<A>) -> Unit;
+
 class DEventBus(val eventBus: EventBus, objectMapper: ObjectMapper) {
     val mapper = DMapper(objectMapper)
 
@@ -28,10 +30,10 @@ class DEventBus(val eventBus: EventBus, objectMapper: ObjectMapper) {
     }
     inline fun <reified A> dsSend(address: String, question: Any): Single<DAnswer<A>> = dsSend(address, question, A::class.java)
 
-    inline fun <Q, A : Any> dsConsumer(address: String, crossinline consumerFn: (question: Q, answerer: DAnswerer<A>) -> Unit, questionClass: Class<Q>) {
+    inline fun <Q, A : Any> dsConsumer(address: String, crossinline consumerFn: DConsumer<Q, A>, questionClass: Class<Q>) {
         eventBus.consumer<DJsonObject>(address) { handle ->
             consumerFn(mapper.interpretAs(handle.body(), questionClass), DAnswerer(handle))
         }
     }
-    inline fun <reified Q, A : Any> dsConsumer(address: String, crossinline consumerFn: (question: Q, answerer: DAnswerer<A>) -> Unit) = dsConsumer(address, consumerFn, Q::class.java);
+    inline fun <reified Q, A : Any> dsConsumer(address: String, crossinline consumerFn: DConsumer<Q, A>) = dsConsumer(address, consumerFn, Q::class.java);
 }
