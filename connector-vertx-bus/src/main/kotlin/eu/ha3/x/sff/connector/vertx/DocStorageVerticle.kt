@@ -16,6 +16,9 @@ import io.vertx.rxjava.core.AbstractVerticle
  * @author gyam
  */
 class DocStorageVerticle(private val delegate: IDocStorage) : AbstractVerticle() {
+    val appendToDocs = Binder(Jsonify.mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
+    val listDocs = Binder(Jsonify.mapper, DEvent.LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
+
     override fun start(fut: Future<Void>) {
         appendToDocs.ofSingle { doc ->
             delegate.appendToDocs(doc)
@@ -30,14 +33,9 @@ class DocStorageVerticle(private val delegate: IDocStorage) : AbstractVerticle()
         fut.complete()
     }
 
-    object VersDocStorage : IDocStorage {
-        override fun appendToDocs(doc: DocCreateRequest): Single<Doc> = appendToDocs.questionSender()(doc)
-        override fun listAll(): Single<DocListResponse> = listDocs.questionSender()(NoMessage())
-    }
-
-    companion object {
-        val appendToDocs = Binder(DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
-        val listDocs = Binder(DEvent.LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
+    inner class VersDocStorage : IDocStorage {
+        override fun appendToDocs(doc: DocCreateRequest): Single<Doc> = (appendToDocs.questionSender(vertx.eventBus()))(doc)
+        override fun listAll(): Single<DocListResponse> = (listDocs.questionSender(vertx.eventBus()))(NoMessage())
     }
 }
 

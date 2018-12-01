@@ -16,13 +16,14 @@ import java.time.ZonedDateTime
  */
 internal class JsonifyTest {
     data class ExampleModel(val someZdt: ZonedDateTime, val someList: List<String>, val someString: String)
+    private val mapper = DMapper(Jsonify.mapper)
 
     @Test
     internal fun `it should convert model to json`() {
         val model = JsonifyTest.MODEL
 
         // Exercise
-        val result = model.jsonify()
+        val result = mapper.jsonify(model)
 
         // Verify
         result.inner.apply {
@@ -41,7 +42,7 @@ internal class JsonifyTest {
                 .put("someString", "hello"))
 
         // Exercise
-        val result = json.dejsonify(ExampleModel::class.java)
+        val result = mapper.dejsonify(json, ExampleModel::class.java)
 
         // Verify
         assertThat(result).isEqualTo(expected)
@@ -52,7 +53,7 @@ internal class JsonifyTest {
         val model = JsonifyTest.MODEL_ZONED_PARIS
 
         // Exercise
-        val result = model.jsonify()
+        val result = mapper.jsonify(model)
 
         // Verify
         result.inner.apply {
@@ -71,7 +72,7 @@ internal class JsonifyTest {
                 .put("someString", "hello"))
 
         // Exercise
-        val result = json.dejsonify(ExampleModel::class.java)
+        val result = mapper.dejsonify(json, ExampleModel::class.java)
 
         // Verify
         assertThat(result).isEqualTo(expected)

@@ -57,11 +57,14 @@ object Jsonify {
 }
 
 data class DJsonObject(val inner: JsonObject)
-@Deprecated("Use interpretAs() instead") fun <T> DJsonObject.dejsonify(klass: Class<T>): T = Jsonify.mapper.convertValue<T>(this.inner.map, klass)
-fun <T> DJsonObject.interpretAs(klass: Class<T>): T = Jsonify.mapper.convertValue<T>(this.inner.map, klass)
-fun <T> String.dejsonifyByParsing(klass: Class<T>): T = Jsonify.mapper.readValue(this, klass)
-@Deprecated("Use asQuestion() or asAnswer() instead") fun Any.jsonify(): DJsonObject = DJsonObject(JsonObject(Jsonify.mapper.convertValue(this, Map::class.java) as Map<String, Any>))
-fun Any.asQuestion(): DJsonObject = DJsonObject(JsonObject(Jsonify.mapper.convertValue(this, Map::class.java) as Map<String, Any>))
-fun Any.asAnswer(): DJsonObject = DJsonObject(JsonObject(Jsonify.mapper.convertValue(this, Map::class.java) as Map<String, Any>))
-fun Any.jsonifyToString(): String = Jsonify.mapper.writeValueAsString(this)
-fun Any.jsonifyToPrettyString(): String = Jsonify.prettyMapper.writeValueAsString(this)
+class DMapper(private val mapper: ObjectMapper) {
+    @Deprecated("Use interpretAs() instead")
+    fun <T> dejsonify(dJsonObject: DJsonObject, klass: Class<T>): T = mapper.convertValue<T>(dJsonObject.inner.map, klass)
+    fun <T> interpretAs(dJsonObject: DJsonObject, klass: Class<T>): T = mapper.convertValue<T>(dJsonObject.inner.map, klass)
+    fun <T> dejsonifyByParsing(s: String, klass: Class<T>): T = mapper.readValue(s, klass)
+    @Deprecated("Use asQuestion() or asAnswer() instead")
+    fun jsonify(any: Any): DJsonObject = DJsonObject(JsonObject(mapper.convertValue(any, Map::class.java) as Map<String, Any>))
+    fun asQuestion(any: Any): DJsonObject = DJsonObject(JsonObject(mapper.convertValue(any, Map::class.java) as Map<String, Any>))
+    fun asAnswer(any: Any): DJsonObject = DJsonObject(JsonObject(mapper.convertValue(any, Map::class.java) as Map<String, Any>))
+    fun jsonifyToString(any: Any): String = mapper.writeValueAsString(any)
+}

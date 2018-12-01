@@ -57,7 +57,7 @@ internal class DocStorageVerticleTest {
         }
 
         // Exercise
-        vertx.eventBus().dsSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
+        DBound(vertx.eventBus(), Jsonify.mapper).dsSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
             assertThat(res.answer).isEqualTo(expected)
             async.flag()
         }, context::failNow)

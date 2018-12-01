@@ -8,31 +8,23 @@ package eu.ha3.x.sff.connector.vertx
  */
 
 
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import eu.ha3.x.sff.api.IDocStorage
 import eu.ha3.x.sff.core.DocCreateRequest
 import io.vertx.core.Future
 import io.vertx.core.http.HttpMethod
-import io.vertx.core.json.Json
 import io.vertx.rxjava.core.AbstractVerticle
 import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
 import io.vertx.rxjava.ext.web.handler.BodyHandler
 
 class WebVerticle(private val docStorage: IDocStorage) : AbstractVerticle() {
+    private val objectMapper = Jsonify.prettyMapper
+
     override fun start(fut: Future<Void>) {
         val router: Router = Router.router(vertx)
         router.route().handler(BodyHandler.create());
         router.route(HttpMethod.GET, "/docs").handler(::getDocs)
         router.route(HttpMethod.POST, "/docs").handler(::appendToDocs);
-
-        Json.mapper.apply {
-            registerKotlinModule()
-        }
-
-        Json.prettyMapper.apply {
-            registerKotlinModule()
-        }
 
         vertx
                 .createHttpServer()
@@ -57,7 +49,7 @@ class WebVerticle(private val docStorage: IDocStorage) : AbstractVerticle() {
 
     private fun appendToDocs(rc: RoutingContext) {
         val createRequest: DocCreateRequest = try {
-            rc.bodyAsString.dejsonifyByParsing(DocCreateRequest::class.java)
+            DMapper(objectMapper).dejsonifyByParsing(rc.bodyAsString, DocCreateRequest::class.java)
 
         } catch (e: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException) {
             rc.fail(400)
@@ -75,7 +67,7 @@ class WebVerticle(private val docStorage: IDocStorage) : AbstractVerticle() {
     private fun RoutingContext.replyJson(obj: Any, code: Int) {
         response().setStatusCode(code)
                 .putHeader("content-type", "application/json; charset=utf-8")
-                .end(obj.jsonifyToPrettyString())
+                .end(DMapper(objectMapper).jsonifyToString(obj))
     }
 
     private fun RoutingContext.serverError() {

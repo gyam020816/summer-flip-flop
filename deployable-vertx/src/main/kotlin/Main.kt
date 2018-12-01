@@ -19,13 +19,17 @@ fun main(args: Array<String>) {
     val vertx = Vertx.vertx()
     vertx.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
 
+    val system = DocSystemVerticle(object : IDocSystem {
+        override fun appendToDocs(doc: Doc) = Single.just(NoMessage())
+        override fun listAll() = Single.just(DocListResponse(listOf(Doc("hello", ZonedDateTime.now()))))
+    })
+    val storage = DocStorageVerticle(DocStorage(system.VersDocStorage()))
+    val web = WebVerticle(storage.VersDocStorage())
+
     val verticles = listOf(
-            WebVerticle(DocStorageVerticle.VersDocStorage),
-            DocStorageVerticle(DocStorage(DocSystemVerticle.VersDocStorage)),
-            DocSystemVerticle(object : IDocSystem {
-                override fun appendToDocs(doc: Doc) = Single.just(NoMessage())
-                override fun listAll() = Single.just(DocListResponse(listOf(Doc("hello", ZonedDateTime.now()))))
-            })
+            system,
+            storage,
+            web
     )
     verticles.forEach(vertx::deployVerticle)
 }

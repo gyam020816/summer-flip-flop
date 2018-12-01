@@ -1,7 +1,7 @@
 package eu.ha3.x.sff.connector.vertx
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.reactivex.Single
-import io.vertx.rxjava.core.AbstractVerticle
 import io.vertx.rxjava.core.eventbus.EventBus
 
 /**
@@ -12,13 +12,14 @@ import io.vertx.rxjava.core.eventbus.EventBus
  */
 interface DBinder
 class Binder<Q : Any, A : Any>(
+        private val objectMapper: ObjectMapper,
         private val address: String,
         private val questionClass: Class<Q>,
         private val answerClass: Class<A>,
-        private val errorHandler: (DAnswerer<*>) -> (Throwable) -> Unit = { answerer -> { error ->
+        private val errorHandler: (DBound.DAnswerer<*>) -> (Throwable) -> Unit = { answerer -> { error ->
             answerer.message.fail(500, "")
         }}
-) : AbstractVerticle(), DBinder {
+) : DBinder {
     fun ofSingle(boundFn: (Q) -> Single<A>) = BSingle(boundFn)
 
     interface DBind<B> {
@@ -26,11 +27,11 @@ class Binder<Q : Any, A : Any>(
         fun bind(bus: EventBus): B
     }
 
-    fun questionSender(q: Q): Single<A> = questionSender()(q)
+    fun questionSender(eventBus: EventBus, q: Q): Single<A> = questionSender(eventBus)(q)
 
-    fun questionSender(): (Q) -> Single<A> = { question ->
+    fun questionSender(bus: EventBus): (Q) -> Single<A> = { question ->
         Single.create<A> { handler ->
-            vertx.eventBus().dsSendBound(address, question, answerClass).subscribe({ res ->
+            DBound(bus, objectMapper).dsSendBound(address, question, answerClass).subscribe({ res ->
                 handler.onSuccess(res.answer)
 
             }, handler::onError);
@@ -39,14 +40,14 @@ class Binder<Q : Any, A : Any>(
 
     inner class BSingle(private val boundFn: (Q) -> Single<A>): DBind<(Q) -> Single<A>> {
         override fun registerAnswerer(bus: EventBus) {
-            bus.dsAnswererBound(address, { question: Q, answerer: DAnswerer<A> ->
+            DBound(bus, objectMapper).dsAnswererBound(address, { question: Q, answerer: DBound.DAnswerer<A> ->
                 boundFn.invoke(question).subscribe(answerer::answer, errorHandler.invoke(answerer))
             }, questionClass)
         }
 
         override fun bind(bus: EventBus): (Q) -> Single<A> {
             registerAnswerer(bus)
-            return questionSender()
+            return questionSender(bus)
         }
     }
 }

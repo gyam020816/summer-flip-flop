@@ -80,12 +80,12 @@ class WebVerticleTest {
         // Exercise
         WebClient.create(vertx)
                 .post(8080, "localhost", "/docs")
-                .sendJson(request.jsonify().inner) { response ->
+                .sendJson(DMapper(Jsonify.mapper).jsonify(request).inner) { response ->
                     // Verify
                     context.verify {
                         val result = response.result()
 
-                        assertThatJson(result.bodyAsString()).isEqualTo(expected.jsonify().inner.encodePrettily())
+                        assertThatJson(result.bodyAsString()).isEqualTo(DMapper(Jsonify.mapper).jsonify(expected).inner.encodePrettily())
                         assertThat(result.statusCode()).isEqualTo(201)
                         async.flag()
                     }
