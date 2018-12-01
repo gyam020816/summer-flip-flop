@@ -16,17 +16,17 @@ import io.vertx.rxjava.core.eventbus.EventBus
  * @author gyam
  */
 class DocSystemVertx {
-    val appendToDocs = Binder(Jsonify.mapper, DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
-    val listDocs = Binder(Jsonify.mapper, DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
+    val appendToDocsBinder = Binder(Jsonify.mapper, DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
+    val listDocsBinder = Binder(Jsonify.mapper, DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
     inner class Verticle(private val concrete: IDocSystem) : AbstractVerticle() {
         override fun start(fut: Future<Void>) {
-            appendToDocs.ofSingle { doc ->
+            appendToDocsBinder.ofSingle { doc ->
                 concrete.appendToDocs(doc)
 
             }.registerAnswerer(vertx.eventBus())
 
-            listDocs.ofSingle {
+            listDocsBinder.ofSingle {
                 concrete.listAll()
 
             }.registerAnswerer(vertx.eventBus())
@@ -36,7 +36,10 @@ class DocSystemVertx {
     }
 
     inner class QuestionSender(private val eventBus: EventBus) : IDocSystem {
-        override fun appendToDocs(doc: Doc): Single<NoMessage> = (appendToDocs.questionSender(eventBus))(doc)
-        override fun listAll(): Single<DocListResponse> = (listDocs.questionSender(eventBus))(NoMessage())
+        private val appendToDocsFn = appendToDocsBinder.questionSender(eventBus)
+        private val listDocsFn = listDocsBinder.questionSender(eventBus)
+
+        override fun appendToDocs(doc: Doc): Single<NoMessage> = appendToDocsFn(doc)
+        override fun listAll(): Single<DocListResponse> = listDocsFn(NoMessage())
     }
 }
