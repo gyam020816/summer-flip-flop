@@ -56,7 +56,7 @@ internal class DocSystemVertxTest {
         }
 
         // Exercise
-        DBound(vertx.eventBus(), Jsonify.mapper).dsSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
+        DEventBus(vertx.eventBus(), Jsonify.mapper).dsSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
             context.verify {
                 assertThat(res.answer).isEqualTo(expected)
             }

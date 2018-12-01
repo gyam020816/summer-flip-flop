@@ -16,7 +16,7 @@ class Binder<Q : Any, A : Any>(
         private val address: String,
         private val questionClass: Class<Q>,
         private val answerClass: Class<A>,
-        private val errorHandler: (DBound.DAnswerer<*>) -> (Throwable) -> Unit = { answerer -> { error ->
+        private val errorHandler: (DEventBus.DAnswerer<*>) -> (Throwable) -> Unit = { answerer -> { error ->
             answerer.message.fail(500, "")
         }}
 ) : DBinder {
@@ -31,7 +31,7 @@ class Binder<Q : Any, A : Any>(
 
     fun questionSender(bus: EventBus): (Q) -> Single<A> = { question ->
         Single.create<A> { handler ->
-            DBound(bus, objectMapper).dsSendBound(address, question, answerClass).subscribe({ res ->
+            DEventBus(bus, objectMapper).dsSend(address, question, answerClass).subscribe({ res ->
                 handler.onSuccess(res.answer)
 
             }, handler::onError);
@@ -40,7 +40,7 @@ class Binder<Q : Any, A : Any>(
 
     inner class BSingle(private val boundFn: (Q) -> Single<A>): DBind<(Q) -> Single<A>> {
         override fun registerAnswerer(bus: EventBus) {
-            DBound(bus, objectMapper).dsAnswererBound(address, { question: Q, answerer: DBound.DAnswerer<A> ->
+            DEventBus(bus, objectMapper).dsConsumer(address, { question: Q, answerer: DEventBus.DAnswerer<A> ->
                 boundFn.invoke(question).subscribe(answerer::answer, errorHandler.invoke(answerer))
             }, questionClass)
         }
