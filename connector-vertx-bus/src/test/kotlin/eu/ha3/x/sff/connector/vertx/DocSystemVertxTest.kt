@@ -3,10 +3,10 @@ package eu.ha3.x.sff.connector.vertx
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.stub
-import eu.ha3.x.sff.api.IDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.system.IDocSystem
 import io.reactivex.Single
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
@@ -21,22 +21,21 @@ import java.time.ZonedDateTime
 
 /**
  * (Default template)
- * Created on 2018-10-06
+ * Created on 2018-10-07
  *
- * @author gyam
+ * @author Ha3
  */
-
 @ExtendWith(VertxExtension::class)
-internal class DocStorageVerticleTest {
+internal class DocSystemVertxTest {
     private lateinit var vertx: Vertx
-    private lateinit var docStorage: IDocStorage
+    private lateinit var docSystem: IDocSystem
 
     @BeforeEach
     fun setUp(context: VertxTestContext) {
-        docStorage = mock()
+        docSystem = mock()
         vertx = Vertx.vertx()
         vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
-        vertx.delegate.deployVerticle(DocStorageVerticle(docStorage), context.succeeding {
+        vertx.delegate.deployVerticle(DocSystemVertx().Verticle(docSystem), context.succeeding {
             context.completeNow()
         })
     }
@@ -52,13 +51,16 @@ internal class DocStorageVerticleTest {
     fun `it should delegate listAll`(context: VertxTestContext) {
         val async = context.checkpoint()
         val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC))))
-        docStorage.stub {
+        docSystem.stub {
             on { listAll() }.doReturn(Single.just(expected))
         }
 
         // Exercise
-        DBound(vertx.eventBus(), Jsonify.mapper).dsSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
-            assertThat(res.answer).isEqualTo(expected)
+        DBound(vertx.eventBus(), Jsonify.mapper).dsSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage()).subscribe({ res ->
+            context.verify {
+                assertThat(res.answer).isEqualTo(expected)
+            }
+
             async.flag()
         }, context::failNow)
     }
