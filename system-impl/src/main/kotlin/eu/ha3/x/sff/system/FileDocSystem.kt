@@ -27,7 +27,7 @@ class FileDocSystem(private val folder: Path) : IDocSystem {
     }
 
     override fun listAll() = Single.create<DocListResponse> { source ->
-        val result = Files.walk(folder, 2)
+        val result = Files.walk(folder, 1)
                 .filter { !Files.isDirectory(it) }
                 .map {
                     val content = String(Files.readAllBytes(it), StandardCharsets.UTF_8)

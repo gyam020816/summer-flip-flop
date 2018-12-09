@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import java.nio.file.Files
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.util.*
 
 /**
  * (Default template)
@@ -52,5 +53,15 @@ internal class FileDocSystemTest {
 
         // Verify
         assertThat(SUT.listAll().blockingGet()).isEqualTo(DocListResponse(listOf(item1999, item2000, item2001)))
+    }
+
+    @Test
+    internal fun `it should be empty even if a subfolder has a file`() {
+        val innerFolder = virtualFilesystem.getPath("some_subfolder").resolve("inner_folder")
+        Files.createDirectories(innerFolder)
+        Files.write(innerFolder.resolve(UUID.randomUUID().toString()), ByteArray(1))
+
+        // Verify
+        assertThat(SUT.listAll().blockingGet()).isEqualTo(DocListResponse(emptyList()))
     }
 }
