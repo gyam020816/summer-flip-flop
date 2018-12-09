@@ -41,6 +41,6 @@ class DocStorageVertx {
         private val listDocsFn = listDocsBinder.questionSender(eventBus)
 
         override fun appendToDocs(doc: DocCreateRequest): Single<Doc> = appendToDocsFn(doc)
-        override fun listAll(): Single<DocListResponse> = listDocsFn(NoMessage())
+        override fun listAll(): Single<DocListResponse> = listDocsFn(NoMessage)
     }
 }

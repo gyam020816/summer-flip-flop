@@ -18,10 +18,10 @@ import java.util.*
  * @author Ha3
  */
 internal class FileDocSystemTest {
-    val virtualFilesystem = Jimfs.newFileSystem(Configuration.unix()).apply {
+    private val virtualFilesystem = Jimfs.newFileSystem(Configuration.unix()).apply {
         Files.createDirectories(getPath("some_subfolder"))
     }
-    val SUT = FileDocSystem(virtualFilesystem.getPath("some_subfolder"))
+    private val SUT = FileDocSystem(virtualFilesystem.getPath("some_subfolder"))
 
     @Test
     internal fun `it should be empty at first`() {

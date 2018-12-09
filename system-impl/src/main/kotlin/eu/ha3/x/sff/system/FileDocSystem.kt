@@ -54,6 +54,6 @@ class FileDocSystem(private val folder: Path) : IDocSystem {
             }
         }
 
-        source.onSuccess(NoMessage())
+        source.onSuccess(NoMessage)
     }
 }

@@ -40,6 +40,6 @@ class DocSystemVertx {
         private val listDocsFn = listDocsBinder.questionSender(eventBus)
 
         override fun appendToDocs(doc: Doc): Single<NoMessage> = appendToDocsFn(doc)
-        override fun listAll(): Single<DocListResponse> = listDocsFn(NoMessage())
+        override fun listAll(): Single<DocListResponse> = listDocsFn(NoMessage)
     }
 }

@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
 
     val verticles = listOf(
             WebVerticle(DocStorage(object : IDocSystem {
-                override fun appendToDocs(doc: Doc) = Single.just(NoMessage())
+                override fun appendToDocs(doc: Doc) = Single.just(NoMessage)
                 override fun listAll() = Single.just(DocListResponse(listOf(Doc("hello", ZonedDateTime.now()))))
             }))
     )

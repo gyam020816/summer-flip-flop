@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
 
     val verticles = listOf(
             system.Verticle(object : IDocSystem {
-                override fun appendToDocs(doc: Doc) = Single.just(NoMessage())
+                override fun appendToDocs(doc: Doc) = Single.just(NoMessage)
                 override fun listAll() = Single.just(DocListResponse(listOf(Doc("hello", ZonedDateTime.now()))))
             }),
             storage.Verticle(concreteDocStorage),
