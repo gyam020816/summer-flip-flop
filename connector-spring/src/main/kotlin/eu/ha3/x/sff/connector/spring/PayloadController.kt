@@ -2,13 +2,14 @@ package eu.ha3.x.sff.connector.spring
 
 import eu.ha3.x.sff.api.IDocStorage
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocCreateRequest
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.multipart.MultipartFile
 import java.util.concurrent.CompletableFuture
 
 @RestController
@@ -16,9 +17,15 @@ open class PayloadController {
     @Autowired
     private lateinit var docStorage: IDocStorage;
 
-    @PostMapping("/docs")
-    fun uploadPayload(@RequestParam("file", required = false) file: MultipartFile?): ResponseEntity<Long> {
-        return ResponseEntity.status(201).body(file?.size ?: -1)
+    @PostMapping(value = ["/docs"], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun uploadPayload(@RequestBody docCreateRequest: DocCreateRequest): ResponseEntity<Doc> {
+        val futureResponse = CompletableFuture<ResponseEntity<Doc>>()
+
+        docStorage.appendToDocs(docCreateRequest).subscribe({ success ->
+            futureResponse.complete(ResponseEntity.status(201).body(success))
+        })
+
+        return futureResponse.join()
     }
 
     @GetMapping("/docs")
