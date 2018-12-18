@@ -25,8 +25,11 @@ internal class FileDocSystemTest {
 
     @Test
     internal fun `it should be empty at first`() {
+        // Exercise
+        val result = SUT.listAll().blockingGet()
+
         // Verify
-        assertThat(SUT.listAll().blockingGet()).isEqualTo(DocListResponse(emptyList()))
+        assertThat(result).isEqualTo(DocListResponse(emptyList()))
     }
 
     @Test
@@ -35,9 +38,10 @@ internal class FileDocSystemTest {
 
         // Exercise
         SUT.appendToDocs(item).blockingGet()
+        val result = SUT.listAll().blockingGet()
 
         // Verify
-        assertThat(SUT.listAll().blockingGet()).isEqualTo(DocListResponse(listOf(item)))
+        assertThat(result).isEqualTo(DocListResponse(listOf(item)))
     }
 
     @Test
@@ -50,9 +54,10 @@ internal class FileDocSystemTest {
         SUT.appendToDocs(item2001).blockingGet()
         SUT.appendToDocs(item1999).blockingGet()
         SUT.appendToDocs(item2000).blockingGet()
+        val result = SUT.listAll().blockingGet()
 
         // Verify
-        assertThat(SUT.listAll().blockingGet()).isEqualTo(DocListResponse(listOf(item1999, item2000, item2001)))
+        assertThat(result).isEqualTo(DocListResponse(listOf(item1999, item2000, item2001)))
     }
 
     @Test
@@ -61,7 +66,10 @@ internal class FileDocSystemTest {
         Files.createDirectories(innerFolder)
         Files.write(innerFolder.resolve(UUID.randomUUID().toString()), ByteArray(1))
 
+        // Exercise
+        val result = SUT.listAll().blockingGet()
+
         // Verify
-        assertThat(SUT.listAll().blockingGet()).isEqualTo(DocListResponse(emptyList()))
+        assertThat(result).isEqualTo(DocListResponse(emptyList()))
     }
 }
