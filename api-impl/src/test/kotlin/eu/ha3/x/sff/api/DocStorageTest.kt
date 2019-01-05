@@ -22,7 +22,8 @@ import java.time.ZonedDateTime
  */
 internal class DocStorageTest {
     val mockDocSystem = mock<IDocSystem>()
-    val SUT = DocStorage(mockDocSystem)
+    val mockCurrentTimeFn = mock<() -> ZonedDateTime>()
+    val SUT = DocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
 
     @Test
     internal fun `it should list all docs from doc system`() {
@@ -44,9 +45,13 @@ internal class DocStorageTest {
 
     @Test
     internal fun `it should append a doc to the system`() {
-        val expected = Doc("basicName", ZonedDateTime.now())
+        val currentTime = ZonedDateTime.now()
+        val expected = Doc("basicName", currentTime)
         mockDocSystem.stub {
             on { appendToDocs(expected) }.doReturn(Single.just(NoMessage))
+        }
+        mockCurrentTimeFn.stub {
+            on { invoke() }.doReturn(currentTime)
         }
 
         // Exercise
