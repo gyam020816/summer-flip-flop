@@ -2,8 +2,11 @@ package eu.ha3.x.sff.api
 
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.stub
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.system.IDocSystem
 import eu.ha3.x.sff.test.verify
 import io.reactivex.Single
@@ -18,16 +21,36 @@ import java.time.ZonedDateTime
  * @author gyam
  */
 internal class DocStorageTest {
+    val mockDocSystem = mock<IDocSystem>()
+    val SUT = DocStorage(mockDocSystem)
+
     @Test
     internal fun `it should list all docs from doc system`() {
         val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now())))
-        val docSystem = mock<IDocSystem> {
+        mockDocSystem.stub {
             on { listAll() }.doReturn(Single.just(expected))
         }
-        val SUT = DocStorage(docSystem)
 
         // Exercise
         val result = SUT.listAll()
+
+        // Verify
+        result.test()
+                .assertNoErrors()
+                .assertValue(verify {
+                    assertThat(this).isEqualTo(expected)
+                })
+    }
+
+    @Test
+    internal fun `it should append a doc to the system`() {
+        val expected = Doc("basicName", ZonedDateTime.now())
+        mockDocSystem.stub {
+            on { appendToDocs(expected) }.doReturn(Single.just(NoMessage))
+        }
+
+        // Exercise
+        val result = SUT.appendToDocs(DocCreateRequest("basicName"))
 
         // Verify
         result.test()
