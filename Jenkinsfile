@@ -27,8 +27,8 @@ pipeline {
                 sh 'ls'
                 sh 'docker --version'
                 sh '''
-                    mvn -Dmaven.repo.local=/tmp/maven_local_repo clean package
-                    mvn -Dmaven.repo.local=/tmp/maven_local_repo jacoco:report-aggregate
+                    mvn -Dmaven.repo.local=/tmp/maven_local_repo -P fast-build clean package
+                    mvn -Dmaven.repo.local=/tmp/maven_local_repo -P fast-build jacoco:report-aggregate
                 '''
             }
         }

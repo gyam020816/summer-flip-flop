@@ -23,6 +23,26 @@
         <module>system-impl</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>fast-build</id>
+            <modules>
+                <module>core</module>
+                <module>api</module>
+                <module>api-impl</module>
+                <module>system</module>
+                <!--<module>connector-spring</module>-->
+                <module>connector-vertx-common</module>
+                <module>connector-vertx-bus</module>
+                <module>connector-vertx-web</module>
+                <module>test-jacoco-reporter</module>
+                <module>test-libraries</module>
+                <module>deployable-vertx</module>
+                <module>system-impl</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <properties>
         <kotlin.version>1.3.0</kotlin.version>
         <kotlinx.coroutines.version>1.0.1</kotlinx.coroutines.version>
