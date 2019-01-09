@@ -1,8 +1,9 @@
-package eu.ha3.x.sff.system
+package eu.ha3.x.sff.system.postgres
 
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.system.IDocSystem
 import io.reactivex.Single
 
 /**
