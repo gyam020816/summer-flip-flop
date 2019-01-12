@@ -1,10 +1,15 @@
 package eu.ha3.x.sff.system.postgres
 
+import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocListResponse
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 /**
  * (Default template)
@@ -16,13 +21,33 @@ import org.testcontainers.junit.jupiter.Testcontainers
 class PostgresDocSystemTest {
     @Container
     private val pgContainer = KPostgreSQLContainer.create()
-
-    @Test
-    fun `WIP it should init test container`() {
-        assertThat(pgContainer.jdbcUrl).startsWith("jdbc:postgresql://")
+    private val db by lazy {
+        DbConnectionParams(
+                jdbcUrl = pgContainer.jdbcUrl,
+                user = KPostgreSQLContainer.POSTGRES_JUNIT_USERNAME,
+                pass = KPostgreSQLContainer.POSTGRES_JUNIT_PASSWORD
+        )
     }
 
-    companion object {
+    private val SUT by lazy { PostgresDocSystem(db) }
+
+    @BeforeEach
+    internal fun setUp() {
+        assertThat(pgContainer.jdbcUrl).startsWith("jdbc:postgresql://")
+        PostgresLiquibaseUpgrade(db, UpgradeParams("changelog.xml", "public"))
+                .upgradeDatabase()
+    }
+
+    @Test
+    fun `it should insert a document and retrieve it`() {
+        val document = Doc("a", ZonedDateTime.of(2000, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC))
+
+        // Exercise
+        SUT.appendToDocs(document).blockingGet()
+        val result = SUT.listAll().blockingGet()
+
+        // Verify
+        assertThat(result).isEqualTo(DocListResponse(listOf(document)))
     }
 }
 

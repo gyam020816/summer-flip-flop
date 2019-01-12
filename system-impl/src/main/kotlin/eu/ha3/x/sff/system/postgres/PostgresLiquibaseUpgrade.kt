@@ -1,5 +1,6 @@
 package eu.ha3.x.sff.system.postgres
 
+import eu.ha3.x.sff.system.postgres.PgUtil.Companion.open
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
@@ -9,7 +10,6 @@ import liquibase.resource.ClassLoaderResourceAccessor
 import liquibase.resource.CompositeResourceAccessor
 import liquibase.resource.FileSystemResourceAccessor
 import java.sql.Connection
-import java.sql.DriverManager
 
 /**
  * (Default template)
@@ -19,7 +19,7 @@ import java.sql.DriverManager
  */
 class PostgresLiquibaseUpgrade(private val db: DbConnectionParams, private val upgrade: UpgradeParams) {
     fun upgradeDatabase() {
-        open { connection ->
+        open(db) { connection ->
             val database = databaseFromConnection(connection)
             val liquibasex = Liquibase(upgrade.changelogFilename, accessor(), database)
             liquibasex.update(null as String?)
@@ -27,7 +27,7 @@ class PostgresLiquibaseUpgrade(private val db: DbConnectionParams, private val u
     }
 
     fun generateChangelog() {
-        open { connection ->
+        open(db) { connection ->
             CommandLineUtils.doGenerateChangeLog(
                     upgrade.changelogFilename,
                     databaseFromConnection(connection),
@@ -42,10 +42,6 @@ class PostgresLiquibaseUpgrade(private val db: DbConnectionParams, private val u
         }
     }
 
-    private fun open(connectionFn: (connection: Connection) -> Unit) {
-        DriverManager.getConnection(db.jdbcUrl, db.user, db.pass).use(connectionFn)
-    }
-
     private fun accessor() = CompositeResourceAccessor(
             ClassLoaderResourceAccessor(),
             FileSystemResourceAccessor(),
@@ -56,5 +52,4 @@ class PostgresLiquibaseUpgrade(private val db: DbConnectionParams, private val u
             DatabaseFactory.getInstance().findCorrectDatabaseImplementation(JdbcConnection(conn))
 }
 
-data class DbConnectionParams(val jdbcUrl: String, val user: String, val pass: String)
 data class UpgradeParams(val changelogFilename: String, val schema: String)

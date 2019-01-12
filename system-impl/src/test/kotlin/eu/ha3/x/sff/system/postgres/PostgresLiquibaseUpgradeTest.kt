@@ -1,5 +1,6 @@
 package eu.ha3.x.sff.system.postgres
 
+import eu.ha3.x.sff.system.postgres.DbConnection.Companion.open
 import eu.ha3.x.sff.test.assertFail
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -10,10 +11,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.ResultSet
-import java.sql.Statement
 
 /**
  * (Default template)
@@ -49,11 +46,13 @@ class PostgresLiquibaseUpgradeTest {
     @Test
     fun `it should generate a changelog`() {
         // Setup
-        execute("CREATE SCHEMA $SCHEMA")
-        execute("""CREATE TABLE $SCHEMA.my_table (
+        open(db) {
+            execute("CREATE SCHEMA $SCHEMA")
+            execute("""CREATE TABLE $SCHEMA.my_table (
                 id serial PRIMARY KEY,
                 data JSONB NOT NULL
             )""")
+        }
 
         // Exercise
         val SUT = PostgresLiquibaseUpgrade(db, UpgradeParams(
@@ -86,9 +85,11 @@ class PostgresLiquibaseUpgradeTest {
         SUT.upgradeDatabase()
 
         // Verify
-        queryNow("SELECT * FROM $SCHEMA.my_table") { query ->
-            while (query.next()) {
-                assertFail("Did not expect any results")
+        open(db) {
+            queryNow("SELECT * FROM $SCHEMA.my_table") { query ->
+                while (query.next()) {
+                    assertFail("Did not expect any results")
+                }
             }
         }
     }
@@ -101,7 +102,7 @@ class PostgresLiquibaseUpgradeTest {
                 SCHEMA
         ))
         SUT.upgradeDatabase()
-        open { connection ->
+        open(db) {
             connection.autoCommit = false
             connection.prepareStatement("INSERT INTO $SCHEMA.my_table (data) VALUES (?)").use { statement ->
                 statement.setObject(1, PGobject().apply {
@@ -114,40 +115,20 @@ class PostgresLiquibaseUpgradeTest {
         }
 
         // Verify
-        queryNow("SELECT * FROM $SCHEMA.my_table") { query ->
-            if (query.next()) {
-                val obj: PGobject = query.getObject("data", PGobject::class.java)
-                assertThat(obj.value).isEqualTo("""{"hello": "world"}""")
+        open(db) {
+            queryNow("SELECT * FROM $SCHEMA.my_table") { query ->
+                if (query.next()) {
+                    val obj: PGobject = query.getObject("data", PGobject::class.java)
+                    assertThat(obj.value).isEqualTo("""{"hello": "world"}""")
 
-            } else {
-                assertFail("Expected a result but got none")
+                } else {
+                    assertFail("Expected a result but got none")
+                }
+
+                if (query.next()) {
+                    assertFail("Too many results")
+                }
             }
-
-            if (query.next()) {
-                assertFail("Too many results")
-            }
         }
-    }
-
-    private fun queryNow(query: String, processorFn: (ResultSet) -> Unit) {
-        openStatement { statement ->
-            statement.executeQuery(query).use(processorFn)
-        }
-    }
-
-    private fun execute(query: String) {
-        openStatement { statement ->
-            statement.execute(query)
-        }
-    }
-
-    private fun openStatement(block: (Statement) -> Unit) {
-        open { connection ->
-            connection.createStatement().use(block)
-        }
-    }
-
-    private fun open(processorFn: (Connection) -> Unit) {
-        DriverManager.getConnection(db.jdbcUrl, db.user, db.pass).use(processorFn)
     }
 }
