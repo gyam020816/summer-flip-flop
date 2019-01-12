@@ -1,7 +1,7 @@
 package eu.ha3.x.sff.system.postgres
 
+import eu.ha3.x.sff.test.assertFail
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.postgresql.util.PGobject
@@ -88,7 +88,7 @@ class PostgresLiquibaseUpgradeTest {
         // Verify
         queryNow("SELECT * FROM $SCHEMA.my_table") { query ->
             while (query.next()) {
-                fail("Did not expect any results")
+                assertFail("Did not expect any results")
             }
         }
     }
@@ -120,11 +120,11 @@ class PostgresLiquibaseUpgradeTest {
                 assertThat(obj.value).isEqualTo("""{"hello": "world"}""")
 
             } else {
-                fail("Expected a result but got none")
+                assertFail("Expected a result but got none")
             }
 
             if (query.next()) {
-                fail("Too many results")
+                assertFail("Too many results")
             }
         }
     }
