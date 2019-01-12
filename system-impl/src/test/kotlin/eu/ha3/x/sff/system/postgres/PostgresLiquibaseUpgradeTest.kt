@@ -33,7 +33,7 @@ class PostgresLiquibaseUpgradeTest {
     companion object {
         private val OUTPUT_FILENAME = "changelog_test_output.xml"
         private val OUTPUT_PATH = Paths.get(OUTPUT_FILENAME)
-        private val INPUT_RESOURCE = Paths.get(PostgresLiquibaseUpgradeTest::class.java.classLoader.getResource("changelog_test_input.xml").toURI()).toString()
+        private val INPUT_RESOURCE = "changelog_test_input.xml"
         private val SCHEMA = "my_schema"
     }
 
@@ -109,7 +109,7 @@ class PostgresLiquibaseUpgradeTest {
                     type = "json"
                     value = """{"hello": "world"}"""
                 })
-                statement.execute()
+                statement.executeUpdate()
                 connection.commit()
             }
         }

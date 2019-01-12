@@ -24,6 +24,10 @@ internal data class DocEntity(val name: String, val createdAt: ZonedDateTime) {
 }
 
 class PostgresDocSystem(val db: DbConnectionParams) : IDocSystem {
+    init {
+        Class.forName("org.postgresql.Driver")
+    }
+
     private val objectMapper = KObjectMapper.newInstance()
 
     override fun listAll(): Single<DocListResponse> = Single.create { rx ->
@@ -58,7 +62,7 @@ class PostgresDocSystem(val db: DbConnectionParams) : IDocSystem {
                         type = "jsonb"
                         value = documentSerialized
                     })
-                    statement.execute()
+                    statement.executeUpdate()
                     connection.commit()
 
                     rx.onSuccess(NoMessage)

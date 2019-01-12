@@ -18,6 +18,10 @@ import java.sql.Connection
  * @author Ha3
  */
 class PostgresLiquibaseUpgrade(private val db: DbConnectionParams, private val upgrade: UpgradeParams) {
+    init {
+        Class.forName("org.postgresql.Driver")
+    }
+
     fun upgradeDatabase() {
         open(db) { connection ->
             val database = databaseFromConnection(connection)

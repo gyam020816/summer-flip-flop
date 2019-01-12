@@ -12,6 +12,15 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
+
     <dependencies>
         <dependency>
             <groupId>eu.ha3.x.sff</groupId>

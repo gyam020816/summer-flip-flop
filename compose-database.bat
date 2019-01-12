@@ -1,0 +1,1 @@
+set DB_NAME=summer && set DB_USER=postgres && set DB_PASSWORD=test123 && set DB_URL=jdbc:postgresql://localhost:16099/summer && docker-compose up -d
