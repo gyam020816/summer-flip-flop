@@ -9,10 +9,6 @@ import java.sql.DriverManager
  *
  * @author Ha3
  */
-internal class PgUtil {
-    companion object {
-        fun open(db: DbConnectionParams, connectionFn: (connection: Connection) -> Unit) {
-            DriverManager.getConnection(db.jdbcUrl, db.user, db.pass).use(connectionFn)
-        }
-    }
+internal fun open(db: DbConnectionParams, connectionFn: (connection: Connection) -> Unit) {
+    DriverManager.getConnection(db.jdbcUrl, db.user, db.pass).use(connectionFn)
 }

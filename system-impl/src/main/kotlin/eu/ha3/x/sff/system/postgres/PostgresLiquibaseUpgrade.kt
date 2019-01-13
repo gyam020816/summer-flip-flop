@@ -1,6 +1,5 @@
 package eu.ha3.x.sff.system.postgres
 
-import eu.ha3.x.sff.system.postgres.PgUtil.Companion.open
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection

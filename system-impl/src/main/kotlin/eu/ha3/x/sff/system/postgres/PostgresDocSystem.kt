@@ -5,7 +5,6 @@ import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.core.SystemException
 import eu.ha3.x.sff.system.IDocSystem
-import eu.ha3.x.sff.system.postgres.PgUtil.Companion.open
 import io.reactivex.Single
 import org.postgresql.util.PGobject
 import java.time.ZonedDateTime
