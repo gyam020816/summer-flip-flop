@@ -1,17 +1,18 @@
-package eu.ha3.x.sff.connector.vertx
+package eu.ha3.x.sff.connector.vertx.coroutine
 
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
+import eu.ha3.x.sff.connector.vertx.*
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import eu.ha3.x.sff.system.IDocSystem
-import io.reactivex.Single
+import eu.ha3.x.sff.system.SDocSystem
+import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
-import io.vertx.rxjava.core.Vertx
-import org.assertj.core.api.Assertions.assertThat
+import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,21 +22,21 @@ import java.time.ZonedDateTime
 
 /**
  * (Default template)
- * Created on 2018-10-07
+ * Created on 2019-01-14
  *
  * @author Ha3
  */
 @ExtendWith(VertxExtension::class)
-internal class DocSystemVertxTest {
+internal class SDocSystemVertxTest {
     private lateinit var vertx: Vertx
-    private lateinit var docSystem: IDocSystem
+    private lateinit var docSystem: SDocSystem
 
     @BeforeEach
     fun setUp(context: VertxTestContext) {
         docSystem = mock()
         vertx = Vertx.vertx()
-        vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
-        vertx.delegate.deployVerticle(DocSystemVertx().Verticle(docSystem), context.succeeding {
+        vertx.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
+        vertx.deployVerticle(SDocSystemVertx().Verticle(docSystem), context.succeeding {
             context.completeNow()
         })
     }
@@ -52,16 +53,19 @@ internal class DocSystemVertxTest {
         val async = context.checkpoint()
         val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC))))
         docSystem.stub {
-            on { listAll() }.doReturn(Single.just(expected))
+            onBlocking { listAll() }.doReturn(expected)
         }
 
-        // Exercise
-        DEventBus(vertx.eventBus(), Jsonify.mapper).dsSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage).subscribe({ res ->
+        runBlocking {
+            // Exercise
+            val res = SEventBus(vertx, Jsonify.mapper).ssSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage)
+
+            // Verify
             context.verify {
-                assertThat(res.answer).isEqualTo(expected)
+                Assertions.assertThat(res.answer).isEqualTo(expected)
             }
 
             async.flag()
-        }, context::failNow)
+        }
     }
 }

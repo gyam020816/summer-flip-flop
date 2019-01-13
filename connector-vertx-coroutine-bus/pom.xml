@@ -7,7 +7,7 @@
         <artifactId>summer-flip-flop</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>connector-vertx-common</artifactId>
+    <artifactId>connector-vertx-coroutine-bus</artifactId>
     <packaging>jar</packaging>
 
     <modelVersion>4.0.0</modelVersion>
@@ -18,38 +18,34 @@
             <artifactId>core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
         <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-core</artifactId>
+            <groupId>eu.ha3.x.sff</groupId>
+            <artifactId>api</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-rx-java</artifactId>
+            <groupId>eu.ha3.x.sff</groupId>
+            <artifactId>system</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-lang-kotlin</artifactId>
+            <groupId>eu.ha3.x.sff</groupId>
+            <artifactId>connector-vertx-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
+        
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-junit5</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-lang-kotlin-coroutines</artifactId>
-        </dependency>
-
 
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-kotlin</artifactId>
+            <groupId>eu.ha3.x.sff</groupId>
+            <artifactId>test-libraries</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 </project>
