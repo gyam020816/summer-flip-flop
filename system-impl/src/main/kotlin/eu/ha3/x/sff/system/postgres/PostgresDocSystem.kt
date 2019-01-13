@@ -33,7 +33,7 @@ class PostgresDocSystem(val db: DbConnectionParams) : IDocSystem {
     override fun listAll(): Single<DocListResponse> = Single.create { rx ->
         try {
             open(db) { connection ->
-                connection.prepareCall("SELECT * FROM public.documents").use { statement ->
+                connection.prepareCall("SELECT * FROM public.documents ORDER BY (data->>'createdAt')::timestamptz ASC").use { statement ->
                     statement.executeQuery().use { query ->
                         val mutableDocuments = mutableListOf<Doc>()
                         while (query.next()) {
