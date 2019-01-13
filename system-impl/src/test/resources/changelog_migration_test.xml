@@ -2,7 +2,9 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
     <include file="changelog/changelog_001.xml" />
+    <changeSet author="PostgresIntegrationTestMigration" context="test" id="after_001__insert_test_data" >
+        <sqlFile path="initial_data_after_1.sql" relativeToChangelogFile="true" />
+    </changeSet>
     <include file="changelog/changelog_002.xml" />
     <include file="changelog/changelog_003.xml" />
-
 </databaseChangeLog>

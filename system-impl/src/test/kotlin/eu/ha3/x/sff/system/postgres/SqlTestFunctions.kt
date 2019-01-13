@@ -20,7 +20,7 @@ class DbConnection private constructor (val connection: Connection) {
 
     fun execute(query: String) {
         openStatement { statement ->
-            statement.execute(query)
+            statement.executeUpdate(query)
         }
     }
 

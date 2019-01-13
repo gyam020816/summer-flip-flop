@@ -42,7 +42,6 @@ class PostgresLiquibaseUpgradeTest {
         Files.deleteIfExists(OUTPUT_PATH)
     }
 
-
     @Test
     fun `it should generate a changelog`() {
         // Setup
@@ -106,7 +105,7 @@ class PostgresLiquibaseUpgradeTest {
             connection.autoCommit = false
             connection.prepareStatement("INSERT INTO $SCHEMA.my_table (data) VALUES (?)").use { statement ->
                 statement.setObject(1, PGobject().apply {
-                    type = "json"
+                    type = "jsonb"
                     value = """{"hello": "world"}"""
                 })
                 statement.executeUpdate()

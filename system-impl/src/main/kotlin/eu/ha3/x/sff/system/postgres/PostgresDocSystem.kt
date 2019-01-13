@@ -33,7 +33,7 @@ class PostgresDocSystem(val db: DbConnectionParams) : IDocSystem {
     override fun listAll(): Single<DocListResponse> = Single.create { rx ->
         try {
             open(db) { connection ->
-                connection.prepareCall("SELECT * FROM public.documents ORDER BY (data->>'createdAt')::timestamptz ASC").use { statement ->
+                connection.prepareCall("SELECT * FROM public.documents ORDER BY created_at ASC").use { statement ->
                     statement.executeQuery().use { query ->
                         val mutableDocuments = mutableListOf<Doc>()
                         while (query.next()) {
@@ -57,11 +57,16 @@ class PostgresDocSystem(val db: DbConnectionParams) : IDocSystem {
         try {
             open(db) { connection ->
                 connection.autoCommit = false
-                connection.prepareStatement("INSERT INTO public.documents (data) VALUES (?)").use { statement ->
+                connection.prepareStatement("INSERT INTO public.documents (data, created_at) VALUES (?, ?)").use { statement ->
                     statement.setObject(1, PGobject().apply {
                         type = "jsonb"
                         value = documentSerialized
                     })
+                    statement.setObject(2, PGobject().apply {
+                        type = "timestamp"
+                        value = objectMapper.writeValueAsString(doc.createdAt)
+                    })
+
                     statement.executeUpdate()
                     connection.commit()
 
