@@ -19,8 +19,9 @@ class DocStorage(private val docSystem: IDocSystem, private val currentTimeFn: (
     }
 
     override fun appendToDocs(request: DocCreateRequest): Single<Doc> {
-        return Single.just(Doc(request.name, now()))
-                .doOnSuccess { document -> docSystem.appendToDocs(document) }
+        val doc = Doc(request.name, now())
+        return docSystem.appendToDocs(doc)
+                .map { doc }
     }
 
     private fun now() = currentTimeFn()
