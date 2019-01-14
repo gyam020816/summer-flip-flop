@@ -6,7 +6,7 @@ import com.nhaarman.mockitokotlin2.stub
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import eu.ha3.x.sff.system.IDocSystem
+import eu.ha3.x.sff.system.RxDocSystem
 import io.reactivex.Single
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
@@ -28,7 +28,7 @@ import java.time.ZonedDateTime
 @ExtendWith(VertxExtension::class)
 internal class DocSystemVertxTest {
     private lateinit var vertx: Vertx
-    private lateinit var docSystem: IDocSystem
+    private lateinit var docSystem: RxDocSystem
 
     @BeforeEach
     fun setUp(context: VertxTestContext) {

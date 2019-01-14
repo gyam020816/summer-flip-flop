@@ -7,7 +7,7 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import eu.ha3.x.sff.system.IDocSystem
+import eu.ha3.x.sff.system.RxDocSystem
 import eu.ha3.x.sff.test.verify
 import io.reactivex.Single
 import org.assertj.core.api.Assertions.assertThat
@@ -20,10 +20,10 @@ import java.time.ZonedDateTime
  *
  * @author gyam
  */
-internal class DocStorageTest {
-    val mockDocSystem = mock<IDocSystem>()
+internal class ReactiveDocStorageTest {
+    val mockDocSystem = mock<RxDocSystem>()
     val mockCurrentTimeFn = mock<() -> ZonedDateTime>()
-    val SUT = DocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
+    val SUT = ReactiveDocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
 
     @Test
     internal fun `it should list all docs from doc system`() {

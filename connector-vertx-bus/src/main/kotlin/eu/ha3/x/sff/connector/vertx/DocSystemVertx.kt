@@ -3,7 +3,7 @@ package eu.ha3.x.sff.connector.vertx
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import eu.ha3.x.sff.system.IDocSystem
+import eu.ha3.x.sff.system.RxDocSystem
 import io.reactivex.Single
 import io.vertx.core.Future
 import io.vertx.rxjava.core.AbstractVerticle
@@ -19,7 +19,7 @@ class DocSystemVertx {
     val appendToDocsBinder = Binder(Jsonify.mapper, DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
     val listDocsBinder = Binder(Jsonify.mapper, DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
-    inner class Verticle(private val concrete: IDocSystem) : AbstractVerticle() {
+    inner class Verticle(private val concrete: RxDocSystem) : AbstractVerticle() {
         override fun start(fut: Future<Void>) {
             appendToDocsBinder.ofSingle { doc ->
                 concrete.appendToDocs(doc)
@@ -35,7 +35,7 @@ class DocSystemVertx {
         }
     }
 
-    inner class QuestionSender(private val eventBus: EventBus) : IDocSystem {
+    inner class QuestionSender(private val eventBus: EventBus) : RxDocSystem {
         private val appendToDocsFn = appendToDocsBinder.questionSender(eventBus)
         private val listDocsFn = listDocsBinder.questionSender(eventBus)
 

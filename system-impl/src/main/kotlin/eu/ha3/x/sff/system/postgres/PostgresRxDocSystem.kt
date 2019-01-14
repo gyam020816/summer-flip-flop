@@ -4,7 +4,7 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.core.SystemException
-import eu.ha3.x.sff.system.IDocSystem
+import eu.ha3.x.sff.system.RxDocSystem
 import io.reactivex.Single
 import org.postgresql.util.PGobject
 import java.time.ZonedDateTime
@@ -22,7 +22,7 @@ internal data class DocEntity(val name: String, val createdAt: ZonedDateTime) {
     fun to(): Doc = Doc(name, createdAt)
 }
 
-class PostgresDocSystem(val db: DbConnectionParams) : IDocSystem {
+class PostgresRxDocSystem(val db: DbConnectionParams) : RxDocSystem {
     init {
         Class.forName("org.postgresql.Driver")
     }

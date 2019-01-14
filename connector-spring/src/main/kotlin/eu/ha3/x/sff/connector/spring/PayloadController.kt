@@ -1,6 +1,6 @@
 package eu.ha3.x.sff.connector.spring
 
-import eu.ha3.x.sff.api.IDocStorage
+import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture
 @RestController
 open class PayloadController {
     @Autowired
-    private lateinit var docStorage: IDocStorage;
+    private lateinit var docStorage: RxDocStorage;
 
     @PostMapping(value = ["/docs"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun uploadPayload(@RequestBody docCreateRequest: DocCreateRequest): ResponseEntity<Doc> {

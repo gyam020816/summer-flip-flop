@@ -1,6 +1,6 @@
 package eu.ha3.x.sff.connector.vertx
 
-import eu.ha3.x.sff.api.IDocStorage
+import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
@@ -20,7 +20,7 @@ class DocStorageVertx {
     val appendToDocsBinder = Binder(Jsonify.mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
     val listDocsBinder = Binder(Jsonify.mapper, DEvent.LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
-    inner class Verticle(private val concrete: IDocStorage) : AbstractVerticle() {
+    inner class Verticle(private val concrete: RxDocStorage) : AbstractVerticle() {
         override fun start(fut: Future<Void>) {
             appendToDocsBinder.ofSingle { doc ->
                 concrete.appendToDocs(doc)
@@ -36,7 +36,7 @@ class DocStorageVertx {
         }
     }
 
-    inner class QuestionSender(private val eventBus: EventBus) : IDocStorage {
+    inner class QuestionSender(private val eventBus: EventBus) : RxDocStorage {
         private val appendToDocsFn = appendToDocsBinder.questionSender(eventBus)
         private val listDocsFn = listDocsBinder.questionSender(eventBus)
 

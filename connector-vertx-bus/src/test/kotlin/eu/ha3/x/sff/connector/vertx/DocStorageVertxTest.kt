@@ -3,7 +3,7 @@ package eu.ha3.x.sff.connector.vertx
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
-import eu.ha3.x.sff.api.IDocStorage
+import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
@@ -29,7 +29,7 @@ import java.time.ZonedDateTime
 @ExtendWith(VertxExtension::class)
 internal class DocStorageVertxTest {
     private lateinit var vertx: Vertx
-    private lateinit var docStorage: IDocStorage
+    private lateinit var docStorage: RxDocStorage
 
     @BeforeEach
     fun setUp(context: VertxTestContext) {

@@ -3,7 +3,7 @@ package eu.ha3.x.sff.connector.vertx
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
-import eu.ha3.x.sff.api.IDocStorage
+import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
@@ -24,14 +24,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(VertxExtension::class)
 class WebVerticleTest {
     private lateinit var vertx: Vertx
-    private lateinit var mockDocStorage : IDocStorage
+    private lateinit var mockDocStorage : RxDocStorage
 
     @BeforeEach
     fun setUp(context: VertxTestContext) {
         vertx = Vertx.vertx()
 
         vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
-        mockDocStorage = mock<IDocStorage>()
+        mockDocStorage = mock<RxDocStorage>()
         vertx.delegate.deployVerticle(WebVerticle(mockDocStorage), context.succeeding {
             context.completeNow()
         })

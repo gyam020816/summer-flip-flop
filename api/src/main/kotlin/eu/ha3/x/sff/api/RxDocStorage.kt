@@ -11,7 +11,7 @@ import io.reactivex.Single
  *
  * @author gyam
  */
-interface IDocStorage {
+interface RxDocStorage {
     fun appendToDocs(request: DocCreateRequest): Single<Doc>
     fun listAll(): Single<DocListResponse>
 }

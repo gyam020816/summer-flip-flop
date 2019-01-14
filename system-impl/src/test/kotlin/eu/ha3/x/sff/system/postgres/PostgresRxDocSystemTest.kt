@@ -1,6 +1,6 @@
 package eu.ha3.x.sff.system.postgres
 
-import eu.ha3.x.sff.system.DocSystemTestFacade
+import eu.ha3.x.sff.system.RxDocSystemTestFacade
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.testcontainers.containers.PostgreSQLContainer
@@ -14,7 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
  * @author Ha3
  */
 @Testcontainers
-class PostgresDocSystemTest : DocSystemTestFacade<PostgresDocSystem> {
+class PostgresRxDocSystemTest : RxDocSystemTestFacade<PostgresRxDocSystem> {
     @Container
     private val pgContainer = KPostgreSQLContainer.create()
     private val db by lazy {
@@ -25,9 +25,9 @@ class PostgresDocSystemTest : DocSystemTestFacade<PostgresDocSystem> {
         )
     }
 
-    private val SUT by lazy { PostgresDocSystem(db) }
+    private val SUT by lazy { PostgresRxDocSystem(db) }
 
-    override fun SUT(): PostgresDocSystem = SUT
+    override fun SUT(): PostgresRxDocSystem = SUT
 
     @BeforeEach
     internal fun setUp() {

@@ -8,7 +8,7 @@ package eu.ha3.x.sff.connector.vertx
  */
 
 
-import eu.ha3.x.sff.api.IDocStorage
+import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.core.DocCreateRequest
 import io.vertx.core.Future
 import io.vertx.core.http.HttpMethod
@@ -17,7 +17,7 @@ import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
 import io.vertx.rxjava.ext.web.handler.BodyHandler
 
-class WebVerticle(private val docStorage: IDocStorage) : AbstractVerticle() {
+class WebVerticle(private val docStorage: RxDocStorage) : AbstractVerticle() {
     private val objectMapper = Jsonify.prettyMapper
 
     override fun start(fut: Future<Void>) {

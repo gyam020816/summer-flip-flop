@@ -11,7 +11,7 @@ import io.reactivex.Single
  *
  * @author gyam
  */
-interface IDocSystem {
+interface RxDocSystem {
     fun listAll(): Single<DocListResponse>
     fun appendToDocs(doc: Doc): Single<NoMessage>
 }

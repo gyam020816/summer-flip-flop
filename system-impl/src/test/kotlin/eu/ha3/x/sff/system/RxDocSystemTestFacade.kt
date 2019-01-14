@@ -13,7 +13,7 @@ import java.time.ZonedDateTime
  *
  * @author Ha3
  */
-interface DocSystemTestFacade<T : IDocSystem> {
+interface RxDocSystemTestFacade<T : RxDocSystem> {
     fun SUT(): T;
 
     @Test

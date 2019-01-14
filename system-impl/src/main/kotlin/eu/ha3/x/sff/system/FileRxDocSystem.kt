@@ -19,7 +19,7 @@ import java.util.stream.Collectors
  *
  * @author Ha3
  */
-class FileDocSystem(private val folder: Path) : IDocSystem {
+class FileRxDocSystem(private val folder: Path) : RxDocSystem {
     init {
         if (!Files.isDirectory(folder)) {
             throw IllegalArgumentException("$folder is not a directory")

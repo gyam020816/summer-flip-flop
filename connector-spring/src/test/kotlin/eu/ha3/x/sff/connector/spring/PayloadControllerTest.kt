@@ -2,7 +2,7 @@ package eu.ha3.x.sff.connector.spring
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import eu.ha3.x.sff.api.IDocStorage
+import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
@@ -27,13 +27,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 open class PayloadAppConfig {
     @Bean
     @Primary
-    public open fun docStorage(): IDocStorage = mock()
+    public open fun docStorage(): RxDocStorage = mock()
 }
 
 @SpringBootTest(classes = [Application::class, PayloadAppConfig::class, JacksonMapper::class])
 public class PayloadControllerTest : AControllerTest() {
     @Autowired
-    lateinit var mockDocStorage: IDocStorage;
+    lateinit var mockDocStorage: RxDocStorage;
 
     @Test
     public fun `it should accept a doc`() {

@@ -3,7 +3,7 @@ package eu.ha3.x.sff.api
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.system.IDocSystem
+import eu.ha3.x.sff.system.RxDocSystem
 import io.reactivex.Single
 import java.time.ZonedDateTime
 
@@ -13,7 +13,7 @@ import java.time.ZonedDateTime
  *
  * @author gyam
  */
-open class DocStorage(private val docSystem: IDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : IDocStorage {
+open class ReactiveDocStorage(private val docSystem: RxDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : RxDocStorage {
     override fun listAll(): Single<DocListResponse> {
         return docSystem.listAll()
     }

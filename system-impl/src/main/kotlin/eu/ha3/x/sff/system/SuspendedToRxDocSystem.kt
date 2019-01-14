@@ -10,7 +10,7 @@ import eu.ha3.x.sff.core.NoMessage
  *
  * @author Ha3
  */
-class SuspendedDocSystem(private val docSystem: IDocSystem) : SDocSystem {
+class SuspendedToRxDocSystem(private val docSystem: RxDocSystem) : SDocSystem {
     override suspend fun listAll(): DocListResponse =
             docSystem.listAll().blockingGet()
 
