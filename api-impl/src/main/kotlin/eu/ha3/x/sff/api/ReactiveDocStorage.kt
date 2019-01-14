@@ -13,7 +13,7 @@ import java.time.ZonedDateTime
  *
  * @author gyam
  */
-open class ReactiveDocStorage(private val docSystem: RxDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : RxDocStorage {
+class ReactiveDocStorage(private val docSystem: RxDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : RxDocStorage {
     override fun listAll(): Single<DocListResponse> {
         return docSystem.listAll()
     }
