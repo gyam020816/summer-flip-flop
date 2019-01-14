@@ -13,15 +13,15 @@ import java.time.ZonedDateTime
  *
  * @author gyam
  */
-class DocStorage(private val docSystem: IDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : IDocStorage {
+open class DocStorage(private val docSystem: IDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : IDocStorage {
     override fun listAll(): Single<DocListResponse> {
         return docSystem.listAll()
     }
 
     override fun appendToDocs(request: DocCreateRequest): Single<Doc> {
-        val doc = Doc(request.name, now())
-        return docSystem.appendToDocs(doc)
-                .map { doc }
+        val document = Doc(request.name, now())
+        return docSystem.appendToDocs(document)
+                .map { document }
     }
 
     private fun now() = currentTimeFn()
