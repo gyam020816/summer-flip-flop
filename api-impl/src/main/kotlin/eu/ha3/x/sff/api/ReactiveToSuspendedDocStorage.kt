@@ -22,16 +22,13 @@ class ReactiveToSuspendedDocStorage(private val docStorage: SDocStorage) : RxDoc
         docStorage.listAll()
     }
 
-    private fun <T> suspendedSingle(suspendedFn: suspend CoroutineScope.() -> T): Single<T> {
-        return Single.create { handler ->
-            try {
-                val result = runBlocking(block = suspendedFn)
-                handler.onSuccess(result)
+    private fun <T> suspendedSingle(suspendedFn: suspend CoroutineScope.() -> T): Single<T> = Single.create { handler ->
+        try {
+            val result = runBlocking(block = suspendedFn)
+            handler.onSuccess(result)
 
-            } catch (e: Exception) {
-                handler.onError(e)
-            }
+        } catch (e: Exception) {
+            handler.onError(e)
         }
     }
-
 }
