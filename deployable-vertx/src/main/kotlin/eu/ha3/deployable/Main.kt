@@ -5,6 +5,7 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.system.RxDocSystem
+import eu.ha3.x.sff.system.SuspendedToRxDocSystem
 import io.reactivex.Single
 import io.vertx.rxjava.core.Vertx
 import java.time.ZonedDateTime
@@ -24,7 +25,7 @@ fun main(args: Array<String>) {
     val system = DocSystemVertx()
     val storage = DocStorageVertx()
 
-    val concreteDocStorage = ReactiveDocStorage(system.QuestionSender(bus))
+    val concreteDocStorage = ReactiveDocStorage(SuspendedToRxDocSystem(system.QuestionSender(bus)))
 
     val verticles = listOf(
             system.Verticle(object : RxDocSystem {

@@ -7,9 +7,9 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import eu.ha3.x.sff.system.RxDocSystem
+import eu.ha3.x.sff.system.SDocSystem
 import eu.ha3.x.sff.test.verify
-import io.reactivex.Single
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
@@ -21,15 +21,15 @@ import java.time.ZonedDateTime
  * @author gyam
  */
 internal class ReactiveDocStorageTest {
-    val mockDocSystem = mock<RxDocSystem>()
+    val mockDocSystem = mock<SDocSystem>()
     val mockCurrentTimeFn = mock<() -> ZonedDateTime>()
     val SUT = ReactiveDocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
 
     @Test
-    internal fun `it should list all docs from doc system`() {
+    internal fun `it should list all docs from doc system`() = runBlocking {
         val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now())))
         mockDocSystem.stub {
-            on { listAll() }.doReturn(Single.just(expected))
+            onBlocking { listAll() }.doReturn(expected)
         }
 
         // Exercise
@@ -41,14 +41,16 @@ internal class ReactiveDocStorageTest {
                 .assertValue(verify {
                     assertThat(this).isEqualTo(expected)
                 })
+
+        Unit
     }
 
     @Test
-    internal fun `it should append a doc to the system`() {
+    internal fun `it should append a doc to the system`() = runBlocking {
         val currentTime = ZonedDateTime.now()
         val expected = Doc("basicName", currentTime)
         mockDocSystem.stub {
-            on { appendToDocs(expected) }.doReturn(Single.just(NoMessage))
+            onBlocking { appendToDocs(expected) }.doReturn(NoMessage)
         }
         mockCurrentTimeFn.stub {
             on { invoke() }.doReturn(currentTime)
@@ -63,5 +65,7 @@ internal class ReactiveDocStorageTest {
                 .assertValue(verify {
                     assertThat(this).isEqualTo(expected)
                 })
+
+        Unit
     }
 }

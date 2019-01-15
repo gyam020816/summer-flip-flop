@@ -1,10 +1,6 @@
 package eu.ha3.x.sff.api
 
-import eu.ha3.x.sff.core.Doc
-import eu.ha3.x.sff.core.DocCreateRequest
-import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.system.RxDocSystem
-import io.reactivex.Single
+import eu.ha3.x.sff.system.SDocSystem
 import java.time.ZonedDateTime
 
 /**
@@ -13,16 +9,5 @@ import java.time.ZonedDateTime
  *
  * @author gyam
  */
-class ReactiveDocStorage(private val docSystem: RxDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : RxDocStorage {
-    override fun listAll(): Single<DocListResponse> {
-        return docSystem.listAll()
-    }
-
-    override fun appendToDocs(request: DocCreateRequest): Single<Doc> {
-        val document = Doc(request.name, now())
-        return docSystem.appendToDocs(document)
-                .map { document }
-    }
-
-    private fun now() = currentTimeFn()
-}
+class ReactiveDocStorage(private val docSystem: SDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now)
+    : RxDocStorage by ReactiveToSuspendedDocStorage(SuspendedDocStorage(docSystem, currentTimeFn))
