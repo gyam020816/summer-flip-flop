@@ -5,8 +5,8 @@ import com.nhaarman.mockitokotlin2.whenever
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.test.testBlocking
 import io.reactivex.Single
-import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZoneOffset
@@ -23,7 +23,7 @@ internal class SuspendedToRxDocSystemTest {
     private val SUT = SuspendedToRxDocSystem(docSystem)
 
     @Test
-    internal fun `it should list all docs by proxy`() = runBlocking<Unit> {
+    internal fun `it should list all docs by proxy`() = testBlocking {
         val item = DocListResponse(listOf(Doc("a", ZonedDateTime.of(2000, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC))))
         whenever(docSystem.listAll()).thenReturn(Single.create { source ->
             source.onSuccess(item)
@@ -37,7 +37,7 @@ internal class SuspendedToRxDocSystemTest {
     }
 
     @Test
-    internal fun `it should append doc by proxy`() = runBlocking<Unit> {
+    internal fun `it should append doc by proxy`() = testBlocking {
         val item = Doc("a", ZonedDateTime.of(2000, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC))
         whenever(docSystem.appendToDocs(item)).thenReturn(Single.create { source ->
             source.onSuccess(NoMessage)

@@ -8,7 +8,7 @@ import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.system.SDocSystem
-import kotlinx.coroutines.runBlocking
+import eu.ha3.x.sff.test.testBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
@@ -25,7 +25,7 @@ internal class SuspendedDocStorageTest {
     val SUT = SuspendedDocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
 
     @Test
-    internal fun `it should list all docs from doc system`() = runBlocking {
+    internal fun `it should list all docs from doc system`() = testBlocking {
         val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now())))
         mockDocSystem.stub {
             onBlocking { listAll() }.doReturn(expected)
@@ -36,11 +36,10 @@ internal class SuspendedDocStorageTest {
 
         // Verify
         assertThat(result).isEqualTo(expected)
-
-    }.let { Unit }
+    }
 
     @Test
-    internal fun `it should append a doc to the system`() = runBlocking {
+    internal fun `it should append a doc to the system`() = testBlocking {
         val currentTime = ZonedDateTime.now()
         val expected = Doc("basicName", currentTime)
         mockDocSystem.stub {
@@ -55,6 +54,5 @@ internal class SuspendedDocStorageTest {
 
         // Verify
         assertThat(result).isEqualTo(expected)
-
-    }.let { Unit }
+    }
 }

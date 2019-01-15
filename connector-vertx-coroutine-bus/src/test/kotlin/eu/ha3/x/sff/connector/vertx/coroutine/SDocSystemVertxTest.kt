@@ -8,10 +8,10 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.system.SDocSystem
+import eu.ha3.x.sff.test.testBlocking
 import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
-import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -49,23 +49,21 @@ internal class SDocSystemVertxTest {
     }
 
     @Test
-    fun `it should delegate listAll`(context: VertxTestContext) {
+    fun `it should delegate listAll`(context: VertxTestContext) = testBlocking {
         val async = context.checkpoint()
         val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC))))
         docSystem.stub {
             onBlocking { listAll() }.doReturn(expected)
         }
 
-        runBlocking {
-            // Exercise
-            val res = SEventBus(vertx, Jsonify.mapper).ssSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage)
+        // Exercise
+        val res = SEventBus(vertx, Jsonify.mapper).ssSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage)
 
-            // Verify
-            context.verify {
-                Assertions.assertThat(res.answer).isEqualTo(expected)
-            }
-
-            async.flag()
+        // Verify
+        context.verify {
+            Assertions.assertThat(res.answer).isEqualTo(expected)
         }
+
+        async.flag()
     }
 }

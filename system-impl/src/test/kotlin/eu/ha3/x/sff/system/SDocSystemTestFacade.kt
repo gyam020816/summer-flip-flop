@@ -2,7 +2,7 @@ package eu.ha3.x.sff.system
 
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
-import kotlinx.coroutines.runBlocking
+import eu.ha3.x.sff.test.testBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZoneOffset
@@ -18,18 +18,16 @@ interface SDocSystemTestFacade<T : SDocSystem> {
     fun SUT(): T;
 
     @Test
-    fun `it should be empty at first (facade)`() = runBlocking {
+    fun `it should be empty at first (facade)`() = testBlocking {
         // Exercise
         val result = SUT().listAll()
 
         // Verify
         assertThat(result).isEqualTo(DocListResponse(emptyList()))
-
-        Unit
     }
 
     @Test
-    fun `it should append to docs and return it (facade)`() = runBlocking {
+    fun `it should append to docs and return it (facade)`() = testBlocking {
         val item = Doc("a", ZonedDateTime.of(2000, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC))
 
         // Exercise
@@ -38,12 +36,10 @@ interface SDocSystemTestFacade<T : SDocSystem> {
 
         // Verify
         assertThat(result).isEqualTo(DocListResponse(listOf(item)))
-
-        Unit
     }
 
     @Test
-    fun `it should append to docs and return them by createdAt property (facade)`() = runBlocking {
+    fun `it should append to docs and return them by createdAt property (facade)`() = testBlocking {
         val item2001 = Doc("a", ZonedDateTime.of(2001, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC))
         val item1999 = Doc("a", ZonedDateTime.of(1999, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC))
         val item2000 = Doc("a", ZonedDateTime.of(2000, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC))
@@ -56,7 +52,5 @@ interface SDocSystemTestFacade<T : SDocSystem> {
 
         // Verify
         assertThat(result).isEqualTo(DocListResponse(listOf(item1999, item2000, item2001)))
-
-        Unit
     }
 }

@@ -4,7 +4,7 @@ import com.google.common.jimfs.Jimfs
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.system.FileSuspendedDocSystem
 import eu.ha3.x.sff.system.SDocSystemTestFacade
-import kotlinx.coroutines.runBlocking
+import eu.ha3.x.sff.test.testBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
@@ -25,7 +25,7 @@ internal class FileSuspendedDocSystemTest : SDocSystemTestFacade<FileSuspendedDo
     override fun SUT(): FileSuspendedDocSystem = SUT
 
     @Test
-    internal fun `it should be empty even if a subfolder has a file`() = runBlocking {
+    internal fun `it should be empty even if a subfolder has a file`() = testBlocking {
         val innerFolder = virtualFilesystem.getPath("some_subfolder").resolve("inner_folder")
         Files.createDirectories(innerFolder)
         Files.write(innerFolder.resolve(UUID.randomUUID().toString()), ByteArray(1))
@@ -35,7 +35,5 @@ internal class FileSuspendedDocSystemTest : SDocSystemTestFacade<FileSuspendedDo
 
         // Verify
         assertThat(result).isEqualTo(DocListResponse(emptyList()))
-
-        Unit
     }
 }
