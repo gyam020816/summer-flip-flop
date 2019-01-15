@@ -2,8 +2,9 @@
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
 import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.system.RxDocSystemTestFacade
-import eu.ha3.x.sff.system.FileRxDocSystem
+import eu.ha3.x.sff.system.FileSuspendedDocSystem
+import eu.ha3.x.sff.system.SDocSystemTestFacade
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
@@ -15,24 +16,26 @@ import java.util.*
  *
  * @author Ha3
  */
-internal class FileRxDocSystemTest : RxDocSystemTestFacade<FileRxDocSystem> {
+internal class FileSuspendedDocSystemTest : SDocSystemTestFacade<FileSuspendedDocSystem> {
     private val virtualFilesystem = Jimfs.newFileSystem(Configuration.unix()).apply {
         Files.createDirectories(getPath("some_subfolder"))
     }
-    private val SUT = FileRxDocSystem(virtualFilesystem.getPath("some_subfolder"))
+    private val SUT = FileSuspendedDocSystem(virtualFilesystem.getPath("some_subfolder"))
 
-    override fun SUT(): FileRxDocSystem = SUT
+    override fun SUT(): FileSuspendedDocSystem = SUT
 
     @Test
-    internal fun `it should be empty even if a subfolder has a file`() {
+    internal fun `it should be empty even if a subfolder has a file`() = runBlocking {
         val innerFolder = virtualFilesystem.getPath("some_subfolder").resolve("inner_folder")
         Files.createDirectories(innerFolder)
         Files.write(innerFolder.resolve(UUID.randomUUID().toString()), ByteArray(1))
 
         // Exercise
-        val result = SUT.listAll().blockingGet()
+        val result = SUT.listAll()
 
         // Verify
         assertThat(result).isEqualTo(DocListResponse(emptyList()))
+
+        Unit
     }
 }

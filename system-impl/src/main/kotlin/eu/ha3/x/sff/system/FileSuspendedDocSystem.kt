@@ -3,7 +3,6 @@ package eu.ha3.x.sff.system
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import io.reactivex.Single
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -19,14 +18,14 @@ import java.util.stream.Collectors
  *
  * @author Ha3
  */
-class FileRxDocSystem(private val folder: Path) : RxDocSystem {
+class FileSuspendedDocSystem(private val folder: Path) : SDocSystem {
     init {
         if (!Files.isDirectory(folder)) {
             throw IllegalArgumentException("$folder is not a directory")
         }
     }
 
-    override fun listAll() = Single.create<DocListResponse> { source ->
+    override suspend fun listAll(): DocListResponse {
         val result = Files.walk(folder, 1)
                 .filter { !Files.isDirectory(it) }
                 .map {
@@ -41,10 +40,10 @@ class FileRxDocSystem(private val folder: Path) : RxDocSystem {
                 .collect(Collectors.toList())
                 .toList()
 
-        source.onSuccess(DocListResponse(result))
+        return DocListResponse(result)
     }
 
-    override fun appendToDocs(doc: Doc) = Single.create<NoMessage> { source ->
+    override suspend fun appendToDocs(doc: Doc): NoMessage {
         val content = """${DateTimeFormatter.ISO_ZONED_DATE_TIME.format(doc.createdAt)} ${doc.name}"""
 
         val file = folder.resolve(UUID.randomUUID().toString())
@@ -54,6 +53,6 @@ class FileRxDocSystem(private val folder: Path) : RxDocSystem {
             }
         }
 
-        source.onSuccess(NoMessage)
+        return NoMessage
     }
 }
