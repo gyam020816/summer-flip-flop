@@ -2,7 +2,7 @@ package eu.ha3.deployable
 import eu.ha3.x.sff.api.ReactiveDocStorage
 import eu.ha3.x.sff.connector.vertx.DJsonObject
 import eu.ha3.x.sff.connector.vertx.DJsonObjectMessageCodec
-import eu.ha3.x.sff.connector.vertx.WebVerticle
+import eu.ha3.x.sff.connector.vertx.ReactiveWebVerticle
 import eu.ha3.x.sff.system.postgres.DbConnectionParams
 import eu.ha3.x.sff.system.postgres.PostgresLiquibaseUpgrade
 import eu.ha3.x.sff.system.postgres.PostgresSuspendedDocSystem
@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
     PostgresLiquibaseUpgrade(db, UpgradeParams("changelog.xml", "public"))
             .upgradeDatabase()
 
-    val verticles = listOf(WebVerticle(ReactiveDocStorage(PostgresSuspendedDocSystem(db))))
+    val verticles = listOf(ReactiveWebVerticle(ReactiveDocStorage(PostgresSuspendedDocSystem(db))))
     verticles.forEach(vertx::deployVerticle)
 }
 

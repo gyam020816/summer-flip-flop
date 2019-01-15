@@ -58,11 +58,11 @@ internal class SDocStorageVertxTest {
         }
 
         // Exercise
-        val result = SEventBus(vertx, Jsonify.mapper).ssSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage)
+        val res = SEventBus(vertx, Jsonify.mapper).ssSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage)
 
         // Verify
         context.verify {
-            assertThat(result).isEqualTo(expected)
+            assertThat(res.answer).isEqualTo(expected)
         }
 
         async.flag()

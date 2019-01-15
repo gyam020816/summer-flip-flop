@@ -32,7 +32,7 @@ class WebVerticleTest {
 
         vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
         mockDocStorage = mock<RxDocStorage>()
-        vertx.delegate.deployVerticle(WebVerticle(mockDocStorage), context.succeeding {
+        vertx.delegate.deployVerticle(ReactiveWebVerticle(mockDocStorage), context.succeeding {
             context.completeNow()
         })
     }

@@ -17,7 +17,7 @@ import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
 import io.vertx.rxjava.ext.web.handler.BodyHandler
 
-class WebVerticle(private val docStorage: RxDocStorage) : AbstractVerticle() {
+class ReactiveWebVerticle(private val docStorage: RxDocStorage) : AbstractVerticle() {
     private val objectMapper = Jsonify.prettyMapper
 
     override fun start(fut: Future<Void>) {

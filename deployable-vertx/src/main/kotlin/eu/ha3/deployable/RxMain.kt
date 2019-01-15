@@ -22,8 +22,8 @@ fun main(args: Array<String>) {
 
     val bus = vertx.eventBus()
 
-    val system = DocSystemVertx()
-    val storage = DocStorageVertx()
+    val system = SDocSystemVertx()
+    val storage = RxDocStorageVertx()
 
     val concreteDocStorage = ReactiveDocStorage(SuspendedToRxDocSystem(system.QuestionSender(bus)))
 
@@ -33,7 +33,7 @@ fun main(args: Array<String>) {
                 override fun listAll() = Single.just(DocListResponse(listOf(Doc("hello", ZonedDateTime.now()))))
             }),
             storage.Verticle(concreteDocStorage),
-            WebVerticle(storage.QuestionSender(bus))
+            ReactiveWebVerticle(storage.QuestionSender(bus))
     )
     verticles.forEach(vertx.delegate::deployVerticle)
 }

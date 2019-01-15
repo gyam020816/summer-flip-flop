@@ -15,7 +15,7 @@ import io.vertx.rxjava.core.eventbus.EventBus
  *
  * @author gyam
  */
-class DocSystemVertx {
+class SDocSystemVertx {
     val appendToDocsBinder = Binder(Jsonify.mapper, DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
     val listDocsBinder = Binder(Jsonify.mapper, DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
