@@ -2,36 +2,25 @@
 
 **summer-flip-flop** is my scratch project for experimenting with various libraries, architectures, or language features
 
-### gutes Delirium architektur
-
 may or may not include the following:
 
 - hexagonal architecture
-- asynchronous / reactive
-- actor model pattern
-- uses vertx event bus function adapters. binder is an utility class that:
-  - produces an adapter function that can be injected (question / event bus sender)
-  - produces a verticle that requires a concrete function (answerer / event bus consumer)
+- actor model pattern, more or less
+- strict dependency inversion at module level
+- asynchronous
+  - via reactivex
+  - via kotlin coroutines
+- liquibase for schema versioning
+- database component integration testing using testcontainers
+- mockito-kotlin
 
 #### module structure
 
-pretty much every module depends on the core module, and dependency inversion is achieved both at the implementation level as well as the module level.
+pretty much every module depends on the core module that contains common model objects, and dependency inversion is achieved both at the implementation level as well as the module level. the domain api is not part of the core module.
 
 i.e. the api does not depend on the system, only the implementation of the api does, and this is reflected in the module dependencies.
 
 ![modules diagram](modules.jpg)
-
-#### connector-vertx-bus and connector-vertx-common
-
-they allow replacing the traditional interactions between the layers with a question-answer event bus
-
-given a concrete function of shape `(Q) -> A` and an address, we define a binder that will produce:
-  - another function of shape `(Q) -> A` that, when invoked, will send `Q` through the event bus at this address
-  - a consumer that listens on the event bus at this address and invoke the concrete function and reply with `A`
-
-so this is just RPC.
-
-![binder diagram](binder.jpg)
 
 #### liquibase
 
@@ -64,3 +53,19 @@ well, what's worse than bridging the two worlds with adapters?
 nothing wrong here
 
 ![coreactinex diagram](coreactinex.jpg)
+
+#### connector-vertx-bus and connector-vertx-common
+
+uses vertx event bus function adapters. binder is an utility class that:
+- produces an adapter function that can be injected (question / event bus sender)
+- produces a verticle that requires a concrete function (answerer / event bus consumer)
+
+they allow replacing the traditional interactions between the layers with a question-answer event bus
+
+given a concrete function of shape `(Q) -> A` and an address, we define a binder that will produce:
+  - another function of shape `(Q) -> A` that, when invoked, will send `Q` through the event bus at this address
+  - a consumer that listens on the event bus at this address and invoke the concrete function and reply with `A`
+
+so this is just RPC.
+
+![binder diagram](binder.jpg)
