@@ -4,6 +4,7 @@ import eu.ha3.x.sff.core.DSROperator
 import eu.ha3.x.sff.core.DSRSource
 import eu.ha3.x.sff.core.DSRTerminalElement
 import net.javacrumbs.jsonunit.assertj.JsonAssertions
+import net.javacrumbs.jsonunit.assertj.JsonAssertions.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -24,7 +25,7 @@ internal class DSROperatorMixinTest {
         val json = SUT.writeValueAsString(SAMPLE_DATA_SIMPLE)
 
         // Verify
-        JsonAssertions.assertThatJson(json).isEqualTo(SAMPLE_JSON_SIMPLE.trimIndent())
+        assertThatJson(json).isEqualTo(SAMPLE_JSON_SIMPLE.trimIndent())
     }
 
     @Test
@@ -42,11 +43,11 @@ internal class DSROperatorMixinTest {
         val json = SUT.writeValueAsString(SAMPLE_DATA_COMPLEX)
 
         // Verify
-        JsonAssertions.assertThatJson(json).isEqualTo(SAMPLE_JSON_COMPLEX.trimIndent())
+        assertThatJson(json).isEqualTo(SAMPLE_JSON_COMPLEX.trimIndent())
     }
 
     @Test
-    internal fun `it should deserialize with mixins`() {
+    internal fun `it should deserialize with mixins (complex)`() {
         // Exercise
         val data = SUT.readValue(SAMPLE_JSON_COMPLEX, DSROperator::class.java)
 

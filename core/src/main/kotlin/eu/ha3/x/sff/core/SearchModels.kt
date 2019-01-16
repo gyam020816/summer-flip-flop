@@ -22,3 +22,24 @@ sealed class DSRTerminalElement {
     data class IntegerNumber(val value: Long) : DSRTerminalElement()
     data class DecimalNumber(val value: BigDecimal) : DSRTerminalElement()
 }
+
+@DslMarker
+annotation class DSRDSLMarker
+
+@DSRDSLMarker
+class DSROperatorBuilder {
+    val elements: MutableList<DSROperator> = mutableListOf()
+    fun isAlways(value: Boolean)
+            = elements.add(DSROperator.IsAlways(value))
+    fun and(dslFn: DSROperatorBuilder.() -> Unit)
+            = elements.add(DSROperatorBuilder().apply(dslFn).buildAnd())
+    fun or(dslFn: DSROperatorBuilder.() -> Unit)
+            = elements.add(DSROperatorBuilder().apply(dslFn).buildOr())
+
+    internal fun buildAnd(): DSROperator = DSROperator.And(elements.toList())
+    internal fun buildOr(): DSROperator = DSROperator.Or(elements.toList())
+
+    companion object {
+        fun dsr() = DSROperatorBuilder()
+    }
+}
