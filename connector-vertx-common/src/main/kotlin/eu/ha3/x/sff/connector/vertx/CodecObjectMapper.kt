@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
 import eu.ha3.x.sff.json.KObjectMapper
+import eu.ha3.x.sff.json.SearchModelsMixin
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import java.util.*
@@ -18,6 +19,8 @@ import java.util.*
  */
 object CodecObjectMapper {
     val mapper: ObjectMapper = KObjectMapper.newInstance().apply {
+        SearchModelsMixin.doRegisterMixins(this)
+
         val module = SimpleModule()
         module.addSerializer(JsonObject::class.java, JsonObjectSerializer)
         module.addSerializer(JsonArray::class.java, JsonArraySerializer)

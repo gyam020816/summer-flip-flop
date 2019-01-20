@@ -5,9 +5,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.connector.vertx.*
-import eu.ha3.x.sff.core.Doc
-import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.core.*
 import eu.ha3.x.sff.test.testBlocking
 import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
@@ -59,6 +57,31 @@ internal class SDocStorageVertxTest {
 
         // Exercise
         val res = SEventBus(vertx, CodecObjectMapper.mapper).ssSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage)
+
+        // Verify
+        context.verify {
+            assertThat(res.answer).isEqualTo(expected)
+        }
+
+        async.flag()
+    }
+
+    @Test
+    fun `it should delegate search`(context: VertxTestContext) = testBlocking {
+        val async = context.checkpoint()
+        val input = DocSearchRequest(DSROperator.And(listOf(
+                DSROperator.IsAlways(true),
+                DSROperator.Or(listOf(
+                        DSROperator.IsAlways(false)
+                ))
+        )))
+        val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC))))
+        docStorage.stub {
+            onBlocking { search(input) }.doReturn(expected)
+        }
+
+        // Exercise
+        val res = SEventBus(vertx, CodecObjectMapper.mapper).ssSend<DocListResponse>(DEvent.SEARCH_DOCS.toString(), input)
 
         // Verify
         context.verify {
