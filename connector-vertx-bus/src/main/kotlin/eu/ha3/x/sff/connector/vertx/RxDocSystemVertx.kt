@@ -1,5 +1,6 @@
 package eu.ha3.x.sff.connector.vertx
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
@@ -15,9 +16,9 @@ import io.vertx.rxjava.core.eventbus.EventBus
  *
  * @author gyam
  */
-class RxDocSystemVertx {
-    val appendToDocsBinder = Binder(Jsonify.mapper, DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
-    val listDocsBinder = Binder(Jsonify.mapper, DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
+class RxDocSystemVertx(mapper: ObjectMapper = Jsonify.mapper) {
+    val appendToDocsBinder = Binder(mapper, DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
+    val listDocsBinder = Binder(mapper, DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
     inner class Verticle(private val concrete: RxDocSystem) : AbstractVerticle() {
         override fun start(fut: Future<Void>) {

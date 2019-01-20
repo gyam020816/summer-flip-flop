@@ -1,5 +1,6 @@
 package eu.ha3.x.sff.connector.vertx
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
@@ -16,9 +17,9 @@ import io.vertx.rxjava.core.eventbus.EventBus
  *
  * @author gyam
  */
-class RxDocStorageVertx {
-    val appendToDocsBinder = Binder(Jsonify.mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
-    val listDocsBinder = Binder(Jsonify.mapper, DEvent.LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
+class RxDocStorageVertx(mapper: ObjectMapper = Jsonify.mapper) {
+    val appendToDocsBinder = Binder(mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
+    val listDocsBinder = Binder(mapper, DEvent.LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
     inner class Verticle(private val concrete: RxDocStorage) : AbstractVerticle() {
         override fun start(fut: Future<Void>) {

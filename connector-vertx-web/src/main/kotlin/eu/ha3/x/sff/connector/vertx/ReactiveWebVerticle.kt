@@ -8,6 +8,7 @@ package eu.ha3.x.sff.connector.vertx
  */
 
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.core.DocCreateRequest
 import io.vertx.core.Future
@@ -17,9 +18,7 @@ import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
 import io.vertx.rxjava.ext.web.handler.BodyHandler
 
-class ReactiveWebVerticle(private val docStorage: RxDocStorage) : AbstractVerticle() {
-    private val objectMapper = Jsonify.prettyMapper
-
+class ReactiveWebVerticle(private val docStorage: RxDocStorage, private val objectMapper: ObjectMapper = Jsonify.prettyMapper) : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         val router: Router = Router.router(vertx)
         router.route().handler(BodyHandler.create());

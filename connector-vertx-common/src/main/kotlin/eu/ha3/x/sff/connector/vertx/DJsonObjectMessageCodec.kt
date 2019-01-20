@@ -1,5 +1,6 @@
 package eu.ha3.x.sff.connector.vertx
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonObject
@@ -10,9 +11,9 @@ import io.vertx.core.json.JsonObject
  *
  * @author Ha3
  */
-class DJsonObjectMessageCodec : MessageCodec<DJsonObject, DJsonObject> {
+class DJsonObjectMessageCodec(private val mapper: ObjectMapper = Jsonify.mapper) : MessageCodec<DJsonObject, DJsonObject> {
     override fun encodeToWire(buffer: Buffer, dJsonObject: DJsonObject) {
-        val encoded = Buffer.buffer(Jsonify.mapper.writeValueAsBytes(dJsonObject.inner))
+        val encoded = Buffer.buffer(mapper.writeValueAsBytes(dJsonObject.inner))
         buffer.appendInt(encoded.length())
         buffer.appendBuffer(encoded)
     }

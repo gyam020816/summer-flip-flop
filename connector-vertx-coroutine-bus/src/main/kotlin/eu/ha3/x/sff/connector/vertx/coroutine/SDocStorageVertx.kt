@@ -1,5 +1,6 @@
 package eu.ha3.x.sff.connector.vertx.coroutine
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.connector.vertx.DEvent
 import eu.ha3.x.sff.connector.vertx.Jsonify
@@ -16,9 +17,9 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
  *
  * @author gyam
  */
-class SDocStorageVertx {
-    val appendToDocsBinder = SBinder(Jsonify.mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
-    val listDocsBinder = SBinder(Jsonify.mapper, DEvent.LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
+class SDocStorageVertx(mapper: ObjectMapper = Jsonify.mapper) {
+    val appendToDocsBinder = SBinder(mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
+    val listDocsBinder = SBinder(mapper, DEvent.LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
     inner class Verticle(private val concrete: SDocStorage) : CoroutineVerticle() {
         override suspend fun start() {

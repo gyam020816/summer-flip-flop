@@ -1,5 +1,6 @@
 package eu.ha3.x.sff.connector.vertx.coroutine
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ha3.x.sff.connector.vertx.DEvent
 import eu.ha3.x.sff.connector.vertx.Jsonify
 import eu.ha3.x.sff.core.Doc
@@ -15,9 +16,9 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
  *
  * @author gyam
  */
-class SDocSystemVertx {
-    val appendToDocsBinder = SBinder(Jsonify.mapper, DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
-    val listDocsBinder = SBinder(Jsonify.mapper, DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
+class SDocSystemVertx(mapper: ObjectMapper = Jsonify.mapper) {
+    val appendToDocsBinder = SBinder(mapper, DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
+    val listDocsBinder = SBinder(mapper, DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
     inner class Verticle(private val concrete: SDocSystem) : CoroutineVerticle() {
         override suspend fun start() {
