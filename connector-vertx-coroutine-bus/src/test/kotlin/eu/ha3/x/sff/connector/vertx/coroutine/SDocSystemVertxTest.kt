@@ -12,7 +12,7 @@ import eu.ha3.x.sff.test.testBlocking
 import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -61,7 +61,7 @@ internal class SDocSystemVertxTest {
 
         // Verify
         context.verify {
-            Assertions.assertThat(res.answer).isEqualTo(expected)
+            assertThat(res.answer).isEqualTo(expected)
         }
 
         async.flag()

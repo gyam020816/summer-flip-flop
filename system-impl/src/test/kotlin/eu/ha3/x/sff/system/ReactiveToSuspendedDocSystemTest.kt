@@ -8,7 +8,8 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.DomainException
 import eu.ha3.x.sff.core.NoMessage
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
@@ -33,7 +34,7 @@ internal class ReactiveToSuspendedDocSystemTest {
         val result = SUT.listAll().blockingGet()
 
         // Verify
-        Assertions.assertThat(result).isEqualTo(expected)
+        assertThat(result).isEqualTo(expected)
     }
 
     @Test
@@ -43,7 +44,7 @@ internal class ReactiveToSuspendedDocSystemTest {
         }
 
         // Exercise and Verify
-        Assertions.assertThatThrownBy { SUT.listAll().blockingGet() }
+        assertThatThrownBy { SUT.listAll().blockingGet() }
                 .isInstanceOf(DomainException::class.java)
     }
 
@@ -58,7 +59,7 @@ internal class ReactiveToSuspendedDocSystemTest {
         val result = SUT.appendToDocs(input).blockingGet()
 
         // Verify
-        Assertions.assertThat(result).isEqualTo(NoMessage)
+        assertThat(result).isEqualTo(NoMessage)
     }
 
     @Test
@@ -69,7 +70,7 @@ internal class ReactiveToSuspendedDocSystemTest {
         }
 
         // Exercise and Verify
-        Assertions.assertThatThrownBy { SUT.appendToDocs(input).blockingGet() }
+        assertThatThrownBy { SUT.appendToDocs(input).blockingGet() }
                 .isInstanceOf(DomainException::class.java)
     }
 }
