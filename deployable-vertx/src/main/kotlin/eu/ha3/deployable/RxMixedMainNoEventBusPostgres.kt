@@ -1,48 +1,14 @@
 package eu.ha3.deployable
-import eu.ha3.x.sff.api.ReactiveDocStorage
-import eu.ha3.x.sff.connector.vertx.DJsonObject
-import eu.ha3.x.sff.connector.vertx.DJsonObjectMessageCodec
-import eu.ha3.x.sff.connector.vertx.ReactiveWebVerticle
-import eu.ha3.x.sff.system.postgres.DbConnectionParams
-import eu.ha3.x.sff.system.postgres.PostgresLiquibaseUpgrade
-import eu.ha3.x.sff.system.postgres.PostgresSuspendedDocSystem
-import eu.ha3.x.sff.system.postgres.UpgradeParams
-import io.vertx.core.Vertx
+
+import eu.ha3.x.sff.deployable.SwitchableFeature.POSTGRES
+import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE_LEGACY
 
 /**
  * (Default template)
- * Created on 2019-01-12
+ * Created on 2018-10-06
  *
- * @author gyam
+ * @author Ha3
  */
 fun main(args: Array<String>) {
-    val vertx = Vertx.vertx()
-    vertx.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
-
-    val db = DbConnectionParams(
-            jdbcUrl = envOrElse("DB_URL", "jdbc:postgresql://localhost:16099/summer"),
-            user = envOrElse("DB_USER", "postgres"),
-            pass = envOrElse("DB_PASSWORD", "test123")
-    )
-
-    PostgresLiquibaseUpgrade(db, UpgradeParams("changelog.xml", "public"))
-            .upgradeDatabase()
-
-    val verticles = listOf(ReactiveWebVerticle(ReactiveDocStorage(PostgresSuspendedDocSystem(db))))
-    verticles.forEach(vertx::deployVerticle)
-}
-
-fun envOrElse(envName: String, defaultValue: String): String {
-    val result: String? = System.getenv(envName)
-    if (result is String) {
-        if (result.trim() != result) {
-            throw IllegalArgumentException("Environment variable $envName must not have leading or trailing whitespace: `$result` (is ${result.length} chars)")
-        }
-
-        return result;
-
-    } else {
-        println(("Missing environment variable: $envName"))
-        return defaultValue
-    }
+    SwitchableDeployer(setOf(REACTIVE_LEGACY, POSTGRES)).run()
 }
