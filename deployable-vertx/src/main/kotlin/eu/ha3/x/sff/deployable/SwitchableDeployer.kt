@@ -1,4 +1,4 @@
-package eu.ha3.deployable
+package eu.ha3.x.sff.deployable
 import eu.ha3.x.sff.api.ReactiveDocStorage
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.api.SuspendedDocStorage

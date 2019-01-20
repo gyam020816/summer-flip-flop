@@ -1,4 +1,4 @@
-package eu.ha3.deployable
+package eu.ha3.x.sff.deployable
 
 import eu.ha3.x.sff.deployable.SwitchableFeature.POSTGRES
 import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE_LEGACY

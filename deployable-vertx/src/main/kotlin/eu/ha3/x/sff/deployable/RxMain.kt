@@ -1,7 +1,7 @@
-package eu.ha3.deployable
+package eu.ha3.x.sff.deployable
 
-import eu.ha3.deployable.SwitchableFeature.COMPONENTS_AS_SEPARATE_VERTICLES
-import eu.ha3.deployable.SwitchableFeature.REACTIVE_LEGACY
+import eu.ha3.x.sff.deployable.SwitchableFeature.COMPONENTS_AS_SEPARATE_VERTICLES
+import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE_LEGACY
 
 /**
  * (Default template)
