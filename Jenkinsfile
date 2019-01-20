@@ -13,6 +13,11 @@ pipeline {
             }
         }
         stage('Build') {
+            when {
+                expression {
+                    return !(branch_name ==~ /^.*-illustration$/)
+                }
+            }
             agent {
                 docker {
                     image 'duskforest.xyz:5000/buildenv-kotlin-maven-docker'
