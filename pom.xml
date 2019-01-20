@@ -186,7 +186,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-parent</artifactId>
-                <version>2.1.1.RELEASE</version>
+                <version>2.1.2.RELEASE</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -279,7 +279,7 @@
         <dependency>
             <groupId>net.javacrumbs.json-unit</groupId>
             <artifactId>json-unit-assertj</artifactId>
-            <version>2.2.0</version>
+            <version>2.3.0</version>
             <scope>test</scope>
         </dependency>
 
