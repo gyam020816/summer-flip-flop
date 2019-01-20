@@ -23,7 +23,7 @@ internal class CodecObjectMapperTest {
         val model = CodecObjectMapperTest.MODEL
 
         // Exercise
-        val result = mapper.jsonify(model)
+        val result = mapper.asJsonObject(model)
 
         // Verify
         result.inner.apply {
@@ -42,7 +42,7 @@ internal class CodecObjectMapperTest {
                 .put("someString", "hello"))
 
         // Exercise
-        val result = mapper.dejsonify(json, ExampleModel::class.java)
+        val result = mapper.interpretAs(json, ExampleModel::class.java)
 
         // Verify
         assertThat(result).isEqualTo(expected)
@@ -53,7 +53,7 @@ internal class CodecObjectMapperTest {
         val model = CodecObjectMapperTest.MODEL_ZONED_PARIS
 
         // Exercise
-        val result = mapper.jsonify(model)
+        val result = mapper.asJsonObject(model)
 
         // Verify
         result.inner.apply {
@@ -72,7 +72,7 @@ internal class CodecObjectMapperTest {
                 .put("someString", "hello"))
 
         // Exercise
-        val result = mapper.dejsonify(json, ExampleModel::class.java)
+        val result = mapper.interpretAs(json, ExampleModel::class.java)
 
         // Verify
         assertThat(result).isEqualTo(expected)

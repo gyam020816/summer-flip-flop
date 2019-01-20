@@ -48,13 +48,8 @@ object CodecObjectMapper {
 
 data class DJsonObject(val inner: JsonObject)
 class DMapper(private val mapper: ObjectMapper) {
-    @Deprecated("Use interpretAs() instead")
-    fun <T> dejsonify(dJsonObject: DJsonObject, klass: Class<T>): T = mapper.convertValue<T>(dJsonObject.inner.map, klass)
     fun <T> interpretAs(dJsonObject: DJsonObject, klass: Class<T>): T = mapper.convertValue<T>(dJsonObject.inner.map, klass)
-    fun <T> dejsonifyByParsing(s: String, klass: Class<T>): T = mapper.readValue(s, klass)
-    @Deprecated("Use asQuestion() or asAnswer() instead")
-    fun jsonify(any: Any): DJsonObject = DJsonObject(JsonObject(mapper.convertValue(any, Map::class.java) as Map<String, Any>))
-    fun asQuestion(any: Any): DJsonObject = DJsonObject(JsonObject(mapper.convertValue(any, Map::class.java) as Map<String, Any>))
-    fun asAnswer(any: Any): DJsonObject = DJsonObject(JsonObject(mapper.convertValue(any, Map::class.java) as Map<String, Any>))
-    fun jsonifyToString(any: Any): String = mapper.writeValueAsString(any)
+    fun asJsonObject(any: Any): DJsonObject = DJsonObject(JsonObject(mapper.convertValue(any, Map::class.java) as Map<String, Any>))
+    fun asQuestion(any: Any): DJsonObject = asJsonObject(any)
+    fun asAnswer(any: Any): DJsonObject = asJsonObject(any)
 }

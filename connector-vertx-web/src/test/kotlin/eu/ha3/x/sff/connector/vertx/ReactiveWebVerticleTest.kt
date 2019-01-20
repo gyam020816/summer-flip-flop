@@ -81,12 +81,12 @@ class ReactiveWebVerticleTest {
         // Exercise
         WebClient.create(vertx)
                 .post(8080, "localhost", "/docs")
-                .sendJson(DMapper(CodecObjectMapper.mapper).jsonify(request).inner) { response ->
+                .sendJson(DMapper(CodecObjectMapper.mapper).asJsonObject(request).inner) { response ->
                     // Verify
                     context.verify {
                         val result = response.result()
 
-                        assertThatJson(result.bodyAsString()).isEqualTo(DMapper(CodecObjectMapper.mapper).jsonify(expected).inner.encodePrettily())
+                        assertThatJson(result.bodyAsString()).isEqualTo(DMapper(CodecObjectMapper.mapper).asJsonObject(expected).inner.encodePrettily())
                         assertThat(result.statusCode()).isEqualTo(201)
                         async.flag()
                     }

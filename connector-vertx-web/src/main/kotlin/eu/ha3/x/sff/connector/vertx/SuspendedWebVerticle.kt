@@ -43,7 +43,7 @@ class SuspendedWebVerticle(private val docStorage: SDocStorage, private val webO
 
     private suspend fun appendToDocs(rc: RoutingContext) {
         val createRequest: DocCreateRequest = try {
-            DMapper(webObjectMapper).dejsonifyByParsing(rc.bodyAsString, DocCreateRequest::class.java)
+            webObjectMapper.readValue(rc.bodyAsString, DocCreateRequest::class.java)
 
         } catch (e: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException) {
             rc.fail(400)
@@ -62,7 +62,7 @@ class SuspendedWebVerticle(private val docStorage: SDocStorage, private val webO
     private fun RoutingContext.replyJson(obj: Any, code: Int) {
         response().setStatusCode(code)
                 .putHeader("content-type", "application/json; charset=utf-8")
-                .end(DMapper(webObjectMapper).jsonifyToString(obj))
+                .end(webObjectMapper.writeValueAsString(obj))
     }
 
     private fun RoutingContext.serverError() {
