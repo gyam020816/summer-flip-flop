@@ -11,7 +11,7 @@ import io.vertx.core.json.JsonObject
  *
  * @author Ha3
  */
-class DJsonObjectMessageCodec(private val mapper: ObjectMapper = Jsonify.mapper) : MessageCodec<DJsonObject, DJsonObject> {
+class DJsonObjectMessageCodec(private val mapper: ObjectMapper = CodecObjectMapper.mapper) : MessageCodec<DJsonObject, DJsonObject> {
     override fun encodeToWire(buffer: Buffer, dJsonObject: DJsonObject) {
         val encoded = Buffer.buffer(mapper.writeValueAsBytes(dJsonObject.inner))
         buffer.appendInt(encoded.length())

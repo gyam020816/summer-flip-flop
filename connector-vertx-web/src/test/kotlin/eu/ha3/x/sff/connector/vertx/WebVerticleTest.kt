@@ -7,6 +7,7 @@ import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.json.KObjectMapper
 import eu.ha3.x.sff.test.TestSample
 import io.reactivex.Single
 import io.vertx.junit5.VertxExtension
@@ -24,15 +25,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(VertxExtension::class)
 class WebVerticleTest {
     private lateinit var vertx: Vertx
-    private lateinit var mockDocStorage : RxDocStorage
+    private var mockDocStorage : RxDocStorage = mock()
+    private val webObjectMapper = KObjectMapper.newInstance()
 
     @BeforeEach
     fun setUp(context: VertxTestContext) {
         vertx = Vertx.vertx()
 
         vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
-        mockDocStorage = mock<RxDocStorage>()
-        vertx.delegate.deployVerticle(ReactiveWebVerticle(mockDocStorage), context.succeeding {
+        vertx.delegate.deployVerticle(ReactiveWebVerticle(mockDocStorage, webObjectMapper), context.succeeding {
             context.completeNow()
         })
     }
@@ -80,12 +81,12 @@ class WebVerticleTest {
         // Exercise
         WebClient.create(vertx)
                 .post(8080, "localhost", "/docs")
-                .sendJson(DMapper(Jsonify.mapper).jsonify(request).inner) { response ->
+                .sendJson(DMapper(CodecObjectMapper.mapper).jsonify(request).inner) { response ->
                     // Verify
                     context.verify {
                         val result = response.result()
 
-                        assertThatJson(result.bodyAsString()).isEqualTo(DMapper(Jsonify.mapper).jsonify(expected).inner.encodePrettily())
+                        assertThatJson(result.bodyAsString()).isEqualTo(DMapper(CodecObjectMapper.mapper).jsonify(expected).inner.encodePrettily())
                         assertThat(result.statusCode()).isEqualTo(201)
                         async.flag()
                     }

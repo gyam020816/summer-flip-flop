@@ -3,7 +3,6 @@ package eu.ha3.x.sff.connector.vertx
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
 import eu.ha3.x.sff.json.KObjectMapper
@@ -17,19 +16,17 @@ import java.util.*
  *
  * @author Ha3
  */
-object Jsonify {
+object CodecObjectMapper {
     val mapper: ObjectMapper = KObjectMapper.newInstance()
-    val prettyMapper: ObjectMapper = KObjectMapper.newInstance()
 
     init {
-        listOf(mapper, prettyMapper).forEach {
+        mapper.apply {
             val module = SimpleModule()
             module.addSerializer(JsonObject::class.java, JsonObjectSerializer)
             module.addSerializer(JsonArray::class.java, JsonArraySerializer)
             module.addSerializer(ByteArray::class.java, ByteArraySerializer)
-            it.registerModule(module)
+            registerModule(module)
         }
-        prettyMapper.configure(SerializationFeature.INDENT_OUTPUT, true)
     }
 
     private object JsonArraySerializer : JsonSerializer<JsonArray>() {

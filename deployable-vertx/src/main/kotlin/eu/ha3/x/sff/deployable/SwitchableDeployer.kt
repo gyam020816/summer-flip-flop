@@ -1,4 +1,5 @@
 package eu.ha3.x.sff.deployable
+import com.fasterxml.jackson.databind.SerializationFeature
 import eu.ha3.x.sff.api.ReactiveDocStorage
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.api.SuspendedDocStorage
@@ -8,6 +9,7 @@ import eu.ha3.x.sff.connector.vertx.coroutine.SDocSystemVertx
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.json.KObjectMapper
 import eu.ha3.x.sff.system.ReactiveToSuspendedDocSystem
 import eu.ha3.x.sff.system.SDocSystem
 import eu.ha3.x.sff.system.SuspendedToRxDocSystem
@@ -32,6 +34,10 @@ enum class SwitchableFeature {
 }
 
 class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable {
+    val webObjectMapper = KObjectMapper.newInstance().apply {
+        configure(SerializationFeature.INDENT_OUTPUT, true)
+    }
+
     override fun run() {
         val concreteDocSystem = resolveDocSystem(features)
 
@@ -57,14 +63,14 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
             val senderDocSystem = system.QuestionSender(vertx)
 
             val verticles = listOf(
-                    SuspendedWebVerticle(senderDocStorage),
+                    SuspendedWebVerticle(senderDocStorage, webObjectMapper),
                     storage.Verticle(docStorageFn(senderDocSystem)),
                     system.Verticle(concreteDocSystem)
             )
             verticles.forEach(vertx::deployVerticle)
 
         } else {
-            val verticles = listOf(SuspendedWebVerticle(docStorageFn(concreteDocSystem)))
+            val verticles = listOf(SuspendedWebVerticle(docStorageFn(concreteDocSystem), webObjectMapper))
             verticles.forEach(vertx::deployVerticle)
         }
     }
@@ -83,14 +89,14 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
             val senderDocSystem = system.QuestionSender(rxBus)
 
             val verticles = listOf(
-                    ReactiveWebVerticle(senderDocStorage),
+                    ReactiveWebVerticle(senderDocStorage, webObjectMapper),
                     storage.Verticle(ReactiveDocStorage(SuspendedToRxDocSystem(senderDocSystem))),
                     system.Verticle(ReactiveToSuspendedDocSystem(concreteDocSystem))
             )
             verticles.forEach(vertx::deployVerticle)
 
         } else {
-            val verticles = listOf(ReactiveWebVerticle(ReactiveDocStorage(concreteDocSystem)))
+            val verticles = listOf(ReactiveWebVerticle(ReactiveDocStorage(concreteDocSystem), webObjectMapper))
             verticles.forEach(vertx::deployVerticle)
         }
     }

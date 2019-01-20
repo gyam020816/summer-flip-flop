@@ -18,7 +18,7 @@ import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
 import io.vertx.rxjava.ext.web.handler.BodyHandler
 
-class ReactiveWebVerticle(private val docStorage: RxDocStorage, private val objectMapper: ObjectMapper = Jsonify.prettyMapper) : AbstractVerticle() {
+class ReactiveWebVerticle(private val docStorage: RxDocStorage, private val webObjectMapper: ObjectMapper) : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         val router: Router = Router.router(vertx)
         router.route().handler(BodyHandler.create());
@@ -48,7 +48,7 @@ class ReactiveWebVerticle(private val docStorage: RxDocStorage, private val obje
 
     private fun appendToDocs(rc: RoutingContext) {
         val createRequest: DocCreateRequest = try {
-            DMapper(objectMapper).dejsonifyByParsing(rc.bodyAsString, DocCreateRequest::class.java)
+            DMapper(webObjectMapper).dejsonifyByParsing(rc.bodyAsString, DocCreateRequest::class.java)
 
         } catch (e: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException) {
             rc.fail(400)
@@ -66,7 +66,7 @@ class ReactiveWebVerticle(private val docStorage: RxDocStorage, private val obje
     private fun RoutingContext.replyJson(obj: Any, code: Int) {
         response().setStatusCode(code)
                 .putHeader("content-type", "application/json; charset=utf-8")
-                .end(DMapper(objectMapper).jsonifyToString(obj))
+                .end(DMapper(webObjectMapper).jsonifyToString(obj))
     }
 
     private fun RoutingContext.serverError() {

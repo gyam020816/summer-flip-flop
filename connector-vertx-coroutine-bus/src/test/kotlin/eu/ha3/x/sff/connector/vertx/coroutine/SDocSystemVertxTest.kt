@@ -57,7 +57,7 @@ internal class SDocSystemVertxTest {
         }
 
         // Exercise
-        val res = SEventBus(vertx, Jsonify.mapper).ssSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage)
+        val res = SEventBus(vertx, CodecObjectMapper.mapper).ssSend<DocListResponse>(DEvent.SYSTEM_LIST_DOCS.toString(), NoMessage)
 
         // Verify
         context.verify {

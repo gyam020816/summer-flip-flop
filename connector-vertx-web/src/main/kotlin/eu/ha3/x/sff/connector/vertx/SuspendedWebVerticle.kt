@@ -6,6 +6,7 @@ package eu.ha3.x.sff.connector.vertx
  *
  * @author Ha3
  */
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.core.DocCreateRequest
 import io.vertx.ext.web.Route
@@ -17,9 +18,7 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.dispatcher
 import kotlinx.coroutines.launch
 
-class SuspendedWebVerticle(private val docStorage: SDocStorage) : CoroutineVerticle() {
-    private val objectMapper = Jsonify.prettyMapper
-
+class SuspendedWebVerticle(private val docStorage: SDocStorage, private val webObjectMapper: ObjectMapper) : CoroutineVerticle() {
     override suspend fun start() {
         val router: Router = Router.router(vertx)
         router.route().handler(BodyHandler.create());
@@ -44,7 +43,7 @@ class SuspendedWebVerticle(private val docStorage: SDocStorage) : CoroutineVerti
 
     private suspend fun appendToDocs(rc: RoutingContext) {
         val createRequest: DocCreateRequest = try {
-            DMapper(objectMapper).dejsonifyByParsing(rc.bodyAsString, DocCreateRequest::class.java)
+            DMapper(webObjectMapper).dejsonifyByParsing(rc.bodyAsString, DocCreateRequest::class.java)
 
         } catch (e: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException) {
             rc.fail(400)
@@ -63,7 +62,7 @@ class SuspendedWebVerticle(private val docStorage: SDocStorage) : CoroutineVerti
     private fun RoutingContext.replyJson(obj: Any, code: Int) {
         response().setStatusCode(code)
                 .putHeader("content-type", "application/json; charset=utf-8")
-                .end(DMapper(objectMapper).jsonifyToString(obj))
+                .end(DMapper(webObjectMapper).jsonifyToString(obj))
     }
 
     private fun RoutingContext.serverError() {

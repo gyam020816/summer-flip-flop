@@ -57,7 +57,7 @@ internal class RxDocStorageVertxTest {
         }
 
         // Exercise
-        DEventBus(vertx.eventBus(), Jsonify.mapper).dsSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage).subscribe({ res ->
+        DEventBus(vertx.eventBus(), CodecObjectMapper.mapper).dsSend<DocListResponse>(DEvent.LIST_DOCS.toString(), NoMessage).subscribe({ res ->
             assertThat(res.answer).isEqualTo(expected)
             async.flag()
         }, context::failNow)

@@ -16,7 +16,7 @@ import java.time.ZonedDateTime
  */
 internal class JsonifyTest {
     data class ExampleModel(val someZdt: ZonedDateTime, val someList: List<String>, val someString: String)
-    private val mapper = DMapper(Jsonify.mapper)
+    private val mapper = DMapper(CodecObjectMapper.mapper)
 
     @Test
     internal fun `it should convert model to json`() {
