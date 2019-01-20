@@ -2,6 +2,7 @@ package eu.ha3.x.sff.system
 
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.DocSearch
 import eu.ha3.x.sff.core.NoMessage
 
 /**
@@ -13,4 +14,5 @@ import eu.ha3.x.sff.core.NoMessage
 interface SDocSystem {
     suspend fun listAll(): DocListResponse
     suspend fun appendToDocs(doc: Doc): NoMessage
+    suspend fun search(docSearch: DocSearch): DocListResponse
 }

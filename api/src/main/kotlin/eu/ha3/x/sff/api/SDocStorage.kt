@@ -3,7 +3,6 @@ package eu.ha3.x.sff.api
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.core.DocSearchRequest
 
 /**
  * (Default template)
@@ -14,5 +13,5 @@ import eu.ha3.x.sff.core.DocSearchRequest
 interface SDocStorage {
     suspend fun appendToDocs(request: DocCreateRequest): Doc
     suspend fun listAll(): DocListResponse
-    suspend fun search(request: DocSearchRequest): DocListResponse
+    suspend fun search(queryInput: String): DocListResponse
 }

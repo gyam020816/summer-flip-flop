@@ -2,9 +2,12 @@ package eu.ha3.x.sff.connector.vertx.coroutine
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ha3.x.sff.api.SDocStorage
-import eu.ha3.x.sff.connector.vertx.DEvent
 import eu.ha3.x.sff.connector.vertx.CodecObjectMapper
-import eu.ha3.x.sff.core.*
+import eu.ha3.x.sff.connector.vertx.DEvent
+import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocCreateRequest
+import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.NoMessage
 import io.vertx.core.Vertx
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 
@@ -17,7 +20,7 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
 class SDocStorageVertx(mapper: ObjectMapper = CodecObjectMapper.mapper) {
     val appendToDocsBinder = SBinder(mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
     val listDocsBinder = SBinder(mapper, DEvent.LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
-    val searchBinder = SBinder(mapper, DEvent.SEARCH_DOCS.address(), DocSearchRequest::class.java, DocListResponse::class.java)
+    val searchBinder = SBinder(mapper, DEvent.SEARCH_DOCS.address(), String::class.java, DocListResponse::class.java)
 
     inner class Verticle(private val concrete: SDocStorage) : CoroutineVerticle() {
         override suspend fun start() {
@@ -45,6 +48,6 @@ class SDocStorageVertx(mapper: ObjectMapper = CodecObjectMapper.mapper) {
 
         override suspend fun appendToDocs(request: DocCreateRequest): Doc = appendToDocsFn(request)
         override suspend fun listAll(): DocListResponse = listDocsFn(NoMessage)
-        override suspend fun search(request: DocSearchRequest): DocListResponse = searchFn(request)
+        override suspend fun search(request: String): DocListResponse = searchFn(request)
     }
 }

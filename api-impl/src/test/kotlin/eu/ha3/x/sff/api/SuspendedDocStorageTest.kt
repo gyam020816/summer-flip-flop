@@ -3,10 +3,7 @@ package eu.ha3.x.sff.api
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
-import eu.ha3.x.sff.core.Doc
-import eu.ha3.x.sff.core.DocCreateRequest
-import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.core.*
 import eu.ha3.x.sff.system.SDocSystem
 import eu.ha3.x.sff.test.testBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -51,6 +48,21 @@ internal class SuspendedDocStorageTest {
 
         // Exercise
         val result = SUT.appendToDocs(DocCreateRequest("basicName"))
+
+        // Verify
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    internal fun `it should search for docs by name`() = testBlocking {
+        val currentTime = ZonedDateTime.now()
+        val expected = DocListResponse(listOf(Doc("basicName", currentTime)))
+        mockDocSystem.stub {
+            onBlocking { search(DocSearch(DSROperator.Equals(DSRSource.SingleElementKey("name"), DSRTerminalElement.Text("hello")))) }.doReturn(expected)
+        }
+
+        // Exercise
+        val result = SUT.search("name=hello")
 
         // Verify
         assertThat(result).isEqualTo(expected)

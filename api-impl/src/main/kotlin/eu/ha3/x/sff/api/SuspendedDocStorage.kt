@@ -1,9 +1,6 @@
 package eu.ha3.x.sff.api
 
-import eu.ha3.x.sff.core.Doc
-import eu.ha3.x.sff.core.DocCreateRequest
-import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.core.DocSearchRequest
+import eu.ha3.x.sff.core.*
 import eu.ha3.x.sff.system.SDocSystem
 import java.time.ZonedDateTime
 
@@ -14,8 +11,10 @@ import java.time.ZonedDateTime
  * @author Ha3
  */
 class SuspendedDocStorage(private val docSystem: SDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : SDocStorage {
-    override suspend fun search(request: DocSearchRequest): DocListResponse {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override suspend fun search(queryInput: String): DocListResponse {
+        val split = queryInput.split("=")
+        val docSearch = DocSearch(DSROperator.Equals(DSRSource.SingleElementKey(split[0]), DSRTerminalElement.Text(split[1])))
+        return docSystem.search(docSearch)
     }
 
     override suspend fun listAll(): DocListResponse {

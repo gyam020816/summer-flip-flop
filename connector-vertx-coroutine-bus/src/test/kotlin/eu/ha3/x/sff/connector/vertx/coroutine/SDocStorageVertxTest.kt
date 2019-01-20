@@ -5,7 +5,9 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.connector.vertx.*
-import eu.ha3.x.sff.core.*
+import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.test.testBlocking
 import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
@@ -69,12 +71,7 @@ internal class SDocStorageVertxTest {
     @Test
     fun `it should delegate search`(context: VertxTestContext) = testBlocking {
         val async = context.checkpoint()
-        val input = DocSearchRequest(DSROperator.And(listOf(
-                DSROperator.IsAlways(true),
-                DSROperator.Or(listOf(
-                        DSROperator.IsAlways(false)
-                ))
-        )))
+        val input = "name=hello"
         val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC))))
         docStorage.stub {
             onBlocking { search(input) }.doReturn(expected)
