@@ -17,16 +17,12 @@ import java.util.*
  * @author Ha3
  */
 object CodecObjectMapper {
-    val mapper: ObjectMapper = KObjectMapper.newInstance()
-
-    init {
-        mapper.apply {
-            val module = SimpleModule()
-            module.addSerializer(JsonObject::class.java, JsonObjectSerializer)
-            module.addSerializer(JsonArray::class.java, JsonArraySerializer)
-            module.addSerializer(ByteArray::class.java, ByteArraySerializer)
-            registerModule(module)
-        }
+    val mapper: ObjectMapper = KObjectMapper.newInstance().apply {
+        val module = SimpleModule()
+        module.addSerializer(JsonObject::class.java, JsonObjectSerializer)
+        module.addSerializer(JsonArray::class.java, JsonArraySerializer)
+        module.addSerializer(ByteArray::class.java, ByteArraySerializer)
+        registerModule(module)
     }
 
     private object JsonArraySerializer : JsonSerializer<JsonArray>() {

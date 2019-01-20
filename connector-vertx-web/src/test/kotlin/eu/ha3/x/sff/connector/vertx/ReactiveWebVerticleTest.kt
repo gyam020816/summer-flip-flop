@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(VertxExtension::class)
-class WebVerticleTest {
+class ReactiveWebVerticleTest {
     private lateinit var vertx: Vertx
     private var mockDocStorage : RxDocStorage = mock()
     private val webObjectMapper = KObjectMapper.newInstance()

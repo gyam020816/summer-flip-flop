@@ -14,13 +14,13 @@ import java.time.ZonedDateTime
  *
  * @author Ha3
  */
-internal class JsonifyTest {
+internal class CodecObjectMapperTest {
     data class ExampleModel(val someZdt: ZonedDateTime, val someList: List<String>, val someString: String)
     private val mapper = DMapper(CodecObjectMapper.mapper)
 
     @Test
     internal fun `it should convert model to json`() {
-        val model = JsonifyTest.MODEL
+        val model = CodecObjectMapperTest.MODEL
 
         // Exercise
         val result = mapper.jsonify(model)
@@ -35,7 +35,7 @@ internal class JsonifyTest {
 
     @Test
     internal fun `it should convert json to model`() {
-        val expected = JsonifyTest.MODEL
+        val expected = CodecObjectMapperTest.MODEL
         val json = DJsonObject(JsonObject()
                 .put("someZdt", "2010-12-30T22:00:04.123Z")
                 .put("someList", JsonArray(listOf("a", "b")))
@@ -50,7 +50,7 @@ internal class JsonifyTest {
 
     @Test
     internal fun `it should convert non-utc model to json`() {
-        val model = JsonifyTest.MODEL_ZONED_PARIS
+        val model = CodecObjectMapperTest.MODEL_ZONED_PARIS
 
         // Exercise
         val result = mapper.jsonify(model)
@@ -65,7 +65,7 @@ internal class JsonifyTest {
 
     @Test
     internal fun `it should convert json to non-utc model`() {
-        val expected = JsonifyTest.MODEL_ZONED_PARIS
+        val expected = CodecObjectMapperTest.MODEL_ZONED_PARIS
         val json = DJsonObject(JsonObject()
                 .put("someZdt", "2010-12-30T22:00:04.123+01:00")
                 .put("someList", JsonArray(listOf("a", "b")))
