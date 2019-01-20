@@ -42,9 +42,10 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
         val concreteDocSystem = resolveDocSystem(features)
 
         if (SwitchableFeature.REACTIVE_LEGACY in features) {
-            suspended(concreteDocSystem)
-        } else {
             reactive(concreteDocSystem)
+
+        } else {
+            suspended(concreteDocSystem)
         }
     }
 
