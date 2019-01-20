@@ -8,7 +8,7 @@ import eu.ha3.x.sff.core.NoMessage
  * (Default template)
  * Created on 2018-10-06
  *
- * @author gyam
+ * @author Ha3
  */
 interface SDocSystem {
     suspend fun listAll(): DocListResponse

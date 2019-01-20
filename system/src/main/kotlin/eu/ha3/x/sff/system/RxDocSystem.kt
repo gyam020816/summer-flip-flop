@@ -9,7 +9,7 @@ import io.reactivex.Single
  * (Default template)
  * Created on 2018-10-06
  *
- * @author gyam
+ * @author Ha3
  */
 interface RxDocSystem {
     fun listAll(): Single<DocListResponse>

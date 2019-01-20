@@ -18,12 +18,12 @@ import java.time.ZonedDateTime
  * (Default template)
  * Created on 2018-10-06
  *
- * @author gyam
+ * @author Ha3
  */
 internal class ReactiveDocStorageTest {
-    val mockDocSystem = mock<SDocSystem>()
-    val mockCurrentTimeFn = mock<() -> ZonedDateTime>()
-    val SUT = ReactiveDocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
+    private val mockDocSystem = mock<SDocSystem>()
+    private val mockCurrentTimeFn = mock<() -> ZonedDateTime>()
+    private val SUT = ReactiveDocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
 
     @Test
     internal fun `it should list all docs from doc system`() = testBlocking {

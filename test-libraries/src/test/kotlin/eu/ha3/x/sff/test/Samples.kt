@@ -12,6 +12,6 @@ import java.time.ZonedDateTime
 class TestSample {
     companion object {
         val zonedDateTimeSerialized = "2018-10-07T16:51:56.845Z"
-        val zonedDateTime = ZonedDateTime.parse(zonedDateTimeSerialized).withZoneSameInstant(ZoneOffset.UTC)
+        val zonedDateTime: ZonedDateTime = ZonedDateTime.parse(zonedDateTimeSerialized).withZoneSameInstant(ZoneOffset.UTC)
     }
 }

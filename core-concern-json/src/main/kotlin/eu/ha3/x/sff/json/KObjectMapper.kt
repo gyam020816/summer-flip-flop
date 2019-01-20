@@ -17,8 +17,8 @@ object KObjectMapper {
         registerKotlinModule()
         registerModule(JavaTimeModule())
         configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
-        configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true);
+        configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false)
+        configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true)
         setSerializationInclusion(JsonInclude.Include.NON_NULL)
     }
 }

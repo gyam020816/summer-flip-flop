@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
  *
  * @author Ha3
  */
-typealias SConsumer<Q, A> = suspend (question: Q, answerer: SEventBus.SAnswerer<A>) -> Unit;
+typealias SConsumer<Q, A> = suspend (question: Q, answerer: SEventBus.SAnswerer<A>) -> Unit
 
 class SEventBus(val vertx: Vertx, objectMapper: ObjectMapper) {
     val mapper = DMapper(objectMapper)
@@ -42,5 +42,5 @@ class SEventBus(val vertx: Vertx, objectMapper: ObjectMapper) {
             }
         }
     }
-    inline fun <reified Q, A : Any> ssConsumer(address: String, noinline consumerFn: SConsumer<Q, A>) = ssConsumer(address, consumerFn, Q::class.java);
+    inline fun <reified Q, A : Any> ssConsumer(address: String, noinline consumerFn: SConsumer<Q, A>) = ssConsumer(address, consumerFn, Q::class.java)
 }

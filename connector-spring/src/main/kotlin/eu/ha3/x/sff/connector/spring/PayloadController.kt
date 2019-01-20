@@ -15,15 +15,15 @@ import java.util.concurrent.CompletableFuture
 @RestController
 open class PayloadController {
     @Autowired
-    private lateinit var docStorage: RxDocStorage;
+    private lateinit var docStorage: RxDocStorage
 
     @PostMapping(value = ["/docs"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun uploadPayload(@RequestBody docCreateRequest: DocCreateRequest): ResponseEntity<Doc> {
         val futureResponse = CompletableFuture<ResponseEntity<Doc>>()
 
-        docStorage.appendToDocs(docCreateRequest).subscribe({ success ->
+        docStorage.appendToDocs(docCreateRequest).subscribe { success ->
             futureResponse.complete(ResponseEntity.status(201).body(success))
-        })
+        }
 
         return futureResponse.join()
     }

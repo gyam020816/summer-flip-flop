@@ -15,7 +15,7 @@ import java.time.ZonedDateTime
  * @author Ha3
  */
 interface SDocSystemTestFacade<T : SDocSystem> {
-    fun SUT(): T;
+    fun SUT(): T
 
     @Test
     fun `it should be empty at first (facade)`() = testBlocking {

@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 class SuspendedWebVerticle(private val docStorage: SDocStorage, private val webObjectMapper: ObjectMapper) : CoroutineVerticle() {
     override suspend fun start() {
         val router: Router = Router.router(vertx)
-        router.route().handler(BodyHandler.create());
+        router.route().handler(BodyHandler.create())
         router.get("/docs").coroutineHandler(::getDocs)
         router.post("/docs").coroutineHandler(::appendToDocs)
 

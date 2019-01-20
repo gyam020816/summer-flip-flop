@@ -44,7 +44,7 @@ class KPostgreSQLContainer(imageName: String) : PostgreSQLContainer<KPostgreSQLC
         internal const val POSTGRES_JUNIT_USERNAME = "test_junit_username"
         internal const val POSTGRES_JUNIT_PASSWORD = "test_junit_password"
 
-        fun create() = KPostgreSQLContainer("postgres:9.6.2")
+        fun create(): KPostgreSQLContainer = KPostgreSQLContainer("postgres:9.6.2")
                 .withUsername(POSTGRES_JUNIT_USERNAME)
                 .withPassword(POSTGRES_JUNIT_PASSWORD)
     }

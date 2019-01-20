@@ -27,16 +27,16 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 open class PayloadAppConfig {
     @Bean
     @Primary
-    public open fun docStorage(): RxDocStorage = mock()
+    open fun docStorage(): RxDocStorage = mock()
 }
 
 @SpringBootTest(classes = [Application::class, PayloadAppConfig::class, JacksonMapper::class])
-public class PayloadControllerTest : AControllerTest() {
+class PayloadControllerTest : AControllerTest() {
     @Autowired
-    lateinit var mockDocStorage: RxDocStorage;
+    lateinit var mockDocStorage: RxDocStorage
 
     @Test
-    public fun `it should accept a doc`() {
+    fun `it should accept a doc`() {
         whenever(mockDocStorage.appendToDocs(DocCreateRequest("someDoc")))
                 .thenReturn(Single.just(Doc("someDoc", TestSample.zonedDateTime)))
 
@@ -51,7 +51,7 @@ public class PayloadControllerTest : AControllerTest() {
     }
 
     @Test
-    public fun `it should error with bad request`() {
+    fun `it should error with bad request`() {
         mockMvc.perform(post("/docs")
                 .content("""{}""")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -60,7 +60,7 @@ public class PayloadControllerTest : AControllerTest() {
     }
 
     @Test
-    public fun `it should list all docs`() {
+    fun `it should list all docs`() {
         whenever(mockDocStorage.listAll())
                 .thenReturn(Single.just(DocListResponse(listOf(someDoc()))))
 

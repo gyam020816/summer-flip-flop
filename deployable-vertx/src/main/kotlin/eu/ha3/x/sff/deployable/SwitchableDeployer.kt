@@ -34,7 +34,7 @@ enum class SwitchableFeature {
 }
 
 class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable {
-    val webObjectMapper = KObjectMapper.newInstance().apply {
+    private val webObjectMapper = KObjectMapper.newInstance().apply {
         configure(SerializationFeature.INDENT_OUTPUT, true)
     }
 
@@ -128,14 +128,14 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
         override suspend fun listAll() = DocListResponse(listOf(Doc("hello", ZonedDateTime.now())))
     }
 
-    fun envOrElse(envName: String, defaultValue: String): String {
+    private fun envOrElse(envName: String, defaultValue: String): String {
         val result: String? = System.getenv(envName)
         if (result is String) {
             if (result.trim() != result) {
                 throw IllegalArgumentException("Environment variable $envName must not have leading or trailing whitespace: `$result` (is ${result.length} chars)")
             }
 
-            return result;
+            return result
 
         } else {
             println(("Missing environment variable: $envName"))

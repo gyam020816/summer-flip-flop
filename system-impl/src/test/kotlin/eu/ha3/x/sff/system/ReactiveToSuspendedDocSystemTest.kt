@@ -20,8 +20,8 @@ import java.time.ZonedDateTime
  * @author Ha3
  */
 internal class ReactiveToSuspendedDocSystemTest {
-    val mockDocSystem = mock<SDocSystem>()
-    val SUT = ReactiveToSuspendedDocSystem(mockDocSystem)
+    private val mockDocSystem = mock<SDocSystem>()
+    private val SUT = ReactiveToSuspendedDocSystem(mockDocSystem)
 
     @Test
     internal fun `it should delegate call to suspended listAll`() {

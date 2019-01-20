@@ -36,7 +36,7 @@ class Binder<Q : Any, A : Any>(
             DEventBus(bus, objectMapper).dsSend(address, question, answerClass).subscribe({ res ->
                 handler.onSuccess(res.answer)
 
-            }, handler::onError);
+            }, handler::onError)
         }
     }
 

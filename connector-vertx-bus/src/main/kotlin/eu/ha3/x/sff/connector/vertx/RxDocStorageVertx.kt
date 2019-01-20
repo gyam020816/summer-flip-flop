@@ -15,7 +15,7 @@ import io.vertx.rxjava.core.eventbus.EventBus
  * (Default template)
  * Created on 2018-10-06
  *
- * @author gyam
+ * @author Ha3
  */
 class RxDocStorageVertx(mapper: ObjectMapper = CodecObjectMapper.mapper) {
     val appendToDocsBinder = Binder(mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
@@ -37,7 +37,7 @@ class RxDocStorageVertx(mapper: ObjectMapper = CodecObjectMapper.mapper) {
         }
     }
 
-    inner class QuestionSender(private val eventBus: EventBus) : RxDocStorage {
+    inner class QuestionSender(eventBus: EventBus) : RxDocStorage {
         private val appendToDocsFn = appendToDocsBinder.questionSender(eventBus)
         private val listDocsFn = listDocsBinder.questionSender(eventBus)
 

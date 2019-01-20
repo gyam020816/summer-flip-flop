@@ -7,7 +7,7 @@ import java.time.ZonedDateTime
  * (Default template)
  * Created on 2018-10-06
  *
- * @author gyam
+ * @author Ha3
  */
 class ReactiveDocStorage(private val docSystem: SDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now)
     : RxDocStorage by ReactiveToSuspendedDocStorage(SuspendedDocStorage(docSystem, currentTimeFn))

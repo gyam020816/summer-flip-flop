@@ -11,14 +11,10 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class JacksonMapper {
     @Bean
-    open fun objectMapper(): ObjectMapper {
-        val mapper = ObjectMapper().apply {
-            registerKotlinModule()
-            registerModule(JavaTimeModule())
-            configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false); // This avoid [UTC] somehow, see tests
-        }
-
-        return mapper
+    open fun objectMapper() = ObjectMapper().apply {
+        registerKotlinModule()
+        registerModule(JavaTimeModule())
+        configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false) // This avoid [UTC] somehow, see tests
     }
 }

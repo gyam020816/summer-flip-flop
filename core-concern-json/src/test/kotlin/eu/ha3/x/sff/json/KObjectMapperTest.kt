@@ -38,7 +38,7 @@ internal class KObjectMapperTest {
 
     /**
      * Kotlin's Int is assumed to be considered a primitive by Jackson,
-     * which needs [DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES].
+     * which needs [com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES].
      */
     @Test
     internal fun `it should not deserialize if number is missing`() {

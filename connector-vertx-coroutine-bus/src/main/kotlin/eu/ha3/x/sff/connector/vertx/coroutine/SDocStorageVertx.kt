@@ -15,7 +15,7 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
  * (Default template)
  * Created on 2018-10-11
  *
- * @author gyam
+ * @author Ha3
  */
 class SDocStorageVertx(mapper: ObjectMapper = CodecObjectMapper.mapper) {
     val appendToDocsBinder = SBinder(mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)

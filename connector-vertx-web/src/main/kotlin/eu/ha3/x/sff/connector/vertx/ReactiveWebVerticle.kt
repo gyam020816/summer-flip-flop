@@ -19,9 +19,9 @@ import io.vertx.rxjava.ext.web.handler.BodyHandler
 class ReactiveWebVerticle(private val docStorage: RxDocStorage, private val webObjectMapper: ObjectMapper) : AbstractVerticle() {
     override fun start(fut: Future<Void>) {
         val router: Router = Router.router(vertx)
-        router.route().handler(BodyHandler.create());
+        router.route().handler(BodyHandler.create())
         router.route(HttpMethod.GET, "/docs").handler(::getDocs)
-        router.route(HttpMethod.POST, "/docs").handler(::appendToDocs);
+        router.route(HttpMethod.POST, "/docs").handler(::appendToDocs)
 
         vertx
                 .createHttpServer()

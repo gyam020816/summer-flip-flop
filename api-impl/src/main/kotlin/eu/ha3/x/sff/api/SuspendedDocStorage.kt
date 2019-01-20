@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
  *
  * @author Ha3
  */
-class SuspendedDocStorage(val docSystem: SDocSystem, val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : SDocStorage {
+class SuspendedDocStorage(private val docSystem: SDocSystem, val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now) : SDocStorage {
     override suspend fun listAll(): DocListResponse {
         return docSystem.listAll()
     }

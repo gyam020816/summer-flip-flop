@@ -8,7 +8,7 @@ import eu.ha3.x.sff.core.DocListResponse
  * (Default template)
  * Created on 2018-10-06
  *
- * @author gyam
+ * @author Ha3
  */
 interface SDocStorage {
     suspend fun appendToDocs(request: DocCreateRequest): Doc

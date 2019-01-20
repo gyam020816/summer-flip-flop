@@ -23,10 +23,10 @@ abstract class AControllerTest {
     @Autowired
     private lateinit var webApplicationContext: WebApplicationContext
 
-    protected lateinit var mockMvc: MockMvc;
+    protected lateinit var mockMvc: MockMvc
 
     @BeforeEach
-    public fun setup() {
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
+    fun setup() {
+        this.mockMvc = webAppContextSetup(webApplicationContext).build()
     }
 }
