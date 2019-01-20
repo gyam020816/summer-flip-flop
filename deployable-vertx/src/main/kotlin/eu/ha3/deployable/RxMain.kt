@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
 
     val bus = vertx.eventBus()
 
-    val system = SDocSystemVertx()
+    val system = RxDocSystemVertx()
     val storage = RxDocStorageVertx()
 
     val concreteDocStorage = ReactiveDocStorage(SuspendedToRxDocSystem(system.QuestionSender(bus)))

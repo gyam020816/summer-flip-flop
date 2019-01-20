@@ -35,7 +35,7 @@ internal class SDocSystemVertxTest {
         docSystem = mock()
         vertx = Vertx.vertx()
         vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
-        vertx.delegate.deployVerticle(SDocSystemVertx().Verticle(docSystem), context.succeeding {
+        vertx.delegate.deployVerticle(RxDocSystemVertx().Verticle(docSystem), context.succeeding {
             context.completeNow()
         })
     }
