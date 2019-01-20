@@ -3,6 +3,7 @@ package eu.ha3.x.sff.system.postgres
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.json.KObjectMapper
 import eu.ha3.x.sff.system.SDocSystem
 import org.postgresql.util.PGobject
 import java.time.ZonedDateTime

@@ -1,5 +1,5 @@
-package eu.ha3.x.sff.system.postgres
-import com.fasterxml.jackson.databind.DeserializationFeature
+package eu.ha3.x.sff.json
+
 import com.fasterxml.jackson.databind.JsonMappingException
 import net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 import org.assertj.core.api.Assertions.assertThat

@@ -1,10 +1,12 @@
 package eu.ha3.x.sff.connector.vertx
 
 import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.databind.*
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import eu.ha3.x.sff.json.KObjectMapper
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import java.util.*
@@ -16,21 +18,16 @@ import java.util.*
  * @author Ha3
  */
 object Jsonify {
-    val mapper: ObjectMapper = ObjectMapper()
-    val prettyMapper: ObjectMapper = ObjectMapper()
+    val mapper: ObjectMapper = KObjectMapper.newInstance()
+    val prettyMapper: ObjectMapper = KObjectMapper.newInstance()
 
     init {
         listOf(mapper, prettyMapper).forEach {
-            it.registerKotlinModule()
-            it.registerModule(JavaTimeModule())
-            it.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            it.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false); // This avoid [UTC] somehow, see tests
-
             val module = SimpleModule()
             module.addSerializer(JsonObject::class.java, JsonObjectSerializer)
             module.addSerializer(JsonArray::class.java, JsonArraySerializer)
             module.addSerializer(ByteArray::class.java, ByteArraySerializer)
-            mapper.registerModule(module)
+            it.registerModule(module)
         }
         prettyMapper.configure(SerializationFeature.INDENT_OUTPUT, true)
     }
