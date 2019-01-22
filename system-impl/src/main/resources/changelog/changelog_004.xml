@@ -3,9 +3,8 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-    <include file="changelog/changelog_001.xml" />
-    <include file="changelog/changelog_002.xml" />
-    <include file="changelog/changelog_003.xml" />
-    <include file="changelog/changelog_004.xml" />
+    <changeSet author="PostgresLiquibaseUpgrade" id="004">
+        <sql>UPDATE documents SET created_at = (data->>'createdAt')::timestamptz::timestamp</sql>
+    </changeSet>
 
 </databaseChangeLog>

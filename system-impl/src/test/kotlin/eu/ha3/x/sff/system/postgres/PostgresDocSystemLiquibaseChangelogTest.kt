@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.ZoneOffset
 
 /**
  * (Default template)
@@ -69,8 +70,18 @@ class PostgresDocSystemLiquibaseChangelogTest {
                     if (query.next()) {
                         val timestampObj = query.getTimestamp("created_at")
 
-                        val zdtAtZoneOfSample = timestampObj.toLocalDateTime().atZone(TestSample.zonedDateTime.zone)
+                        val zdtAtZoneOfSample = timestampObj.toInstant().atZone(TestSample.zonedDateTime.zone)
                         assertThat(zdtAtZoneOfSample).isEqualTo(TestSample.zonedDateTime)
+
+                    } else {
+                        assertFail("Expected a result")
+                    }
+
+                    if (query.next()) {
+                        val timestampObj = query.getTimestamp("created_at")
+
+                        val zdtAtZoneOfSample = timestampObj.toInstant().atZone(TestSample.zonedDateTime.zone)
+                        assertThat(zdtAtZoneOfSample).isEqualTo(TestSample.zonedDateTime.withZoneSameLocal(ZoneOffset.of("+05:00")))
 
                     } else {
                         assertFail("Expected a result")
