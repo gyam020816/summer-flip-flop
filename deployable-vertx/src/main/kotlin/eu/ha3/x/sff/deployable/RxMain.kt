@@ -1,7 +1,7 @@
 package eu.ha3.x.sff.deployable
 
 import eu.ha3.x.sff.deployable.SwitchableFeature.COMPONENTS_AS_SEPARATE_VERTICLES
-import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE_LEGACY
+import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE
 
 /**
  * (Default template)
@@ -10,5 +10,5 @@ import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE_LEGACY
  * @author Ha3
  */
 fun main(args: Array<String>) {
-    SwitchableDeployer(setOf(REACTIVE_LEGACY, COMPONENTS_AS_SEPARATE_VERTICLES)).run()
+    SwitchableDeployer(setOf(REACTIVE, COMPONENTS_AS_SEPARATE_VERTICLES)).run()
 }

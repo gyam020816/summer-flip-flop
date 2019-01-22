@@ -1,8 +1,10 @@
 package eu.ha3.x.sff.deployable
 import com.fasterxml.jackson.databind.SerializationFeature
 import eu.ha3.x.sff.api.ReactiveDocStorage
+import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.api.SuspendedDocStorage
+import eu.ha3.x.sff.connector.spring.Application
 import eu.ha3.x.sff.connector.vertx.*
 import eu.ha3.x.sff.connector.vertx.coroutine.SDocStorageVertx
 import eu.ha3.x.sff.connector.vertx.coroutine.SDocSystemVertx
@@ -19,6 +21,8 @@ import eu.ha3.x.sff.system.postgres.PostgresSuspendedDocSystem
 import eu.ha3.x.sff.system.postgres.UpgradeParams
 import io.vertx.core.Vertx
 import io.vertx.core.eventbus.EventBus
+import org.springframework.boot.SpringApplication
+import org.springframework.context.support.beans
 import java.time.ZonedDateTime
 
 /**
@@ -30,7 +34,8 @@ import java.time.ZonedDateTime
 enum class SwitchableFeature {
     COMPONENTS_AS_SEPARATE_VERTICLES,
     POSTGRES,
-    REACTIVE_LEGACY
+    REACTIVE,
+    SPRING
 }
 
 class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable {
@@ -41,12 +46,26 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
     override fun run() {
         val concreteDocSystem = resolveDocSystem(features)
 
-        if (SwitchableFeature.REACTIVE_LEGACY in features) {
-            reactive(concreteDocSystem)
+        if (SwitchableFeature.SPRING in features) {
+            springReactive(concreteDocSystem)
 
         } else {
-            suspended(concreteDocSystem)
+            if (SwitchableFeature.REACTIVE in features) {
+                reactive(concreteDocSystem)
+
+            } else {
+                suspended(concreteDocSystem)
+            }
         }
+    }
+
+    private fun springReactive(concreteDocSystem: SDocSystem) {
+        // https://github.com/spring-projects/spring-boot/issues/8115#issuecomment-326910814
+        SpringApplication(Application::class.java).apply {
+            addInitializers(beans {
+                bean<RxDocStorage> { ReactiveDocStorage(concreteDocSystem) }
+            })
+        }.run()
     }
 
     private fun suspended(concreteDocSystem: SDocSystem) {

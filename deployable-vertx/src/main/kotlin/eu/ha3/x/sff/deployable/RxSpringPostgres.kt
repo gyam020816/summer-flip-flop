@@ -1,7 +1,7 @@
 package eu.ha3.x.sff.deployable
 
 import eu.ha3.x.sff.deployable.SwitchableFeature.POSTGRES
-import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE
+import eu.ha3.x.sff.deployable.SwitchableFeature.SPRING
 
 /**
  * (Default template)
@@ -10,5 +10,5 @@ import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE
  * @author Ha3
  */
 fun main(args: Array<String>) {
-    SwitchableDeployer(setOf(REACTIVE, POSTGRES)).run()
+    SwitchableDeployer(setOf(SPRING, POSTGRES)).run()
 }

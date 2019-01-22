@@ -1,6 +1,6 @@
 package eu.ha3.x.sff.deployable
 
-import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE_LEGACY
+import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE
 
 /**
  * (Default template)
@@ -9,5 +9,5 @@ import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE_LEGACY
  * @author Ha3
  */
 fun main(args: Array<String>) {
-    SwitchableDeployer(setOf(REACTIVE_LEGACY)).run()
+    SwitchableDeployer(setOf(REACTIVE)).run()
 }
