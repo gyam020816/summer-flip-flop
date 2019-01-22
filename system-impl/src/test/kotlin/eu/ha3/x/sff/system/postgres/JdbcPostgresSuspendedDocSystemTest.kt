@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.Duration
 
 /**
  * (Default template)
@@ -47,5 +48,6 @@ class KPostgreSQLContainer(imageName: String) : PostgreSQLContainer<KPostgreSQLC
         fun create(): KPostgreSQLContainer = KPostgreSQLContainer("postgres:9.6.2")
                 .withUsername(POSTGRES_JUNIT_USERNAME)
                 .withPassword(POSTGRES_JUNIT_PASSWORD)
+                .withStartupTimeout(Duration.ofMinutes(5))
     }
 }
