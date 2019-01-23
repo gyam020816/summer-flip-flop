@@ -2,6 +2,7 @@ package eu.ha3.x.sff.test
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 
 /**
  * (Default template)
@@ -9,8 +10,13 @@ import kotlinx.coroutines.runBlocking
  *
  * @author Ha3
  */
-fun testBlocking(suspendedFn: suspend CoroutineScope.() -> Unit): Unit = runBlocking {
-    suspendedFn()
+
+fun testBlocking(suspendedFn: suspend CoroutineScope.() -> Unit): Unit = testWithinSeconds(5, suspendedFn)
+
+fun testWithinSeconds(seconds: Int, suspendedFn: suspend CoroutineScope.() -> Unit): Unit = runBlocking {
+    withTimeout(seconds * 1000L) {
+        suspendedFn()
+    }
 
     Unit
 }

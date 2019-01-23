@@ -9,7 +9,7 @@ import kotlinx.coroutines.channels.BroadcastChannel
  *
  * @author gyam
  */
-class ChannelledSubjects(val capacity: Int) : ChSubjects {
+class ChannelledSubjects(capacity: Int) : ChSubjects {
     private val onDocumentCreated = BroadcastChannel<SEvent.DocumentCreated>(capacity)
 
     override fun onDocumentCreatedChannel() = onDocumentCreated
