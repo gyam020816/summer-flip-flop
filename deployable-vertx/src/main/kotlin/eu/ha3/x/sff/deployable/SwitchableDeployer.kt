@@ -15,10 +15,7 @@ import eu.ha3.x.sff.json.KObjectMapper
 import eu.ha3.x.sff.system.ReactiveToSuspendedDocSystem
 import eu.ha3.x.sff.system.SDocSystem
 import eu.ha3.x.sff.system.SuspendedToRxDocSystem
-import eu.ha3.x.sff.system.postgres.DbConnectionParams
-import eu.ha3.x.sff.system.postgres.PostgresLiquibaseUpgrade
-import eu.ha3.x.sff.system.postgres.PostgresSuspendedDocSystem
-import eu.ha3.x.sff.system.postgres.UpgradeParams
+import eu.ha3.x.sff.system.postgres.*
 import io.vertx.core.Vertx
 import io.vertx.core.eventbus.EventBus
 import org.springframework.boot.SpringApplication
@@ -34,6 +31,7 @@ import java.time.ZonedDateTime
 enum class SwitchableFeature {
     COMPONENTS_AS_SEPARATE_VERTICLES,
     POSTGRES,
+    POSTGRES_JASYNC,
     REACTIVE,
     SPRING
 }
@@ -82,16 +80,21 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
             val senderDocStorage = storage.QuestionSender(vertx)
             val senderDocSystem = system.QuestionSender(vertx)
 
-            val verticles = listOf(
-                    SuspendedWebVerticle(senderDocStorage, webObjectMapper),
-                    storage.Verticle(docStorageFn(senderDocSystem)),
-                    system.Verticle(concreteDocSystem)
-            )
-            verticles.forEach(vertx::deployVerticle)
+            listOf(
+                    (1..16).map { SuspendedWebVerticle(senderDocStorage, webObjectMapper) },
+                    (1..16).map { storage.Verticle(docStorageFn(senderDocSystem)) },
+                    (1..16).map { system.Verticle(concreteDocSystem) }
+            ).flatMap { it }.forEach {
+                vertx.deployVerticle(it)
+                println("Deployed ${it::class.java.simpleName}.")
+            }
 
         } else {
             val verticles = listOf(SuspendedWebVerticle(docStorageFn(concreteDocSystem), webObjectMapper))
-            verticles.forEach(vertx::deployVerticle)
+            verticles.forEach {
+                vertx.deployVerticle(it)
+                println("Deployed ${it::class.java.simpleName}.")
+            }
         }
     }
 
@@ -122,7 +125,7 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
     }
 
     private fun resolveDocSystem(features: Set<SwitchableFeature>): SDocSystem {
-        return if (SwitchableFeature.POSTGRES in features) {
+        return if (SwitchableFeature.POSTGRES in features || SwitchableFeature.POSTGRES_JASYNC in features) {
             val db = DbConnectionParams(
                     jdbcUrl = envOrElse("DB_URL", "jdbc:postgresql://localhost:16099/summer"),
                     user = envOrElse("DB_USER", "postgres"),
@@ -132,7 +135,11 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
             PostgresLiquibaseUpgrade(db, UpgradeParams("changelog.xml", "public"))
                     .upgradeDatabase()
 
-            PostgresSuspendedDocSystem(db)
+            if (SwitchableFeature.POSTGRES_JASYNC in features) {
+                JdbcPostgresSuspendedDocSystem(db)
+            } else {
+                JasyncPostgresSuspendedDocSystem(db)
+            }
 
         } else {
             NoDocSystem

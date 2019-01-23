@@ -1,7 +1,5 @@
 package eu.ha3.x.sff.deployable
 
-import eu.ha3.x.sff.deployable.SwitchableFeature.POSTGRES
-
 /**
  * (Default template)
  * Created on 2019-01-12
@@ -9,5 +7,5 @@ import eu.ha3.x.sff.deployable.SwitchableFeature.POSTGRES
  * @author Ha3
  */
 fun main(args: Array<String>) {
-    SwitchableDeployer(setOf(POSTGRES)).run()
+    SwitchableDeployer(setOf(SwitchableFeature.POSTGRES_JASYNC)).run()
 }

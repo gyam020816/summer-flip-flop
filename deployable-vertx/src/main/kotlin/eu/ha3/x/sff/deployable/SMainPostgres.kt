@@ -1,7 +1,7 @@
 package eu.ha3.x.sff.deployable
 
 import eu.ha3.x.sff.deployable.SwitchableFeature.COMPONENTS_AS_SEPARATE_VERTICLES
-import eu.ha3.x.sff.deployable.SwitchableFeature.POSTGRES
+import eu.ha3.x.sff.deployable.SwitchableFeature.POSTGRES_JASYNC
 
 /**
  * (Default template)
@@ -10,5 +10,5 @@ import eu.ha3.x.sff.deployable.SwitchableFeature.POSTGRES
  * @author Ha3
  */
 fun main(args: Array<String>) {
-    SwitchableDeployer(setOf(COMPONENTS_AS_SEPARATE_VERTICLES, POSTGRES)).run()
+    SwitchableDeployer(setOf(COMPONENTS_AS_SEPARATE_VERTICLES, POSTGRES_JASYNC)).run()
 }

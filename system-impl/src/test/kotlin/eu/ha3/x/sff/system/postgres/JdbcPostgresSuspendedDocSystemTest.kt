@@ -14,7 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
  * @author Ha3
  */
 @Testcontainers
-class PostgresSuspendedDocSystemTest : SDocSystemTestFacade<PostgresSuspendedDocSystem> {
+class JdbcPostgresSuspendedDocSystemTest : SDocSystemTestFacade<JdbcPostgresSuspendedDocSystem> {
     @Container
     private val pgContainer = KPostgreSQLContainer.create()
     private val db by lazy {
@@ -25,9 +25,9 @@ class PostgresSuspendedDocSystemTest : SDocSystemTestFacade<PostgresSuspendedDoc
         )
     }
 
-    private val SUT by lazy { PostgresSuspendedDocSystem(db) }
+    private val SUT by lazy { JdbcPostgresSuspendedDocSystem(db) }
 
-    override fun SUT(): PostgresSuspendedDocSystem = SUT
+    override fun SUT(): JdbcPostgresSuspendedDocSystem = SUT
 
     @BeforeEach
     internal fun setUp() {

@@ -21,7 +21,7 @@ internal data class DocEntity(val name: String, val createdAt: ZonedDateTime) {
     fun to(): Doc = Doc(name, createdAt)
 }
 
-class PostgresSuspendedDocSystem(val db: DbConnectionParams) : SDocSystem {
+class JdbcPostgresSuspendedDocSystem(val db: DbConnectionParams) : SDocSystem {
     init {
         Class.forName("org.postgresql.Driver")
     }
