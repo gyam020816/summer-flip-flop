@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.sql.ResultSet
 import java.time.ZoneOffset
 
 /**
@@ -44,11 +45,9 @@ class PostgresChangelogTest {
 
         // Verify
         open(db) {
-            openStatement { statement ->
-                statement.executeQuery("SELECT * FROM $CHANGELOG_PUBLIC_SCHEMA.documents").use { query ->
-                    if (query.next()) {
-                        assertFail("Did not expect any results")
-                    }
+            queryNow("SELECT * FROM $CHANGELOG_PUBLIC_SCHEMA.documents") { query ->
+                if (query.next()) {
+                    assertFail("Did not expect any results")
                 }
             }
         }
@@ -65,33 +64,37 @@ class PostgresChangelogTest {
 
         // Verify
         open(db) {
-            openStatement { statement ->
-                statement.executeQuery("SELECT * FROM $CHANGELOG_PUBLIC_SCHEMA.documents").use { query ->
-                    if (query.next()) {
-                        val timestampObj = query.getTimestamp("created_at")
+            queryNow("SELECT * FROM $CHANGELOG_PUBLIC_SCHEMA.documents") { query ->
+                expectResult(query.next())
+                `the first element should keep created_at in UTC`(query)
 
-                        val zdtAtZoneOfSample = timestampObj.toInstant().atZone(TestSample.zonedDateTime.zone)
-                        assertThat(zdtAtZoneOfSample).isEqualTo(TestSample.zonedDateTime)
+                expectResult(query.next())
+                `the second element should have its created_at adjusted to UTC`(query)
 
-                    } else {
-                        assertFail("Expected a result")
-                    }
-
-                    if (query.next()) {
-                        val timestampObj = query.getTimestamp("created_at")
-
-                        val zdtAtZoneOfSample = timestampObj.toInstant().atZone(TestSample.zonedDateTime.zone)
-                        assertThat(zdtAtZoneOfSample).isEqualTo(TestSample.zonedDateTime.withZoneSameLocal(ZoneOffset.of("+05:00")))
-
-                    } else {
-                        assertFail("Expected a result")
-                    }
-
-                    if (query.next()) {
-                        assertFail("Too many results")
-                    }
+                if (query.next()) {
+                    assertFail("Too many results")
                 }
             }
         }
+    }
+
+    private fun expectResult(resultOfQueryNext: Boolean) {
+        if (!resultOfQueryNext) {
+            assertFail("Expected a result")
+        }
+    }
+
+    private fun `the first element should keep created_at in UTC`(query: ResultSet) {
+        val timestampObj = query.getTimestamp("created_at")
+
+        val zdtAtZoneOfSample = timestampObj.toInstant().atZone(TestSample.zonedDateTime.zone)
+        assertThat(zdtAtZoneOfSample).isEqualTo(TestSample.zonedDateTime)
+    }
+
+    private fun `the second element should have its created_at adjusted to UTC`(query: ResultSet) {
+        val timestampObj = query.getTimestamp("created_at")
+
+        val zdtAtZoneOfSample = timestampObj.toInstant().atZone(TestSample.zonedDateTime.zone)
+        assertThat(zdtAtZoneOfSample).isEqualTo(TestSample.zonedDateTime.withZoneSameLocal(ZoneOffset.of("+05:00")))
     }
 }
