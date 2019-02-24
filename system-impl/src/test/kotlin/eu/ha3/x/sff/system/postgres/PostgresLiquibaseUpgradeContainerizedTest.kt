@@ -19,7 +19,7 @@ import java.nio.file.Paths
  * @author Ha3
  */
 @Testcontainers
-class PostgresLiquibaseUpgradeTest {
+class PostgresLiquibaseUpgradeContainerizedTest {
     @Container
     private val pgContainer = KPostgreSQLContainer.create()
     private val db by lazy {

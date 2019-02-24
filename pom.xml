@@ -48,6 +48,19 @@
                 <module>z-spring-test-junit5</module>
             </modules>
         </profile>
+        <profile>
+            <id>no-testcontainers</id>
+            <properties>
+                <test.inclusion>**/*Test.java</test.inclusion>
+                <test.exclusion>**/*ContainerizedTest.java</test.exclusion>
+            </properties>
+        </profile>
+        <profile>
+            <id>only-testcontainers</id>
+            <properties>
+                <test.inclusion>**/*ContainerizedTest.java</test.inclusion>
+            </properties>
+        </profile>
     </profiles>
 
     <properties>
@@ -58,6 +71,8 @@
         <junit.platform.version>1.4.0</junit.platform.version>
         <jackson.version>2.9.8</jackson.version>
         <jackson.kotlin.version>2.9.8</jackson.kotlin.version>
+        <test.inclusion>**/*Test.java</test.inclusion>
+        <test.exclusion/>
     </properties>
 
     <build>
@@ -90,11 +105,11 @@
                 <version>3.0.0-M1</version>
                 <configuration>
                     <includes>
-                        <include>**/Test*.java</include>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                        <include>**/*TestCase.java</include>
+                        <include>${test.inclusion}</include>
                     </includes>
+                    <excludes>
+                        <exclude>${test.exclusion}</exclude>
+                    </excludes>
                     <properties>
                         <excludeTags>slow</excludeTags>
                     </properties>

@@ -15,8 +15,8 @@ build_app:
     image: duskforest.xyz:5000/buildenv-kotlin-maven-docker
     stage: build
     script:
-        - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build clean package
-        - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build jacoco:report-aggregate
+        - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss,SSS -P fast-build clean package
+        - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss,SSS -P fast-build jacoco:report-aggregate
 
 image_app:
     image: docker:dind

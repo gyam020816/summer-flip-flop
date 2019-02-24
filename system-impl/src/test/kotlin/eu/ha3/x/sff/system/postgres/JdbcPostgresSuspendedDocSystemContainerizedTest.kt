@@ -15,7 +15,7 @@ import java.time.Duration
  * @author Ha3
  */
 @Testcontainers
-class JdbcPostgresSuspendedDocSystemTest : SDocSystemTestFacade<JdbcPostgresSuspendedDocSystem> {
+class JdbcPostgresSuspendedDocSystemContainerizedTest : SDocSystemTestFacade<JdbcPostgresSuspendedDocSystem> {
     @Container
     private val pgContainer = KPostgreSQLContainer.create()
     private val db by lazy {

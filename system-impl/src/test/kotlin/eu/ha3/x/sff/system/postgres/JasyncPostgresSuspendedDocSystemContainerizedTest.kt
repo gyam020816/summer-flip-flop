@@ -14,7 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
  * @author Ha3
  */
 @Testcontainers
-class JasyncPostgresSuspendedDocSystemTest : SDocSystemTestFacade<JasyncPostgresSuspendedDocSystem> {
+class JasyncPostgresSuspendedDocSystemContainerizedTest : SDocSystemTestFacade<JasyncPostgresSuspendedDocSystem> {
     @Container
     private val pgContainer = KPostgreSQLContainer.create()
     private val db by lazy {

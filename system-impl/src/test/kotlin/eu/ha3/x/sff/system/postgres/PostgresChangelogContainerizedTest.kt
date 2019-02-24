@@ -17,7 +17,7 @@ import java.time.ZoneOffset
  * @author Ha3
  */
 @Testcontainers
-class PostgresChangelogTest {
+class PostgresChangelogContainerizedTest {
     @Container
     private val pgContainer = KPostgreSQLContainer.create()
     private val db by lazy {
