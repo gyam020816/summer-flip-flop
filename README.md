@@ -14,6 +14,25 @@ may or may not include the following:
 - database component integration testing using testcontainers
 - mockito-kotlin
 
+# quick start
+
+to run the project locally:
+
+- run `./do-linux-local-nonpersistent.sh` on Linux
+- run `do-windows-local-nonpersistent.bat` on Windows.
+
+this will expose a PostgreSQL container on port hosts' port 16099.
+
+the service will be running at http://localhost:8080/docs.
+
+### debugging
+
+run the project locally as described in quick start so that the containers will run.
+
+then just start one of the main classes in debug mode with the IDE.
+
+# stuff
+
 #### module structure
 
 pretty much every module depends on the core module that contains common model objects, and dependency inversion is achieved both at the implementation level as well as the module level. the domain api is not part of the core module.
