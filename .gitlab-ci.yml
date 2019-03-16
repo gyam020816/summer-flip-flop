@@ -1,0 +1,16 @@
+stages:
+  - build
+
+cache:
+  untracked: true
+  key: "$CI_PROJECT_ID"
+  paths:
+    - maven_local_repo/
+
+build_app:
+  image: duskforest.xyz:5000/buildenv-kotlin-maven-docker
+  stage: build
+  script:
+    - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build clean package
+    - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build jacoco:report-aggregate
+

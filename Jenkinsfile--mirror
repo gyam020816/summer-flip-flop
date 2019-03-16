@@ -1,0 +1,34 @@
+properties([[$class: 'GitLabConnectionProperty', gitLabConnection: 'gitlab']])
+pipeline {
+    agent {
+        label 'docker'
+    }
+    options {
+        skipDefaultCheckout true
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                //sh 'ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts'
+                checkout([
+                    $class: 'GitSCM',
+                    branches: scm.branches,
+                    extensions: scm.extensions + [[$class: 'LocalBranch'], [$class: 'WipeWorkspace']],
+                    userRemoteConfigs: [[url: 'https://github.com/gyam020816/summer-flip-flop.git']],
+                    doGenerateSubmoduleConfigurations: false
+                ])
+            }
+        }
+        stage('Mirror') {
+            steps {
+                sh 'git remote rm origin || true'
+                sh 'git remote add gitlab-mirror ssh://git@gitlab.ci.duskforest.xyz:2222/hubci/summer-flip-flop--mirror.git || true'
+
+                // --prune and --mirror are fail with error "The default branch of a project cannot be deleted."
+                // Instead, delete all remote branches except master, and then push all local branches into gitlab-mirror
+                sh 'git branch -r | grep gitlab-mirror/ | grep -v \'master$\' | grep -v HEAD | cut -d/ -f2 | while read line; do git push gitlab-mirror :$line; done;'
+                sh 'git push --set-upstream --force --all gitlab-mirror'
+            }
+        }
+    }
+}
