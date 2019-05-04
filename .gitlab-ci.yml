@@ -1,37 +1,57 @@
 stages:
-  - pre-status
-  - build
-  - post-status
+    - pre-status
+    - build
+    - image
+    - deploy
+    - post-status
 
 cache:
-  untracked: true
-  key: "$CI_PROJECT_ID"
-  paths:
-    - maven_local_repo/
+    untracked: true
+    key: "$CI_PROJECT_ID"
+    paths:
+        - maven_local_repo/
 
 build_app:
-  image: duskforest.xyz:5000/buildenv-kotlin-maven-docker
-  stage: build
-  script:
-    - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build clean package
-    - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build jacoco:report-aggregate
+    image: duskforest.xyz:5000/buildenv-kotlin-maven-docker
+    stage: build
+    script:
+        - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build clean package
+        - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build jacoco:report-aggregate
+
+image_app:
+    image: docker:dind
+    stage: image
+    script:
+        - docker build -t duskforest.xyz:5000/summer-flip-flop .
+
+docker_app:
+    stage: deploy
+    script:
+        - DVER=$(date +%Y'.'%m'.'%d'_'%H'.'%M'.'%S)
+        - docker tag duskforest.xyz:5000/summer-flip-flop:latest duskforest.xyz:5000/summer-flip-flop:$DVER
+        - docker login -u $REG_USER -p $REG_PASS duskforest.xyz:5000
+        - docker push duskforest.xyz:5000/summer-flip-flop:latest
+        - docker push duskforest.xyz:5000/summer-flip-flop:$DVER
+    only:
+        - master
+
 
 pre_status:
-  image: pstauffer/curl
-  stage: pre-status
-  script:
-    - ./_gitlab-ci/pre_status.sh
+    image: pstauffer/curl
+    stage: pre-status
+    script:
+        - ./_gitlab-ci/pre_status.sh
 
 post_status_success:
-  image: pstauffer/curl
-  stage: post-status
-  when: on_success
-  script:
-    - ./_gitlab-ci/post_status_success.sh
+    image: pstauffer/curl
+    stage: post-status
+    when: on_success
+    script:
+        - ./_gitlab-ci/post_status_success.sh
 
 post_status_failure:
-  image: pstauffer/curl
-  stage: post-status
-  when: on_failure
-  script:
-    - ./_gitlab-ci/post_status_failure.sh
+    image: pstauffer/curl
+    stage: post-status
+    when: on_failure
+    script:
+        - ./_gitlab-ci/post_status_failure.sh

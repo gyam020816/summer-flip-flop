@@ -32,6 +32,28 @@ pipeline {
                 '''
             }
         }
+        stage('Build Docker image') {
+            steps {
+                sh 'docker build -t duskforest.xyz:5000/summer-flip-flop .'
+            }
+        }
+        stage('Publish Docker image (master)') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sh 'docker build -t duskforest.xyz:5000/summer-flip-flop .'
+                withCredentials([usernamePassword(credentialsId: 'regcenter', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                    sh '''
+                        DVER=$(date +%Y'.'%m'.'%d'_'%H'.'%M'.'%S)
+                        docker tag duskforest.xyz:5000/summer-flip-flop:latest duskforest.xyz:5000/summer-flip-flop:$DVER
+                        docker login -u $USER -p $PASS duskforest.xyz:5000
+                        docker push duskforest.xyz:5000/summer-flip-flop:latest
+                        docker push duskforest.xyz:5000/summer-flip-flop:$DVER
+                    '''
+                }
+            }
+        }
     }
     post {
         always {
