@@ -26,6 +26,7 @@
         <module>core-concern-json</module>
         <module>z-maven-jasync</module>
         <module>z-spring-test-junit5</module>
+        <module>z-r2dbc</module>
     </modules>
 
     <profiles>

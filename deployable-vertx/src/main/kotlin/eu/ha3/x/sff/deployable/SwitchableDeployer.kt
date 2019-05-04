@@ -33,6 +33,7 @@ enum class SwitchableFeature {
     COMPONENTS_AS_SEPARATE_VERTICLES,
     POSTGRES,
     POSTGRES_JASYNC,
+    POSTGRES_R2DBC,
     REACTIVE,
     SPRING,
     KTOR
@@ -134,7 +135,8 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
     }
 
     private fun resolveDocSystem(features: Set<SwitchableFeature>): SDocSystem {
-        return if (SwitchableFeature.POSTGRES in features || SwitchableFeature.POSTGRES_JASYNC in features) {
+        val postgresFeatures = setOf(SwitchableFeature.POSTGRES, SwitchableFeature.POSTGRES_JASYNC, SwitchableFeature.POSTGRES_R2DBC)
+        return if (features.any { it in postgresFeatures }) {
             val db = DbConnectionParams(
                     jdbcUrl = envOrElse("DB_URL", "jdbc:postgresql://localhost:16099/summer"),
                     user = envOrElse("DB_USER", "postgres"),
@@ -146,6 +148,8 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
 
             if (SwitchableFeature.POSTGRES_JASYNC in features) {
                 JdbcPostgresSuspendedDocSystem(db)
+            } else if (SwitchableFeature.POSTGRES_R2DBC in features) {
+                R2dbcPostgreSuspendedDocSystem(db)
             } else {
                 JasyncPostgresSuspendedDocSystem(db)
             }
