@@ -1,5 +1,7 @@
 stages:
+  - pre-status
   - build
+  - post-status
 
 cache:
   untracked: true
@@ -14,3 +16,22 @@ build_app:
     - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build clean package
     - mvn --global-toolchains=/maven-data/toolchains.xml -Dmaven.repo.local=maven_local_repo -P fast-build jacoco:report-aggregate
 
+pre_status:
+  image: pstauffer/curl
+  stage: pre-status
+  script:
+    - ./_gitlab-ci/pre_status.sh
+
+post_status_success:
+  image: pstauffer/curl
+  stage: post-status
+  when: on_success
+  script:
+    - ./_gitlab-ci/post_status_success.sh
+
+post_status_failure:
+  image: pstauffer/curl
+  stage: post-status
+  when: on_failure
+  script:
+    - ./_gitlab-ci/post_status_failure.sh
