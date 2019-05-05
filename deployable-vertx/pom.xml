@@ -72,5 +72,10 @@
             <artifactId>connector-vertx-coroutine-bus</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>eu.ha3.x.sff</groupId>
+            <artifactId>connector-ktor</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

@@ -4,6 +4,7 @@ import eu.ha3.x.sff.api.ReactiveDocStorage
 import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.api.SuspendedDocStorage
+import eu.ha3.x.sff.connector.ktor.KtorApplication
 import eu.ha3.x.sff.connector.spring.Application
 import eu.ha3.x.sff.connector.vertx.*
 import eu.ha3.x.sff.connector.vertx.coroutine.SDocStorageVertx
@@ -33,7 +34,8 @@ enum class SwitchableFeature {
     POSTGRES,
     POSTGRES_JASYNC,
     REACTIVE,
-    SPRING
+    SPRING,
+    KTOR
 }
 
 class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable {
@@ -46,6 +48,9 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
 
         if (SwitchableFeature.SPRING in features) {
             springReactive(concreteDocSystem)
+
+        } else if (SwitchableFeature.KTOR in features) {
+            ktorSuspended(concreteDocSystem)
 
         } else {
             if (SwitchableFeature.REACTIVE in features) {
@@ -64,6 +69,10 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
                 bean<RxDocStorage> { ReactiveDocStorage(concreteDocSystem) }
             })
         }.run()
+    }
+
+    private fun ktorSuspended(concreteDocSystem: SDocSystem) {
+        KtorApplication.newEmbedded(SuspendedDocStorage(concreteDocSystem), webObjectMapper).start(wait = true)
     }
 
     private fun suspended(concreteDocSystem: SDocSystem) {

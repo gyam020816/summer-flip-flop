@@ -14,6 +14,7 @@ import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.server.netty.NettyApplicationEngine
 
 /**
  * (Default template)
@@ -42,8 +43,8 @@ fun Application.main(docStorage: SDocStorage, webObjectMapper: ObjectMapper) {
 }
 
 object KtorApplication {
-    fun newEmbedded(docStorage: SDocStorage, webObjectMapper: ObjectMapper) {
-        embeddedServer(Netty, port = 8080) {
+    fun newEmbedded(docStorage: SDocStorage, webObjectMapper: ObjectMapper): NettyApplicationEngine {
+        return embeddedServer(Netty, port = 8080) {
             this.main(docStorage, webObjectMapper)
         }
     }
