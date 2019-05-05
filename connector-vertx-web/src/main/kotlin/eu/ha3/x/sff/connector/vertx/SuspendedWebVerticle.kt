@@ -8,6 +8,9 @@ package eu.ha3.x.sff.connector.vertx
  */
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ha3.x.sff.api.SDocStorage
+import eu.ha3.x.sff.api.ledger.Ledger
+import eu.ha3.x.sff.api.ledger.SLedger
+import eu.ha3.x.sff.api.ledger.SLedgerEvent
 import eu.ha3.x.sff.core.DocCreateRequest
 import io.vertx.ext.web.Route
 import io.vertx.ext.web.Router
@@ -18,12 +21,25 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.dispatcher
 import kotlinx.coroutines.launch
 
-class SuspendedWebVerticle(private val docStorage: SDocStorage, private val webObjectMapper: ObjectMapper) : CoroutineVerticle() {
+object PlaceholderSLedger : SLedger {
+    override suspend fun <E : SLedgerEvent> execute(command: Ledger<E>): E {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}
+
+class SuspendedWebVerticle(
+        private val docStorage: SDocStorage,
+        private val ledger: SLedger,
+        private val webObjectMapper: ObjectMapper
+) : CoroutineVerticle() {
+    constructor(docStorage: SDocStorage, webObjectMapper: ObjectMapper) : this(docStorage, PlaceholderSLedger, webObjectMapper)
+
     override suspend fun start() {
         val router: Router = Router.router(vertx)
         router.route().handler(BodyHandler.create())
         router.get("/docs").coroutineHandler(::getDocs)
         router.post("/docs").coroutineHandler(::appendToDocs)
+        router.post("/ledgers/accounts").coroutineHandler(::openAccount)
 
         vertx
                 .createHttpServer()
@@ -42,8 +58,9 @@ class SuspendedWebVerticle(private val docStorage: SDocStorage, private val webO
     }
 
     private suspend fun appendToDocs(rc: RoutingContext) {
+        val java = DocCreateRequest::class.java
         val createRequest: DocCreateRequest = try {
-            webObjectMapper.readValue(rc.bodyAsString, DocCreateRequest::class.java)
+            webObjectMapper.readValue(rc.bodyAsString, java)
 
         } catch (e: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException) {
             rc.fail(400)
@@ -56,6 +73,29 @@ class SuspendedWebVerticle(private val docStorage: SDocStorage, private val webO
 
         } catch (e: Exception) {
             rc.serverError()
+        }
+    }
+
+    private suspend fun openAccount(rc: RoutingContext) {
+        try {
+            val command = command<Ledger.OpenAccount>(rc)
+            val event = ledger.execute(command)
+            rc.replyJson(event, 201)
+
+        } catch (e: Exception) {
+            rc.serverError()
+        }
+    }
+
+    class WebVerticleBadRequest(e: java.lang.Exception) : RuntimeException(e)
+
+    private inline fun <reified T> command(rc: RoutingContext): T {
+        try {
+            return webObjectMapper.readValue<T>(rc.bodyAsString, T::class.java)
+
+        } catch (e: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException) {
+            rc.fail(400)
+            throw WebVerticleBadRequest(e)
         }
     }
 

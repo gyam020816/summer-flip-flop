@@ -6,6 +6,7 @@ enum class DEvent {
     SYSTEM_LIST_DOCS,
     APPEND_TO_DOCS,
     SYSTEM_APPEND_TO_DOCS,
+    LEDGER_OPEN_ACCOUNT
     ;
 
     fun address() = name
