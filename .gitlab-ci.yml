@@ -36,6 +36,14 @@ docker_app:
         - master
 
 
+pre_pull_request:
+    image: pstauffer/curl
+    stage: pre-status
+    script:
+        - ./_gitlab-ci/pre_pull_request.sh
+    except:
+        - master
+
 pre_status:
     image: pstauffer/curl
     stage: pre-status
