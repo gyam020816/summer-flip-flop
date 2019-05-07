@@ -55,26 +55,19 @@ class R2dbcPostgreSuspendedDocSystem(val db: DbConnectionParams) : SDocSystem {
 
     override suspend fun appendToDocs(doc: Doc) {
         coroutineScope {
-            val job = launch {
-                val documentSerialized = objectMapper.writeValueAsString(DocEntity.from(doc))
-
-                r2dbc.useTransaction {
-                    // WTF?
-                    it.execute("INSERT INTO public.documents (data, created_at) VALUES ($1::jsonb, $2::timestamp)",
-                            documentSerialized,
-                            objectMapper.writeValueAsString(doc.createdAt))
-//                    PGobject().apply {
-//                        type = "jsonb"
-//                        value = documentSerialized
-//                    },
-//                    PGobject().apply {
-//                        type = "timestamp"
-//                        value = objectMapper.writeValueAsString(doc.createdAt)
-//                    }
-                }
-                        .block()
-            }
+            val job = launch { insertDocument(doc) }
             job.join()
         }
+    }
+
+    private fun insertDocument(doc: Doc) {
+        val documentSerialized = objectMapper.writeValueAsString(DocEntity.from(doc))
+
+        r2dbc.useTransaction { handle ->
+            handle.execute("INSERT INTO public.documents (data, created_at) VALUES ($1, $2)",
+                    documentSerialized,
+                    doc.createdAt.toInstant())
+        }
+                .block()
     }
 }
