@@ -20,6 +20,7 @@
         <module>connector-vertx-coroutine-bus</module>
         <module>connector-ktor</module>
         <module>connector-kgraphql</module>
+        <module>static-swagger</module>
         <module>test-jacoco-reporter</module>
         <module>test-libraries</module>
         <module>deployable-vertx</module>
@@ -74,6 +75,7 @@
                 <module>connector-vertx-web</module>
                 <module>connector-ktor</module>
                 <module>connector-kgraphql</module>
+                <module>static-swagger</module>
                 <module>test-jacoco-reporter</module>
                 <module>test-libraries</module>
                 <module>deployable-vertx</module>
