@@ -220,6 +220,17 @@
                 <scope>import</scope>
             </dependency>
 
+            <!--
+                Not sure what is happening here, system-impl was explicitly using 3.6.3,
+                but deployable-vertx was pulling 3.6.2, even though there are no transitive
+                dependencies whatsoever that I know of.
+            -->
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>3.6.3</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-kotlin</artifactId>
