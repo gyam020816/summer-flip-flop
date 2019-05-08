@@ -7,7 +7,7 @@
         <artifactId>summer-flip-flop</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>connector-ktor</artifactId>
+    <artifactId>connector-kgraphql</artifactId>
     <packaging>jar</packaging>
 
     <modelVersion>4.0.0</modelVersion>
@@ -34,6 +34,17 @@
             <artifactId>ktor-server-netty</artifactId>
             <version>${ktor.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-jackson</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.ha3.x.sff</groupId>
+            <artifactId>z-kgraphql</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
 
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>

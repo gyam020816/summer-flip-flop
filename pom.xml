@@ -19,6 +19,7 @@
         <module>connector-vertx-web</module>
         <module>connector-vertx-coroutine-bus</module>
         <module>connector-ktor</module>
+        <module>connector-kgraphql</module>
         <module>test-jacoco-reporter</module>
         <module>test-libraries</module>
         <module>deployable-vertx</module>
@@ -26,6 +27,7 @@
         <module>core-concern-json</module>
         <module>z-maven-jasync</module>
         <module>z-spring-test-junit5</module>
+        <module>z-kgraphql</module>
     </modules>
 
     <profiles>
@@ -70,6 +72,8 @@
                 <module>connector-vertx-common</module>
                 <module>connector-vertx-bus</module>
                 <module>connector-vertx-web</module>
+                <module>connector-ktor</module>
+                <module>connector-kgraphql</module>
                 <module>test-jacoco-reporter</module>
                 <module>test-libraries</module>
                 <module>deployable-vertx</module>
@@ -77,6 +81,7 @@
                 <module>core-concern-json</module>
                 <module>z-maven-jasync</module>
                 <module>z-spring-test-junit5</module>
+                <module>z-kgraphql</module>
             </modules>
         </profile>
         <profile>
@@ -98,6 +103,7 @@
         <kotlin.version>1.3.30</kotlin.version>
         <kotlinx.coroutines.version>1.2.1</kotlinx.coroutines.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+        <ktor.version>1.1.4</ktor.version>
         <junit.jupiter.version>5.4.0</junit.jupiter.version>
         <junit.platform.version>1.4.0</junit.platform.version>
         <jackson.version>2.9.8</jackson.version>

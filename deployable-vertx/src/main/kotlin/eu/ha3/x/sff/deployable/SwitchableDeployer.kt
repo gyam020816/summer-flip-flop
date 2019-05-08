@@ -4,6 +4,7 @@ import eu.ha3.x.sff.api.ReactiveDocStorage
 import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.api.SuspendedDocStorage
+import eu.ha3.x.sff.connector.kgraphql.KtorGraphqlApplication
 import eu.ha3.x.sff.connector.ktor.KtorApplication
 import eu.ha3.x.sff.connector.spring.Application
 import eu.ha3.x.sff.connector.vertx.*
@@ -35,7 +36,8 @@ enum class SwitchableFeature {
     POSTGRES_JASYNC,
     REACTIVE,
     SPRING,
-    KTOR
+    KTOR,
+    KGRAPHQL
 }
 
 class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable {
@@ -51,6 +53,9 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
 
         } else if (SwitchableFeature.KTOR in features) {
             ktorSuspended(concreteDocSystem)
+
+        } else if (SwitchableFeature.KGRAPHQL in features) {
+            kGraphqlSuspended(concreteDocSystem)
 
         } else {
             if (SwitchableFeature.REACTIVE in features) {
@@ -73,6 +78,10 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
 
     private fun ktorSuspended(concreteDocSystem: SDocSystem) {
         KtorApplication.newEmbedded(SuspendedDocStorage(concreteDocSystem), webObjectMapper).start(wait = true)
+    }
+
+    private fun kGraphqlSuspended(concreteDocSystem: SDocSystem) {
+        KtorGraphqlApplication.newEmbedded(SuspendedDocStorage(concreteDocSystem), webObjectMapper).start(wait = true)
     }
 
     private fun suspended(concreteDocSystem: SDocSystem) {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>summer-flip-flop</artifactId>
+        <groupId>eu.ha3.x.sff</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- This is a module with a custom repository that is used by a library. -->
+    <!-- By isolating the library in a module, we isolate the <repositories> search to just this library. -->
+    <artifactId>z-kgraphql</artifactId>
+
+    <repositories>
+        <repository>
+            <id>bintray</id>
+            <url>https://dl.bintray.com/pgutkowski/Maven</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.pgutkowski</groupId>
+            <artifactId>kgraphql</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+    </dependencies>
+</project>
