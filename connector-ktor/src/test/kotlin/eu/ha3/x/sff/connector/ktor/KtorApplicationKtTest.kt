@@ -12,10 +12,7 @@ import eu.ha3.x.sff.test.TestSample
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.setBody
-import io.ktor.server.testing.withTestApplication
+import io.ktor.server.testing.*
 import net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -29,6 +26,52 @@ import org.junit.jupiter.api.Test
 class KtorApplicationKtTest {
     private val mockDocStorage: SDocStorage = mock()
     private val webObjectMapper = KObjectMapper.newInstance()
+
+    @Test
+    fun `it should serve swagger html`() = withKtor {
+        // Exercise
+        handleRequest(HttpMethod.Get, "/swagger.html") {
+        }.apply {
+            // Verify
+            assertThat(response.status()).isNotNull()
+                    .extracting { it!!.value }.isEqualTo(200)
+            assertThat(response.contentType()).isEqualTo(ContentType.parse("text/html; charset=UTF-8"))
+            assertThat(response.content)
+                    .startsWith("<!DOCTYPE html>")
+                    .contains("/swagger.json")
+        }
+    }
+
+    @Test
+    fun `it should serve swagger json`() = withKtor {
+        // Exercise
+        handleRequest(HttpMethod.Get, "/swagger.json") {
+        }.apply {
+            // Verify
+            assertThat(response.status()).isNotNull()
+                    .extracting { it!!.value }.isEqualTo(200)
+            assertThat(response.contentType()).isEqualTo(ContentType.parse("application/json; charset=UTF-8"))
+            assertThat(response.content)
+                    .startsWith("{")
+                    .contains(""""title":"Summer Flip Flop Exploratory API"""")
+                    .endsWith("}")
+        }
+    }
+
+    @Test
+    fun `it should serve swagger yaml`() = withKtor {
+        // Exercise
+        handleRequest(HttpMethod.Get, "/swagger.yaml") {
+        }.apply {
+            // Verify
+            assertThat(response.status()).isNotNull()
+                    .extracting { it!!.value }.isEqualTo(200)
+            assertThat(response.contentType()).isEqualTo(ContentType.parse("application/x-yaml; charset=UTF-8"))
+            assertThat(response.content)
+                    .startsWith("openapi: 3.0.1")
+                    .contains("  title: Summer Flip Flop Exploratory API")
+        }
+    }
 
     @Test
     fun `it should accept a doc`() = withKtor {

@@ -23,6 +23,11 @@
             <artifactId>api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>eu.ha3.x.sff</groupId>
+            <artifactId>static-swagger</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
         <dependency>
             <groupId>io.ktor</groupId>
@@ -38,6 +43,16 @@
             <groupId>io.ktor</groupId>
             <artifactId>ktor-jackson</artifactId>
             <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-webjars</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+            <version>3.22.0</version>
         </dependency>
 
         <dependency>
