@@ -22,7 +22,7 @@ class SBinder<Q : Any, A : Any>(
             answerer.message.fail(500, "")
         }}
 ) : SDBinder {
-    fun ofSuspended(boundFn: QASuspendFunction<Q, A>) = BSuspended(boundFn)
+    fun ofCoroutine(boundFn: QASuspendFunction<Q, A>) = BCoroutine(boundFn)
 
     interface SDBind<B> {
         fun registerAnswerer(vertx: Vertx)
@@ -35,7 +35,7 @@ class SBinder<Q : Any, A : Any>(
         SEventBus(vertx, objectMapper).ssSend(address, question, answerClass).answer
     }
 
-    inner class BSuspended(private val boundFn: QASuspendFunction<Q, A>): SDBind<QASuspendFunction<Q, A>> {
+    inner class BCoroutine(private val boundFn: QASuspendFunction<Q, A>): SDBind<QASuspendFunction<Q, A>> {
         override fun registerAnswerer(vertx: Vertx) {
             SEventBus(vertx, objectMapper).ssConsumer(address, { question: Q, answerer: SEventBus.SAnswerer<A> ->
                 try {

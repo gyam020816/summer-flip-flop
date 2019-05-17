@@ -1,7 +1,6 @@
 package eu.ha3.x.sff.system.postgres
 
-import eu.ha3.x.sff.system.SDocSystemTestFacade
-import eu.ha3.x.sff.system.postgres.*
+import eu.ha3.x.sff.system.SDocPersistenceSystemTestFacade
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.testcontainers.junit.jupiter.Container
@@ -14,7 +13,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
  * @author Ha3
  */
 @Testcontainers
-class JasyncPostgresSuspendedDocSystemContainerizedTest : SDocSystemTestFacade<JasyncPostgresSuspendedDocSystem> {
+class JasyncPostgresDocSystemContainerizedTest : SDocPersistenceSystemTestFacade<JasyncPostgresDocPersistenceSystem> {
     @Container
     private val pgContainer = KPostgreSQLContainer.create()
     private val db by lazy {
@@ -25,9 +24,9 @@ class JasyncPostgresSuspendedDocSystemContainerizedTest : SDocSystemTestFacade<J
         )
     }
 
-    private val SUT by lazy { JasyncPostgresSuspendedDocSystem(db) }
+    private val SUT by lazy { JasyncPostgresDocPersistenceSystem(db) }
 
-    override fun SUT(): JasyncPostgresSuspendedDocSystem = SUT
+    override fun SUT(): JasyncPostgresDocPersistenceSystem = SUT
 
     @BeforeEach
     internal fun setUp() {

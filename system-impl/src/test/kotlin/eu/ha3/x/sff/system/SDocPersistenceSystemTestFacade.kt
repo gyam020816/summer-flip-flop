@@ -14,7 +14,7 @@ import java.time.ZonedDateTime
  *
  * @author Ha3
  */
-interface SDocSystemTestFacade<T : SDocSystem> {
+interface SDocPersistenceSystemTestFacade<T : SDocPersistenceSystem> {
     fun SUT(): T
 
     @Test

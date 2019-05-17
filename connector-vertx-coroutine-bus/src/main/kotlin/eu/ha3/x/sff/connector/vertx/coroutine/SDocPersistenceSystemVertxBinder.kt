@@ -1,12 +1,12 @@
 package eu.ha3.x.sff.connector.vertx.coroutine
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import eu.ha3.x.sff.connector.vertx.DEvent
 import eu.ha3.x.sff.connector.vertx.CodecObjectMapper
+import eu.ha3.x.sff.connector.vertx.DEvent
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import eu.ha3.x.sff.system.SDocSystem
+import eu.ha3.x.sff.system.SDocPersistenceSystem
 import io.vertx.core.Vertx
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 
@@ -16,25 +16,25 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
  *
  * @author Ha3
  */
-class SDocSystemVertx(mapper: ObjectMapper = CodecObjectMapper.mapper) {
+class SDocPersistenceSystemVertxBinder(mapper: ObjectMapper = CodecObjectMapper.mapper) {
     val appendToDocsBinder = SBinder(mapper, DEvent.SYSTEM_APPEND_TO_DOCS.address(), Doc::class.java, NoMessage::class.java)
     val listDocsBinder = SBinder(mapper, DEvent.SYSTEM_LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
-    inner class Verticle(private val concrete: SDocSystem) : CoroutineVerticle() {
+    inner class Verticle(private val concrete: SDocPersistenceSystem) : CoroutineVerticle() {
         override suspend fun start() {
-            appendToDocsBinder.ofSuspended { doc ->
+            appendToDocsBinder.ofCoroutine { doc ->
                 concrete.appendToDocs(doc)
 
             }.registerAnswerer(vertx)
 
-            listDocsBinder.ofSuspended {
+            listDocsBinder.ofCoroutine {
                 concrete.listAll()
 
             }.registerAnswerer(vertx)
         }
     }
 
-    inner class QuestionSender(vertx: Vertx) : SDocSystem {
+    inner class QuestionSender(vertx: Vertx) : SDocPersistenceSystem {
         private val appendToDocsFn = appendToDocsBinder.questionSender(vertx)
         private val listDocsFn = listDocsBinder.questionSender(vertx)
 

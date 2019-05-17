@@ -2,8 +2,8 @@ package eu.ha3.x.sff.connector.vertx.coroutine
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ha3.x.sff.api.SDocStorage
-import eu.ha3.x.sff.connector.vertx.DEvent
 import eu.ha3.x.sff.connector.vertx.CodecObjectMapper
+import eu.ha3.x.sff.connector.vertx.DEvent
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
@@ -17,18 +17,18 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
  *
  * @author Ha3
  */
-class SDocStorageVertx(mapper: ObjectMapper = CodecObjectMapper.mapper) {
+class SDocStorageVertxBinder(mapper: ObjectMapper = CodecObjectMapper.mapper) {
     val appendToDocsBinder = SBinder(mapper, DEvent.APPEND_TO_DOCS.address(), DocCreateRequest::class.java, Doc::class.java)
     val listDocsBinder = SBinder(mapper, DEvent.LIST_DOCS.address(), NoMessage::class.java, DocListResponse::class.java)
 
     inner class Verticle(private val concrete: SDocStorage) : CoroutineVerticle() {
         override suspend fun start() {
-            appendToDocsBinder.ofSuspended { doc ->
+            appendToDocsBinder.ofCoroutine { doc ->
                 concrete.appendToDocs(doc)
 
             }.registerAnswerer(vertx)
 
-            listDocsBinder.ofSuspended {
+            listDocsBinder.ofCoroutine {
                 concrete.listAll()
 
             }.registerAnswerer(vertx)

@@ -2,8 +2,8 @@
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
 import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.system.FileSuspendedDocSystem
-import eu.ha3.x.sff.system.SDocSystemTestFacade
+import eu.ha3.x.sff.system.FileDocPersistenceSystem
+import eu.ha3.x.sff.system.SDocPersistenceSystemTestFacade
 import eu.ha3.x.sff.test.testBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -16,13 +16,13 @@ import java.util.*
  *
  * @author Ha3
  */
-internal class FileSuspendedDocSystemTest : SDocSystemTestFacade<FileSuspendedDocSystem> {
+internal class FileDocPersistenceSystemTest : SDocPersistenceSystemTestFacade<FileDocPersistenceSystem> {
     private val virtualFilesystem = Jimfs.newFileSystem(Configuration.unix()).apply {
         Files.createDirectories(getPath("some_subfolder"))
     }
-    private val SUT = FileSuspendedDocSystem(virtualFilesystem.getPath("some_subfolder"))
+    private val SUT = FileDocPersistenceSystem(virtualFilesystem.getPath("some_subfolder"))
 
-    override fun SUT(): FileSuspendedDocSystem = SUT
+    override fun SUT(): FileDocPersistenceSystem = SUT
 
     @Test
     internal fun `it should be empty even if a subfolder has a file`() = testBlocking {

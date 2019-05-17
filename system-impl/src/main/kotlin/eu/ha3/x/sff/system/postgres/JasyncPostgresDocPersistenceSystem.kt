@@ -8,7 +8,7 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.json.KObjectMapper
-import eu.ha3.x.sff.system.SDocSystem
+import eu.ha3.x.sff.system.SDocPersistenceSystem
 import org.postgresql.util.PGobject
 
 /**
@@ -17,7 +17,7 @@ import org.postgresql.util.PGobject
  *
  * @author Ha3
  */
-class JasyncPostgresSuspendedDocSystem(val db: DbConnectionParams) : SDocSystem {
+class JasyncPostgresDocPersistenceSystem(val db: DbConnectionParams) : SDocPersistenceSystem {
     init {
         Class.forName("org.postgresql.Driver")
     }

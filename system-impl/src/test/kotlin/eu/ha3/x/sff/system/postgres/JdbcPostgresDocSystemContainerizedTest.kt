@@ -1,6 +1,6 @@
 package eu.ha3.x.sff.system.postgres
 
-import eu.ha3.x.sff.system.SDocSystemTestFacade
+import eu.ha3.x.sff.system.SDocPersistenceSystemTestFacade
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.testcontainers.containers.PostgreSQLContainer
@@ -15,7 +15,7 @@ import java.time.Duration
  * @author Ha3
  */
 @Testcontainers
-class JdbcPostgresSuspendedDocSystemContainerizedTest : SDocSystemTestFacade<JdbcPostgresSuspendedDocSystem> {
+class JdbcPostgresDocSystemContainerizedTest : SDocPersistenceSystemTestFacade<JdbcPostgresDocPersistenceSystem> {
     @Container
     private val pgContainer = KPostgreSQLContainer.create()
     private val db by lazy {
@@ -26,9 +26,9 @@ class JdbcPostgresSuspendedDocSystemContainerizedTest : SDocSystemTestFacade<Jdb
         )
     }
 
-    private val SUT by lazy { JdbcPostgresSuspendedDocSystem(db) }
+    private val SUT by lazy { JdbcPostgresDocPersistenceSystem(db) }
 
-    override fun SUT(): JdbcPostgresSuspendedDocSystem = SUT
+    override fun SUT(): JdbcPostgresDocPersistenceSystem = SUT
 
     @BeforeEach
     internal fun setUp() {

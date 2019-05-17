@@ -8,8 +8,8 @@ what to do if a coroutine-based class needs to call a reactive-based adapter?
 
 well, what's worse than bridging the two worlds with adapters?
 
-- `ReactiveToSuspendedDocStorage` exposes a Reactive `RxDocStorage` and consumes a coroutine-based `SDocStorage`
-- `SuspendedToRxDocSystem` exposes a coroutine-based `SuspendedDocSystem` and consumes a coroutine-based `RxDocSystem`
+- `ReactiveToCoroutineDocStorage` exposes a Reactive `RxDocStorage` and consumes a coroutine-based `SDocStorage`
+- `CoroutineToRxDocSystem` exposes a coroutine-based `CoroutineDocSystem` and consumes a coroutine-based `RxDocSystem`
 
 nothing wrong here
 

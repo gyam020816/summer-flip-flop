@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(VertxExtension::class)
-class SuspendedWebVerticleTest {
+class CoroutineWebVerticleTest {
     private lateinit var vertx: Vertx
     private val webObjectMapper = KObjectMapper.newInstance()
     private var mockDocStorage : SDocStorage = mock()
@@ -33,7 +33,7 @@ class SuspendedWebVerticleTest {
         vertx = Vertx.vertx()
 
         vertx.delegate.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
-        vertx.delegate.deployVerticle(SuspendedWebVerticle(mockDocStorage, webObjectMapper), context.succeeding {
+        vertx.delegate.deployVerticle(CoroutineWebVerticle(mockDocStorage, webObjectMapper), context.succeeding {
             context.completeNow()
         })
     }

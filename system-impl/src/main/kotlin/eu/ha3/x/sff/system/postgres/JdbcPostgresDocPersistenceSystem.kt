@@ -4,7 +4,7 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.json.KObjectMapper
-import eu.ha3.x.sff.system.SDocSystem
+import eu.ha3.x.sff.system.SDocPersistenceSystem
 import org.postgresql.util.PGobject
 import java.time.ZonedDateTime
 
@@ -21,7 +21,7 @@ internal data class DocEntity(val name: String, val createdAt: ZonedDateTime) {
     fun to(): Doc = Doc(name, createdAt)
 }
 
-class JdbcPostgresSuspendedDocSystem(val db: DbConnectionParams) : SDocSystem {
+class JdbcPostgresDocPersistenceSystem(val db: DbConnectionParams) : SDocPersistenceSystem {
     init {
         Class.forName("org.postgresql.Driver")
     }

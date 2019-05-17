@@ -18,7 +18,7 @@ import java.util.stream.Collectors
  *
  * @author Ha3
  */
-class FileSuspendedDocSystem(private val folder: Path) : SDocSystem {
+class FileDocPersistenceSystem(private val folder: Path) : SDocPersistenceSystem {
     init {
         if (!Files.isDirectory(folder)) {
             throw IllegalArgumentException("$folder is not a directory")

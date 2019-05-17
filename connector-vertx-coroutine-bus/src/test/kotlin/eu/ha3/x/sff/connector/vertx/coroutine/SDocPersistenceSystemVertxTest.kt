@@ -7,7 +7,7 @@ import eu.ha3.x.sff.connector.vertx.*
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import eu.ha3.x.sff.system.SDocSystem
+import eu.ha3.x.sff.system.SDocPersistenceSystem
 import eu.ha3.x.sff.test.testBlocking
 import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
@@ -27,16 +27,16 @@ import java.time.ZonedDateTime
  * @author Ha3
  */
 @ExtendWith(VertxExtension::class)
-internal class SDocSystemVertxTest {
+internal class SDocPersistenceSystemVertxTest {
     private lateinit var vertx: Vertx
-    private lateinit var docSystem: SDocSystem
+    private lateinit var docSystem: SDocPersistenceSystem
 
     @BeforeEach
     fun setUp(context: VertxTestContext) {
         docSystem = mock()
         vertx = Vertx.vertx()
         vertx.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
-        vertx.deployVerticle(SDocSystemVertx().Verticle(docSystem), context.succeeding {
+        vertx.deployVerticle(SDocPersistenceSystemVertxBinder().Verticle(docSystem), context.succeeding {
             context.completeNow()
         })
     }

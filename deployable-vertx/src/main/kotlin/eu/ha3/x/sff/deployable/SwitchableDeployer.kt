@@ -1,22 +1,22 @@
 package eu.ha3.x.sff.deployable
 import com.fasterxml.jackson.databind.SerializationFeature
+import eu.ha3.x.sff.api.CoroutineDocStorage
 import eu.ha3.x.sff.api.ReactiveDocStorage
 import eu.ha3.x.sff.api.RxDocStorage
 import eu.ha3.x.sff.api.SDocStorage
-import eu.ha3.x.sff.api.SuspendedDocStorage
 import eu.ha3.x.sff.connector.kgraphql.KtorGraphqlApplication
 import eu.ha3.x.sff.connector.ktor.KtorApplication
 import eu.ha3.x.sff.connector.spring.Application
 import eu.ha3.x.sff.connector.vertx.*
-import eu.ha3.x.sff.connector.vertx.coroutine.SDocStorageVertx
-import eu.ha3.x.sff.connector.vertx.coroutine.SDocSystemVertx
+import eu.ha3.x.sff.connector.vertx.coroutine.SDocPersistenceSystemVertxBinder
+import eu.ha3.x.sff.connector.vertx.coroutine.SDocStorageVertxBinder
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
 import eu.ha3.x.sff.json.KObjectMapper
-import eu.ha3.x.sff.system.ReactiveToSuspendedDocSystem
-import eu.ha3.x.sff.system.SDocSystem
-import eu.ha3.x.sff.system.SuspendedToRxDocSystem
+import eu.ha3.x.sff.system.ReactiveToCoroutineDocPersistenceSystem
+import eu.ha3.x.sff.system.SDocPersistenceSystem
+import eu.ha3.x.sff.system.CoroutineToReactiveDocPersistenceSystem
 import eu.ha3.x.sff.system.postgres.*
 import io.vertx.core.Vertx
 import io.vertx.core.eventbus.EventBus
@@ -52,22 +52,22 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
             springReactive(concreteDocSystem)
 
         } else if (SwitchableFeature.KTOR in features) {
-            ktorSuspended(concreteDocSystem)
+            ktorCoroutine(concreteDocSystem)
 
         } else if (SwitchableFeature.KGRAPHQL in features) {
-            kGraphqlSuspended(concreteDocSystem)
+            kGraphqlCoroutine(concreteDocSystem)
 
         } else {
             if (SwitchableFeature.REACTIVE in features) {
                 reactive(concreteDocSystem)
 
             } else {
-                suspended(concreteDocSystem)
+                coroutine(concreteDocSystem)
             }
         }
     }
 
-    private fun springReactive(concreteDocSystem: SDocSystem) {
+    private fun springReactive(concreteDocSystem: SDocPersistenceSystem) {
         // https://github.com/spring-projects/spring-boot/issues/8115#issuecomment-326910814
         SpringApplication(Application::class.java).apply {
             addInitializers(beans {
@@ -76,30 +76,30 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
         }.run()
     }
 
-    private fun ktorSuspended(concreteDocSystem: SDocSystem) {
-        KtorApplication.newEmbedded(SuspendedDocStorage(concreteDocSystem), webObjectMapper).start(wait = true)
+    private fun ktorCoroutine(concreteDocSystem: SDocPersistenceSystem) {
+        KtorApplication.newEmbedded(CoroutineDocStorage(concreteDocSystem), webObjectMapper).start(wait = true)
     }
 
-    private fun kGraphqlSuspended(concreteDocSystem: SDocSystem) {
-        KtorGraphqlApplication.newEmbedded(SuspendedDocStorage(concreteDocSystem), webObjectMapper).start(wait = true)
+    private fun kGraphqlCoroutine(concreteDocSystem: SDocPersistenceSystem) {
+        KtorGraphqlApplication.newEmbedded(CoroutineDocStorage(concreteDocSystem), webObjectMapper).start(wait = true)
     }
 
-    private fun suspended(concreteDocSystem: SDocSystem) {
+    private fun coroutine(concreteDocSystem: SDocPersistenceSystem) {
         val vertx: Vertx = Vertx.vertx()
         val eventBus = vertx.eventBus()
         doRegisterCodecs(eventBus)
 
-        val docStorageFn: (SDocSystem) -> SDocStorage = { docSystem: SDocSystem -> SuspendedDocStorage(docSystem) }
+        val docStorageFn: (SDocPersistenceSystem) -> SDocStorage = { docSystem: SDocPersistenceSystem -> CoroutineDocStorage(docSystem) }
 
         if (SwitchableFeature.COMPONENTS_AS_SEPARATE_VERTICLES in features) {
-            val system = SDocSystemVertx()
-            val storage = SDocStorageVertx()
+            val system = SDocPersistenceSystemVertxBinder()
+            val storage = SDocStorageVertxBinder()
 
             val senderDocStorage = storage.QuestionSender(vertx)
             val senderDocSystem = system.QuestionSender(vertx)
 
             listOf(
-                    (1..16).map { SuspendedWebVerticle(senderDocStorage, webObjectMapper) },
+                    (1..16).map { CoroutineWebVerticle(senderDocStorage, webObjectMapper) },
                     (1..16).map { storage.Verticle(docStorageFn(senderDocSystem)) },
                     (1..16).map { system.Verticle(concreteDocSystem) }
             ).flatMap { it }.forEach {
@@ -108,7 +108,7 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
             }
 
         } else {
-            val verticles = listOf(SuspendedWebVerticle(docStorageFn(concreteDocSystem), webObjectMapper))
+            val verticles = listOf(CoroutineWebVerticle(docStorageFn(concreteDocSystem), webObjectMapper))
             verticles.forEach {
                 vertx.deployVerticle(it)
                 println("Deployed ${it::class.java.simpleName}.")
@@ -116,7 +116,7 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
         }
     }
 
-    private fun reactive(concreteDocSystem: SDocSystem) {
+    private fun reactive(concreteDocSystem: SDocPersistenceSystem) {
         val vertx: io.vertx.rxjava.core.Vertx = io.vertx.rxjava.core.Vertx.vertx()
         doRegisterCodecs(vertx.eventBus().delegate)
 
@@ -131,8 +131,8 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
 
             val verticles = listOf(
                     ReactiveWebVerticle(senderDocStorage, webObjectMapper),
-                    storage.Verticle(ReactiveDocStorage(SuspendedToRxDocSystem(senderDocSystem))),
-                    system.Verticle(ReactiveToSuspendedDocSystem(concreteDocSystem))
+                    storage.Verticle(ReactiveDocStorage(CoroutineToReactiveDocPersistenceSystem(senderDocSystem))),
+                    system.Verticle(ReactiveToCoroutineDocPersistenceSystem(concreteDocSystem))
             )
             verticles.forEach(vertx::deployVerticle)
 
@@ -142,7 +142,7 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
         }
     }
 
-    private fun resolveDocSystem(features: Set<SwitchableFeature>): SDocSystem {
+    private fun resolveDocSystem(features: Set<SwitchableFeature>): SDocPersistenceSystem {
         return if (SwitchableFeature.POSTGRES in features || SwitchableFeature.POSTGRES_JASYNC in features) {
             val db = DbConnectionParams(
                     jdbcUrl = envOrElse("DB_URL", "jdbc:postgresql://localhost:16099/summer"),
@@ -154,13 +154,13 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
                     .upgradeDatabase()
 
             if (SwitchableFeature.POSTGRES_JASYNC in features) {
-                JdbcPostgresSuspendedDocSystem(db)
+                JdbcPostgresDocPersistenceSystem(db)
             } else {
-                JasyncPostgresSuspendedDocSystem(db)
+                JasyncPostgresDocPersistenceSystem(db)
             }
 
         } else {
-            NoDocSystem
+            NoDocPersistenceSystem
         }
     }
 
@@ -168,7 +168,7 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
         eventBus.registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
     }
 
-    private object NoDocSystem : SDocSystem {
+    private object NoDocPersistenceSystem : SDocPersistenceSystem {
         override suspend fun appendToDocs(doc: Doc) = NoMessage
         override suspend fun listAll() = DocListResponse(listOf(Doc("hello", ZonedDateTime.now())))
     }

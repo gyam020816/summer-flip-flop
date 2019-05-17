@@ -13,18 +13,18 @@ import kotlinx.coroutines.runBlocking
  *
  * @author Ha3
  */
-class ReactiveToSuspendedDocSystem(private val docSystem: SDocSystem) : RxDocSystem {
-    override fun listAll(): Single<DocListResponse> = suspendedSingle {
+class ReactiveToCoroutineDocPersistenceSystem(private val docSystem: SDocPersistenceSystem) : RxDocPersistenceSystem {
+    override fun listAll(): Single<DocListResponse> = coroutineSingle {
         docSystem.listAll()
     }
 
-    override fun appendToDocs(doc: Doc): Single<NoMessage> = suspendedSingle {
+    override fun appendToDocs(doc: Doc): Single<NoMessage> = coroutineSingle {
         docSystem.appendToDocs(doc)
     }
 
-    private fun <T> suspendedSingle(suspendedFn: suspend CoroutineScope.() -> T): Single<T> = Single.create { handler ->
+    private fun <T> coroutineSingle(coroutineFn: suspend CoroutineScope.() -> T): Single<T> = Single.create { handler ->
         try {
-            val result = runBlocking(block = suspendedFn)
+            val result = runBlocking(block = coroutineFn)
             handler.onSuccess(result)
 
         } catch (e: Exception) {

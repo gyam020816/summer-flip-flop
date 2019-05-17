@@ -13,18 +13,18 @@ import kotlinx.coroutines.runBlocking
  *
  * @author Ha3
  */
-class ReactiveToSuspendedDocStorage(private val docStorage: SDocStorage) : RxDocStorage {
-    override fun appendToDocs(request: DocCreateRequest): Single<Doc> = suspendedSingle {
+class ReactiveToCoroutineDocStorage(private val docStorage: SDocStorage) : RxDocStorage {
+    override fun appendToDocs(request: DocCreateRequest): Single<Doc> = coroutineSingle {
         docStorage.appendToDocs(request)
     }
 
-    override fun listAll(): Single<DocListResponse> = suspendedSingle {
+    override fun listAll(): Single<DocListResponse> = coroutineSingle {
         docStorage.listAll()
     }
 
-    private fun <T> suspendedSingle(suspendedFn: suspend CoroutineScope.() -> T): Single<T> = Single.create { handler ->
+    private fun <T> coroutineSingle(coroutineFn: suspend CoroutineScope.() -> T): Single<T> = Single.create { handler ->
         try {
-            val result = runBlocking(block = suspendedFn)
+            val result = runBlocking(block = coroutineFn)
             handler.onSuccess(result)
 
         } catch (e: Exception) {

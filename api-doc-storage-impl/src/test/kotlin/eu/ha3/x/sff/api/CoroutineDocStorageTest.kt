@@ -7,7 +7,7 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import eu.ha3.x.sff.system.SDocSystem
+import eu.ha3.x.sff.system.SDocPersistenceSystem
 import eu.ha3.x.sff.test.testBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -19,10 +19,10 @@ import java.time.ZonedDateTime
  *
  * @author Ha3
  */
-internal class SuspendedDocStorageTest {
-    private val mockDocSystem = mock<SDocSystem>()
+internal class CoroutineDocStorageTest {
+    private val mockDocSystem = mock<SDocPersistenceSystem>()
     private val mockCurrentTimeFn = mock<() -> ZonedDateTime>()
-    private val SUT = SuspendedDocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
+    private val SUT = CoroutineDocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
 
     @Test
     internal fun `it should list all docs from doc system`() = testBlocking {

@@ -28,7 +28,7 @@ import java.time.ZonedDateTime
  */
 
 @ExtendWith(VertxExtension::class)
-internal class SDocStorageVertxTest {
+internal class SDocStorageVertxBinderTest {
     private lateinit var vertx: Vertx
     private lateinit var docStorage: SDocStorage
 
@@ -37,7 +37,7 @@ internal class SDocStorageVertxTest {
         docStorage = mock()
         vertx = Vertx.vertx()
         vertx.eventBus().registerDefaultCodec(DJsonObject::class.java, DJsonObjectMessageCodec())
-        vertx.deployVerticle(SDocStorageVertx().Verticle(docStorage), context.succeeding {
+        vertx.deployVerticle(SDocStorageVertxBinder().Verticle(docStorage), context.succeeding {
             context.completeNow()
         })
     }

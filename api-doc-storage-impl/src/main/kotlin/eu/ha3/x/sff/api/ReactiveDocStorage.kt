@@ -1,6 +1,6 @@
 package eu.ha3.x.sff.api
 
-import eu.ha3.x.sff.system.SDocSystem
+import eu.ha3.x.sff.system.SDocPersistenceSystem
 import java.time.ZonedDateTime
 
 /**
@@ -9,5 +9,5 @@ import java.time.ZonedDateTime
  *
  * @author Ha3
  */
-class ReactiveDocStorage(private val docSystem: SDocSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now)
-    : RxDocStorage by ReactiveToSuspendedDocStorage(SuspendedDocStorage(docSystem, currentTimeFn))
+class ReactiveDocStorage(private val docSystem: SDocPersistenceSystem, private val currentTimeFn: () -> ZonedDateTime = ZonedDateTime::now)
+    : RxDocStorage by ReactiveToCoroutineDocStorage(CoroutineDocStorage(docSystem, currentTimeFn))

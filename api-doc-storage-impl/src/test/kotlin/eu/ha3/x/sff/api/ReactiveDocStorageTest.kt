@@ -7,7 +7,7 @@ import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
-import eu.ha3.x.sff.system.SDocSystem
+import eu.ha3.x.sff.system.SDocPersistenceSystem
 import eu.ha3.x.sff.test.testBlocking
 import eu.ha3.x.sff.test.verify
 import org.assertj.core.api.Assertions.assertThat
@@ -21,7 +21,7 @@ import java.time.ZonedDateTime
  * @author Ha3
  */
 internal class ReactiveDocStorageTest {
-    private val mockDocSystem = mock<SDocSystem>()
+    private val mockDocSystem = mock<SDocPersistenceSystem>()
     private val mockCurrentTimeFn = mock<() -> ZonedDateTime>()
     private val SUT = ReactiveDocStorage(mockDocSystem, currentTimeFn = mockCurrentTimeFn)
 

@@ -1,13 +1,13 @@
-package eu.ha3.x.sff.system
+package eu.ha3.x.sff.api
 
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.DomainException
-import eu.ha3.x.sff.core.NoMessage
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -15,18 +15,18 @@ import java.time.ZonedDateTime
 
 /**
  * (Default template)
- * Created on 2019-01-15
+ * Created on 2019-01-14
  *
  * @author Ha3
  */
-internal class ReactiveToSuspendedDocSystemTest {
-    private val mockDocSystem = mock<SDocSystem>()
-    private val SUT = ReactiveToSuspendedDocSystem(mockDocSystem)
+internal class ReactiveToCoroutineDocStorageTest {
+    private val mockDocStorage = mock<SDocStorage>()
+    private val SUT = ReactiveToCoroutineDocStorage(mockDocStorage)
 
     @Test
-    internal fun `it should delegate call to suspended listAll`() {
+    internal fun `it should delegate call to coroutine listAll`() {
         val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now())))
-        mockDocSystem.stub {
+        mockDocStorage.stub {
             onBlocking { listAll() }.doReturn(expected)
         }
 
@@ -38,8 +38,8 @@ internal class ReactiveToSuspendedDocSystemTest {
     }
 
     @Test
-    internal fun `it should carry exceptions from suspended listAll`() {
-        mockDocSystem.stub {
+    internal fun `it should carry exceptions from coroutine listAll`() {
+        mockDocStorage.stub {
             onBlocking { listAll() }.doThrow(DomainException("expected"))
         }
 
@@ -49,28 +49,29 @@ internal class ReactiveToSuspendedDocSystemTest {
     }
 
     @Test
-    internal fun `it should delegate call to suspended appendToDocs`() {
-        val input = Doc("basicName", ZonedDateTime.now())
-        mockDocSystem.stub {
-            onBlocking { appendToDocs(input) }.doReturn(NoMessage)
+    internal fun `it should delegate call to coroutine appendToDocs`() {
+        val request = DocCreateRequest("basicName")
+        val expected = Doc("basicName", ZonedDateTime.now())
+        mockDocStorage.stub {
+            onBlocking { appendToDocs(request) }.doReturn(expected)
         }
 
         // Exercise
-        val result = SUT.appendToDocs(input).blockingGet()
+        val result = SUT.appendToDocs(request).blockingGet()
 
         // Verify
-        assertThat(result).isEqualTo(NoMessage)
+        assertThat(result).isEqualTo(expected)
     }
 
     @Test
-    internal fun `it should carry exceptions from suspended appendToDocs`() {
-        val input = Doc("basicName", ZonedDateTime.now())
-        mockDocSystem.stub {
-            onBlocking { appendToDocs(input) }.doThrow(DomainException("expected"))
+    internal fun `it should carry exceptions from coroutine appendToDocs`() {
+        val request = DocCreateRequest("basicName")
+        mockDocStorage.stub {
+            onBlocking { appendToDocs(request) }.doThrow(DomainException("expected"))
         }
 
         // Exercise and Verify
-        assertThatThrownBy { SUT.appendToDocs(input).blockingGet() }
+        assertThatThrownBy { SUT.appendToDocs(request).blockingGet() }
                 .isInstanceOf(DomainException::class.java)
     }
 }

@@ -18,9 +18,9 @@ import java.time.ZonedDateTime
  *
  * @author Ha3
  */
-internal class SuspendedToRxDocSystemTest {
-    private val docSystem = mock<RxDocSystem>()
-    private val SUT = SuspendedToRxDocSystem(docSystem)
+internal class CoroutineToReactiveDocSystemTest {
+    private val docSystem = mock<RxDocPersistenceSystem>()
+    private val SUT = CoroutineToReactiveDocPersistenceSystem(docSystem)
 
     @Test
     internal fun `it should list all docs by proxy`() = testBlocking {

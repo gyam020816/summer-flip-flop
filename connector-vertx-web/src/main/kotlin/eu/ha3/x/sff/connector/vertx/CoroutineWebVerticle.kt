@@ -18,7 +18,7 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.dispatcher
 import kotlinx.coroutines.launch
 
-class SuspendedWebVerticle(private val docStorage: SDocStorage, private val webObjectMapper: ObjectMapper) : CoroutineVerticle() {
+class CoroutineWebVerticle(private val docStorage: SDocStorage, private val webObjectMapper: ObjectMapper) : CoroutineVerticle() {
     override suspend fun start() {
         val router: Router = Router.router(vertx)
         router.route().handler(BodyHandler.create())

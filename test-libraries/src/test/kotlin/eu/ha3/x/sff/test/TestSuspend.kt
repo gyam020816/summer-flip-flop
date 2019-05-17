@@ -9,8 +9,8 @@ import kotlinx.coroutines.runBlocking
  *
  * @author Ha3
  */
-fun testBlocking(suspendedFn: suspend CoroutineScope.() -> Unit): Unit = runBlocking {
-    suspendedFn()
+fun testBlocking(coroutineFn: suspend CoroutineScope.() -> Unit): Unit = runBlocking {
+    coroutineFn()
 
     Unit
 }
