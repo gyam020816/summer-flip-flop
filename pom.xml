@@ -10,8 +10,8 @@
 
     <modules>
         <module>core</module>
-        <module>api</module>
-        <module>api-impl</module>
+        <module>api-doc-storage</module>
+        <module>api-doc-storage-impl</module>
         <module>system</module>
         <module>connector-spring</module>
         <module>connector-vertx-common</module>
@@ -66,8 +66,8 @@
             <id>fast-build</id>
             <modules>
                 <module>core</module>
-                <module>api</module>
-                <module>api-impl</module>
+                <module>api-doc-storage</module>
+                <module>api-doc-storage-impl</module>
                 <module>system</module>
                 <!--<module>connector-spring</module>-->
                 <module>connector-vertx-common</module>

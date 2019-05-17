@@ -15,6 +15,8 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
+import io.ktor.webjars.Webjars
+import java.time.ZoneId
 
 /**
  * (Default template)
@@ -25,6 +27,9 @@ import io.ktor.server.netty.NettyApplicationEngine
 data class GraphQLRequest(val query: String = "", val operationName: String?)
 
 fun Application.main(schema: KGraphqlSchema, webObjectMapper: ObjectMapper) {
+    install(Webjars) {
+        zone = ZoneId.of("UTC")
+    }
     routing {
         install(ContentNegotiation) {
             register(ContentType.Application.Json, JacksonConverter(webObjectMapper))
