@@ -26,9 +26,7 @@
         <module>deployable-vertx</module>
         <module>system-impl</module>
         <module>core-concern-json</module>
-        <module>z-maven-jasync</module>
-        <module>z-spring-test-junit5</module>
-        <module>z-kgraphql</module>
+        <module>z-libraries</module>
     </modules>
 
     <profiles>
@@ -81,9 +79,7 @@
                 <module>deployable-vertx</module>
                 <module>system-impl</module>
                 <module>core-concern-json</module>
-                <module>z-maven-jasync</module>
-                <module>z-spring-test-junit5</module>
-                <module>z-kgraphql</module>
+                <module>z-libraries</module>
             </modules>
         </profile>
         <profile>
