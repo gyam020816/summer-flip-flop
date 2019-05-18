@@ -1,7 +1,7 @@
 package eu.ha3.x.sff.deployable
 
+import eu.ha3.x.sff.deployable.SwitchableFeature.CONNECTOR_VERTX_REACTIVE
 import eu.ha3.x.sff.deployable.SwitchableFeature.POSTGRES_JASYNC
-import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE
 
 /**
  * (Default template)
@@ -10,5 +10,5 @@ import eu.ha3.x.sff.deployable.SwitchableFeature.REACTIVE
  * @author Ha3
  */
 fun main(args: Array<String>) {
-    SwitchableDeployer(setOf(REACTIVE, POSTGRES_JASYNC)).run()
+    SwitchableDeployer(setOf(CONNECTOR_VERTX_REACTIVE, POSTGRES_JASYNC)).run()
 }

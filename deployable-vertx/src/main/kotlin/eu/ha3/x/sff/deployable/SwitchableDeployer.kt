@@ -13,10 +13,11 @@ import eu.ha3.x.sff.connector.vertx.coroutine.SDocStorageVertxBinder
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.deployable.SwitchableFeature.*
 import eu.ha3.x.sff.json.KObjectMapper
+import eu.ha3.x.sff.system.CoroutineToReactiveDocPersistenceSystem
 import eu.ha3.x.sff.system.ReactiveToCoroutineDocPersistenceSystem
 import eu.ha3.x.sff.system.SDocPersistenceSystem
-import eu.ha3.x.sff.system.CoroutineToReactiveDocPersistenceSystem
 import eu.ha3.x.sff.system.postgres.*
 import io.vertx.core.Vertx
 import io.vertx.core.eventbus.EventBus
@@ -32,12 +33,13 @@ import java.time.ZonedDateTime
  */
 enum class SwitchableFeature {
     COMPONENTS_AS_SEPARATE_VERTICLES,
-    POSTGRES,
+    POSTGRES_JDBC,
     POSTGRES_JASYNC,
-    REACTIVE,
-    SPRING,
-    KTOR,
-    KGRAPHQL
+    CONNECTOR_VERTX_COROUTINE,
+    CONNECTOR_VERTX_REACTIVE,
+    CONNECTOR_SPRING,
+    CONNECTOR_KTOR,
+    CONNECTOR_KGRAPHQL
 }
 
 class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable {
@@ -48,22 +50,13 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
     override fun run() {
         val concreteDocSystem = resolveDocSystem(features)
 
-        if (SwitchableFeature.SPRING in features) {
-            springReactive(concreteDocSystem)
-
-        } else if (SwitchableFeature.KTOR in features) {
-            ktorCoroutine(concreteDocSystem)
-
-        } else if (SwitchableFeature.KGRAPHQL in features) {
-            kGraphqlCoroutine(concreteDocSystem)
-
-        } else {
-            if (SwitchableFeature.REACTIVE in features) {
-                reactive(concreteDocSystem)
-
-            } else {
-                coroutine(concreteDocSystem)
-            }
+        when {
+            CONNECTOR_VERTX_COROUTINE in features -> vertxCoroutine(concreteDocSystem)
+            CONNECTOR_VERTX_REACTIVE in features -> vertxReactive(concreteDocSystem)
+            CONNECTOR_SPRING in features -> springReactive(concreteDocSystem)
+            CONNECTOR_KTOR in features -> ktorCoroutine(concreteDocSystem)
+            CONNECTOR_KGRAPHQL in features -> kGraphqlCoroutine(concreteDocSystem)
+            else -> throw IllegalArgumentException("Missing connector feature")
         }
     }
 
@@ -84,14 +77,14 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
         KtorGraphqlApplication.newEmbedded(CoroutineDocStorage(concreteDocSystem), webObjectMapper).start(wait = true)
     }
 
-    private fun coroutine(concreteDocSystem: SDocPersistenceSystem) {
+    private fun vertxCoroutine(concreteDocSystem: SDocPersistenceSystem) {
         val vertx: Vertx = Vertx.vertx()
         val eventBus = vertx.eventBus()
         doRegisterCodecs(eventBus)
 
         val docStorageFn: (SDocPersistenceSystem) -> SDocStorage = { docSystem: SDocPersistenceSystem -> CoroutineDocStorage(docSystem) }
 
-        if (SwitchableFeature.COMPONENTS_AS_SEPARATE_VERTICLES in features) {
+        if (COMPONENTS_AS_SEPARATE_VERTICLES in features) {
             val system = SDocPersistenceSystemVertxBinder()
             val storage = SDocStorageVertxBinder()
 
@@ -116,11 +109,11 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
         }
     }
 
-    private fun reactive(concreteDocSystem: SDocPersistenceSystem) {
+    private fun vertxReactive(concreteDocSystem: SDocPersistenceSystem) {
         val vertx: io.vertx.rxjava.core.Vertx = io.vertx.rxjava.core.Vertx.vertx()
         doRegisterCodecs(vertx.eventBus().delegate)
 
-        if (SwitchableFeature.COMPONENTS_AS_SEPARATE_VERTICLES in features) {
+        if (COMPONENTS_AS_SEPARATE_VERTICLES in features) {
             val system = RxDocSystemVertx()
             val storage = RxDocStorageVertx()
 
@@ -143,7 +136,7 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
     }
 
     private fun resolveDocSystem(features: Set<SwitchableFeature>): SDocPersistenceSystem {
-        return if (SwitchableFeature.POSTGRES in features || SwitchableFeature.POSTGRES_JASYNC in features) {
+        return if (POSTGRES_JDBC in features || POSTGRES_JASYNC in features) {
             val db = DbConnectionParams(
                     jdbcUrl = envOrElse("DB_URL", "jdbc:postgresql://localhost:16099/summer"),
                     user = envOrElse("DB_USER", "postgres"),
@@ -153,7 +146,7 @@ class SwitchableDeployer(private val features: Set<SwitchableFeature>): Runnable
             PostgresLiquibaseUpgrade(db, UpgradeParams("changelog.xml", "public"))
                     .upgradeDatabase()
 
-            if (SwitchableFeature.POSTGRES_JASYNC in features) {
+            if (POSTGRES_JASYNC in features) {
                 JdbcPostgresDocPersistenceSystem(db)
             } else {
                 JasyncPostgresDocPersistenceSystem(db)
