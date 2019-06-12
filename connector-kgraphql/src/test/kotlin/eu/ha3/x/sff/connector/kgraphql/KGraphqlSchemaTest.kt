@@ -7,6 +7,7 @@ import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.Paginated
 import eu.ha3.x.sff.test.TestSample
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -106,6 +107,35 @@ class KGraphqlSchemaTest {
       "name" : "someDoc"
     }, {
       "name" : "someOtherDoc"
+    } ]
+  }
+}"""
+        )
+    }
+
+    @Test
+    fun `it should return a paginated list of docs`() {
+        val expected = listOf(Doc("someDoc", TestSample.zonedDateTime))
+        mockDocStorage.stub {
+            onBlocking { listPaginated(Paginated(2)) }.doReturn(DocListResponse(expected))
+        }
+
+        // Exercise
+        val result = SUT.schema().execute(
+              """{
+  docs(first: 2) {
+    name
+    createdAt
+  }
+}""")
+
+        // Verify
+        assertThat(result).isEqualToNormalizingNewlines(
+              """{
+  "data" : {
+    "docs" : [ {
+      "name" : "someDoc",
+      "createdAt" : "${TestSample.zonedDateTimeSerialized}"
     } ]
   }
 }"""
