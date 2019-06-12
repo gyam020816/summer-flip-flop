@@ -4,7 +4,6 @@ import com.github.pgutkowski.kgraphql.KGraphQL
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
-import kotlinx.coroutines.runBlocking
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -21,18 +20,14 @@ class KGraphqlSchema(private val storage: SDocStorage) {
         }
 
         query("docs") {
-            resolver { ->
-                runBlocking {
-                    storage.listAll().data
-                }
+            suspendResolver { ->
+                storage.listAll().data
             }
         }
 
         mutation("createDoc") {
-            resolver { name: String ->
-                runBlocking {
-                    storage.appendToDocs(DocCreateRequest(name))
-                }
+            suspendResolver { name: String ->
+                storage.appendToDocs(DocCreateRequest(name))
             }
         }
 
