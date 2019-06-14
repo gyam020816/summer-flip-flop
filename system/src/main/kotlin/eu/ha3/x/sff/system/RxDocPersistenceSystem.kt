@@ -3,6 +3,7 @@ package eu.ha3.x.sff.system
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.core.PaginatedPersistence
 import io.reactivex.Single
 
 /**
@@ -14,4 +15,7 @@ import io.reactivex.Single
 interface RxDocPersistenceSystem {
     fun listAll(): Single<DocListResponse>
     fun appendToDocs(doc: Doc): Single<NoMessage>
+    fun listPaginated(paginatedPersistence: PaginatedPersistence): Single<DocListResponse> {
+        TODO()
+    }
 }

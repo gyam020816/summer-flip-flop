@@ -3,10 +3,7 @@ package eu.ha3.x.sff.api
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
-import eu.ha3.x.sff.core.Doc
-import eu.ha3.x.sff.core.DocCreateRequest
-import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.core.*
 import eu.ha3.x.sff.system.SDocPersistenceSystem
 import eu.ha3.x.sff.test.testBlocking
 import eu.ha3.x.sff.test.verify
@@ -63,5 +60,23 @@ internal class ReactiveDocStorageTest {
                 .assertValue(verify {
                     assertThat(this).isEqualTo(expected)
                 })
+    }
+
+    @Test
+    internal fun `it should list pagianted from doc system`() = testBlocking {
+        val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now())))
+        mockDocSystem.stub {
+            onBlocking { listPaginated(PaginatedPersistence(1)) }.doReturn(expected)
+        }
+
+        // Exercise
+        val result = SUT.listPaginated(DocListPaginationRequest(1))
+
+        // Verify
+        result.test()
+              .assertNoErrors()
+              .assertValue(verify {
+                  assertThat(this).isEqualTo(expected)
+              })
     }
 }

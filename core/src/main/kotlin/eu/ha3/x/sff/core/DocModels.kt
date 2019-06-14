@@ -13,6 +13,8 @@ data class Doc(val name: String, val createdAt: ZonedDateTime)
 data class DocCreateRequest(val name: String)
 data class DocListResponse(val data: List<Doc>)
 
-data class Paginated(val first: Int)
+data class DocListPaginationRequest(val first: Int)
+
+data class PaginatedPersistence(val first: Int)
 
 typealias NoMessage = Unit

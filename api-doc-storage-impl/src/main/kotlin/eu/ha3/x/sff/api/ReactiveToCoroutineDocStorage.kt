@@ -2,6 +2,7 @@ package eu.ha3.x.sff.api
 
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
+import eu.ha3.x.sff.core.DocListPaginationRequest
 import eu.ha3.x.sff.core.DocListResponse
 import io.reactivex.Single
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +21,10 @@ class ReactiveToCoroutineDocStorage(private val docStorage: SDocStorage) : RxDoc
 
     override fun listAll(): Single<DocListResponse> = coroutineSingle {
         docStorage.listAll()
+    }
+
+    override fun listPaginated(request: DocListPaginationRequest)= coroutineSingle {
+        docStorage.listPaginated(request)
     }
 
     private fun <T> coroutineSingle(coroutineFn: suspend CoroutineScope.() -> T): Single<T> = Single.create { handler ->

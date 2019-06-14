@@ -4,7 +4,7 @@ import com.github.pgutkowski.kgraphql.KGraphQL
 import eu.ha3.x.sff.api.SDocStorage
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
-import eu.ha3.x.sff.core.Paginated
+import eu.ha3.x.sff.core.DocListPaginationRequest
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -23,7 +23,7 @@ class KGraphqlSchema(private val storage: SDocStorage) {
         query("docs") {
             suspendResolver { first: Int? ->
                 if (first is Int) {
-                    val paginated = Paginated(first)
+                    val paginated = DocListPaginationRequest(first)
                     storage.listPaginated(paginated).data
 
                 } else {

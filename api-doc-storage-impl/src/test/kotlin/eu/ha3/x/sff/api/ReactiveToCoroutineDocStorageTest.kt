@@ -4,10 +4,7 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
-import eu.ha3.x.sff.core.Doc
-import eu.ha3.x.sff.core.DocCreateRequest
-import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.core.DomainException
+import eu.ha3.x.sff.core.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -73,5 +70,30 @@ internal class ReactiveToCoroutineDocStorageTest {
         // Exercise and Verify
         assertThatThrownBy { SUT.appendToDocs(request).blockingGet() }
                 .isInstanceOf(DomainException::class.java)
+    }
+
+    @Test
+    internal fun `it should delegate call to coroutine listPaginated`() {
+        val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now())))
+        mockDocStorage.stub {
+            onBlocking { listPaginated(DocListPaginationRequest(1)) }.doReturn(expected)
+        }
+
+        // Exercise
+        val result = SUT.listPaginated(DocListPaginationRequest(1)).blockingGet()
+
+        // Verify
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    internal fun `it should carry exceptions from coroutine listPaginated`() {
+        mockDocStorage.stub {
+            onBlocking { listPaginated(DocListPaginationRequest(1)) }.doThrow(DomainException("expected"))
+        }
+
+        // Exercise and Verify
+        assertThatThrownBy { SUT.listPaginated(DocListPaginationRequest(1)).blockingGet() }
+              .isInstanceOf(DomainException::class.java)
     }
 }

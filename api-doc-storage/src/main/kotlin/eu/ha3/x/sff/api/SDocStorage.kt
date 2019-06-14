@@ -3,7 +3,7 @@ package eu.ha3.x.sff.api
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocCreateRequest
 import eu.ha3.x.sff.core.DocListResponse
-import eu.ha3.x.sff.core.Paginated
+import eu.ha3.x.sff.core.DocListPaginationRequest
 
 /**
  * (Default template)
@@ -14,7 +14,7 @@ import eu.ha3.x.sff.core.Paginated
 interface SDocStorage {
     suspend fun appendToDocs(request: DocCreateRequest): Doc
     suspend fun listAll(): DocListResponse
-    suspend fun listPaginated(paginated: Paginated): DocListResponse {
+    suspend fun listPaginated(request: DocListPaginationRequest): DocListResponse {
         TODO()
     }
 }
