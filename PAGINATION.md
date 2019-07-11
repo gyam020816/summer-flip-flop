@@ -12,6 +12,8 @@ limit 5;
 
 where `2` is the graphql cursor hash (in our case, an alias of id) of the last item that the client knows
 
+also add context independent cursors ( edge/node ) to the persistence system
+
 resources:
 
 - https://graphql.org/learn/pagination/

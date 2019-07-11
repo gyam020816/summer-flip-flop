@@ -70,11 +70,39 @@ interface SDocPersistenceSystemTestFacade<T : SDocPersistenceSystem> {
 
     @Test
     fun `it should return the first 5 elements (facade)`() = testBlocking {
-        // Exercise
-        (2000..2012)
+        val documents = (2000..2012)
                 .map { Doc("a", ZonedDateTime.of(it, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC)) }
-                .forEach { SUT().appendToDocs(it) }
+
+        // Exercise
+        documents.forEach { SUT().appendToDocs(it) }
         val result = SUT().listPaginated(PaginatedPersistence(5))
+
+        // Verify
+        assertThat(result.data.map { it.createdAt.year }).containsExactly(*((2000..2004).toList().toTypedArray()))
+    }
+
+    @Test
+    fun `it should return 5 elements after the first 3 (facade)`() = testBlocking {
+        val documents = (2000..2012)
+                .map { Doc("a", ZonedDateTime.of(it, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC)) }
+
+        // Exercise
+        documents.forEach { SUT().appendToDocs(it) }
+        val result = SUT().listPaginated(PaginatedPersistence(first = 5, after = ""))
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
 
         // Verify
         assertThat(result.data.map { it.createdAt.year }).containsExactly(*((2000..2004).toList().toTypedArray()))

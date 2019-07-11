@@ -15,6 +15,6 @@ data class DocListResponse(val data: List<Doc>)
 
 data class DocListPaginationRequest(val first: Int)
 
-data class PaginatedPersistence(val first: Int)
+data class PaginatedPersistence(val first: Int, val after: String? = null)
 
 typealias NoMessage = Unit
