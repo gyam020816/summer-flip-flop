@@ -7,6 +7,7 @@ import com.github.jasync.sql.db.postgresql.PostgreSQLConnectionBuilder
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
+import eu.ha3.x.sff.core.PaginatedPersistence
 import eu.ha3.x.sff.json.KObjectMapper
 import eu.ha3.x.sff.system.SDocPersistenceSystem
 import org.postgresql.util.PGobject
@@ -31,13 +32,22 @@ class JasyncPostgresDocPersistenceSystem(val db: DbConnectionParams) : SDocPersi
     private val objectMapper = KObjectMapper.newInstance()
 
     override suspend fun listAll(): DocListResponse {
-        val result: QueryResult = connection.sendPreparedStatement("SELECT * FROM public.documents ORDER BY created_at ASC")
-        val documents = result.rows.map { query ->
+        return connection.sendPreparedStatement("SELECT * FROM public.documents ORDER BY created_at ASC")
+                .let(::convertResults)
+                .let(::DocListResponse)
+    }
+
+    override suspend fun listPaginated(paginatedPersistence: PaginatedPersistence): DocListResponse {
+        return connection.sendPreparedStatement("SELECT * FROM public.documents ORDER BY created_at ASC LIMIT ${paginatedPersistence.first}")
+                .let(::convertResults)
+                .let(::DocListResponse)
+    }
+
+    private fun convertResults(result: QueryResult): List<Doc> {
+        return result.rows.map { query ->
             val data = query.getString("data")
             objectMapper.readValue(data, DocEntity::class.java).to()
         }
-
-        return DocListResponse(documents)
     }
 
     override suspend fun appendToDocs(doc: Doc) {

@@ -2,11 +2,13 @@ package eu.ha3.x.sff.system
 
 import eu.ha3.x.sff.core.Doc
 import eu.ha3.x.sff.core.DocListResponse
+import eu.ha3.x.sff.core.PaginatedPersistence
 import eu.ha3.x.sff.test.testBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.util.stream.IntStream
 
 /**
  * (Default template)
@@ -64,5 +66,17 @@ interface SDocPersistenceSystemTestFacade<T : SDocPersistenceSystem> {
 
         // Verify
         assertThat(result).isEqualTo(DocListResponse(listOf(item1999, item2000, item2001)))
+    }
+
+    @Test
+    fun `it should return the first 5 elements (facade)`() = testBlocking {
+        // Exercise
+        (2000..2012)
+                .map { Doc("a", ZonedDateTime.of(it, 12, 1, 23, 40, 50, 0, ZoneOffset.UTC)) }
+                .forEach { SUT().appendToDocs(it) }
+        val result = SUT().listPaginated(PaginatedPersistence(5))
+
+        // Verify
+        assertThat(result.data.map { it.createdAt.year }).containsExactly(*((2000..2004).toList().toTypedArray()))
     }
 }
