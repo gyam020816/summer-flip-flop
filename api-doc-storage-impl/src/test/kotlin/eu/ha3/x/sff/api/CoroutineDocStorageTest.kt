@@ -5,10 +5,12 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
 import eu.ha3.x.sff.core.*
 import eu.ha3.x.sff.system.SDocPersistenceSystem
+import eu.ha3.x.sff.test.TestSample
 import eu.ha3.x.sff.test.testBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
+import java.util.*
 
 /**
  * (Default template)
@@ -23,7 +25,7 @@ internal class CoroutineDocStorageTest {
 
     @Test
     internal fun `it should list all docs from doc system`() = testBlocking {
-        val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now())))
+        val expected = DocListResponse(listOf(Doc(DocId(TestSample.uuidA), "basicName", ZonedDateTime.now())))
         mockDocSystem.stub {
             onBlocking { listAll() }.doReturn(expected)
         }
@@ -38,7 +40,7 @@ internal class CoroutineDocStorageTest {
     @Test
     internal fun `it should append a doc to the system`() = testBlocking {
         val currentTime = ZonedDateTime.now()
-        val expected = Doc("basicName", currentTime)
+        val expected = Doc(DocId(TestSample.uuidA),"basicName", currentTime)
         mockDocSystem.stub {
             onBlocking { appendToDocs(expected) }.doReturn(NoMessage)
         }
@@ -55,7 +57,7 @@ internal class CoroutineDocStorageTest {
 
     @Test
     internal fun `it should list paginated docs from doc system`() = testBlocking {
-        val expected = DocListResponse(listOf(Doc("basicName", ZonedDateTime.now())))
+        val expected = DocListResponse(listOf(Doc(DocId(TestSample.uuidA), "basicName", ZonedDateTime.now())))
         mockDocSystem.stub {
             onBlocking { listPaginated(PaginatedPersistence(1)) }.doReturn(expected)
         }

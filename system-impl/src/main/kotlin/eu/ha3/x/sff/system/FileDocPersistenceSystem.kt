@@ -1,6 +1,7 @@
 package eu.ha3.x.sff.system
 
 import eu.ha3.x.sff.core.Doc
+import eu.ha3.x.sff.core.DocId
 import eu.ha3.x.sff.core.DocListResponse
 import eu.ha3.x.sff.core.NoMessage
 import java.nio.charset.StandardCharsets
@@ -18,7 +19,7 @@ import java.util.stream.Collectors
  *
  * @author Ha3
  */
-class FileDocPersistenceSystem(private val folder: Path) : SDocPersistenceSystem {
+class FileDocPersistenceSystem(private val folder: Path, private val uuidProvider: IUuidProvider) : SDocPersistenceSystem {
     init {
         if (!Files.isDirectory(folder)) {
             throw IllegalArgumentException("$folder is not a directory")
@@ -32,6 +33,7 @@ class FileDocPersistenceSystem(private val folder: Path) : SDocPersistenceSystem
                     val content = String(Files.readAllBytes(it), StandardCharsets.UTF_8)
                     val firstSpace = content.indexOf(' ')
                     Doc(
+                            docId = DocId(uuidProvider.newUuid()),
                             createdAt = ZonedDateTime.parse(content.substring(0, firstSpace)),
                             name = content.substring(firstSpace + 1)
                     )

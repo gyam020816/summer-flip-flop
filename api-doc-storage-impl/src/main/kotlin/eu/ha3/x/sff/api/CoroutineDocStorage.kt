@@ -3,6 +3,7 @@ package eu.ha3.x.sff.api
 import eu.ha3.x.sff.core.*
 import eu.ha3.x.sff.system.SDocPersistenceSystem
 import java.time.ZonedDateTime
+import java.util.*
 
 /**
  * (Default template)
@@ -16,7 +17,7 @@ class CoroutineDocStorage(private val docSystem: SDocPersistenceSystem, val curr
     }
 
     override suspend fun appendToDocs(request: DocCreateRequest): Doc {
-        val document = Doc(request.name, now())
+        val document = Doc(DocId(UUID.randomUUID()), request.name, now())
         return docSystem.appendToDocs(document)
                 .let { document }
     }

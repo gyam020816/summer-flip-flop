@@ -3,10 +3,12 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-    <include file="changelog/changelog_001.xml" />
-    <include file="changelog/changelog_002.xml" />
-    <include file="changelog/changelog_003.xml" />
-    <include file="changelog/changelog_004.xml" />
-    <include file="changelog/changelog_005.xml" />
+    <changeSet author="PostgresLiquibaseUpgrade" id="005">
+        <sql>ALTER TABLE documents ADD COLUMN uuid UUID NOT NULL</sql>
+        <customChange class="eu.ha3.x.sff.system.postgres.LB005AddUuidToExistingDocs">
+            <param name="id" value="2" />
+        </customChange>
+        <sql></sql>
+    </changeSet>
 
 </databaseChangeLog>
